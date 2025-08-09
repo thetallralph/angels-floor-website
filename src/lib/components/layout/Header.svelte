@@ -118,10 +118,9 @@
         
         <div class="ml-8">
           <Button 
-            variant="primary" 
+            variant="secondary" 
             size="sm" 
-            href="/grossistes" 
-            class="bg-primary-green hover:bg-primary-green-vibrant text-white font-bold"
+            href="/grossistes"
           >
             Devenir Partenaire
           </Button>
@@ -188,10 +187,9 @@
           
           <div class="px-4 pt-4">
             <Button 
-              variant="primary" 
+              variant="secondary" 
               size="md" 
-              href="/grossistes" 
-              class="w-full bg-primary-green hover:bg-primary-green-vibrant text-white font-bold"
+              href="/grossistes"
             >
               Devenir Partenaire
             </Button>
@@ -209,5 +207,5 @@
     on:keydown={(e) => e.key === 'Escape' && closeMobileMenu()}
     role="button"
     tabindex="0"
-  />
+  ></div>
 {/if}

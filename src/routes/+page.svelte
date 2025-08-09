@@ -1,23 +1,40 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ShoppingBag, Leaf } from 'lucide-svelte';
-  import Button from '$lib/components/ui/Button.svelte';
-  import Card from '$lib/components/ui/Card.svelte';
+  import { Leaf } from 'lucide-svelte';
+  import AnimatedText from '$lib/components/ui/AnimatedText.svelte';
+  import ScrollingBanner from '$lib/components/ui/ScrollingBanner.svelte';
   import { appStore } from '$lib/stores/app.js';
 
   let currentSlide = 0;
   let slideInterval: number;
+  let heroVisible = false;
+  let currentImageIndex = 0;
+  
+  const heroImages = [
+    'https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1519096845289-95806ee03a1a?w=600&h=900&fit=crop',
+    'https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=600&h=900&fit=crop'
+  ];
 
   onMount(() => {
     appStore.initialize();
+    heroVisible = true;
     
     // Auto-advance slider
     slideInterval = setInterval(() => {
       currentSlide = (currentSlide + 1) % 3;
     }, 4000);
     
+    // Auto-advance hero images
+    const imageInterval = setInterval(() => {
+      currentImageIndex = (currentImageIndex + 1) % heroImages.length;
+    }, 4000);
+    
     return () => {
       if (slideInterval) clearInterval(slideInterval);
+      clearInterval(imageInterval);
     };
   });
 
@@ -42,117 +59,107 @@
   </div>
 </div>
 
-<!-- Hero Section -->
-<section class="relative bg-primary-green overflow-hidden">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-    <div class="relative z-10 text-center">
+<!-- Hero Section with Animated Text -->
+<section class="relative overflow-hidden py-16 lg:py-24 bg-primary-green">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
       
-      <!-- Main Hero Content -->
-      <h1 class="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-        Saveurs Ancestrales<br/>
-        Du Bénin Transformées
-      </h1>
+      <!-- Text Content -->
+      <div class="relative z-10">
+        <div class="hero-heading" class:visible={heroVisible}>
+          <h1 class="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-8 leading-tight">
+            <AnimatedText 
+              text="Où chaque bouchée est une célébration du Bénin" 
+              className="inline" 
+              delay={100}
+            />
+          </h1>
+          
+          <div class="hero-desc opacity-0 translate-y-8" class:show={heroVisible}>
+            <p class="text-lg md:text-xl lg:text-2xl text-white/90 mb-8 leading-relaxed max-w-xl">
+              Angel's Floor - une expérience culinaire authentique.
+              Toujours naturelle, toujours premium. Suivez-nous
+              pour découvrir nos saveurs ancestrales!
+            </p>
+            
+            <div class="flex flex-wrap gap-4">
+              <button 
+                on:click={() => window.location.href='/produits'}
+                class="bg-white text-primary-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+              >
+                Découvrir Nos Produits
+              </button>
+              <button 
+                on:click={() => window.location.href='/a-propos'}
+                class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-primary-green transition-all duration-300"
+              >
+                Notre Histoire
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       
-      <p class="text-xl text-white/90 max-w-3xl mx-auto mb-10 leading-relaxed">
-        Produits naturels béninois, prêts à consommer, et pleins d'ingrédients biologiques authentiques. 
-        Fonio précuit, baobab vitaminé, biscuits enrichis et bien plus encore...
-      </p>
-      
-      <!-- CTA Button -->
-      <button 
-        on:click={() => window.location.href='/produits'}
-        class="bg-white text-primary-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-      >
-        Découvrir Nos Produits
-      </button>
-    </div>
-
-    <!-- Floating Product Display -->
-    <div class="relative mt-16 max-w-5xl mx-auto">
-      <div class="grid grid-cols-3 gap-8 items-center">
+      <!-- Vertical Image Carousel -->
+      <div class="relative h-[600px] lg:h-[750px] flex items-center justify-center">
+        <!-- Yellow background accent -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-[400px] lg:w-[550px] h-[550px] lg:h-[700px] bg-accent-gold/20 rounded-[40px] transform rotate-3"></div>
+        </div>
         
-        <!-- Product 1 - Fonio -->
-        <div class="relative animate-float" style="animation-delay: 0s;">
-          <!-- Green glow for Fonio -->
-          <div class="absolute inset-0 bg-primary-green/20 rounded-3xl blur-2xl transform scale-110"></div>
-          <div class="relative bg-white rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
-            <div class="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=400&fit=crop&crop=center" 
-                alt="Fonio Bio" 
-                class="w-full h-48 object-cover rounded-2xl mb-4"
-              />
-              <!-- Floating fruits around product -->
-              <div class="absolute -top-4 -right-4 w-16 h-16">
-                <img 
-                  src="https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=100&h=100&fit=crop&crop=center" 
-                  alt="Grains" 
-                  class="w-full h-full object-cover rounded-full shadow-lg"
-                />
-              </div>
-            </div>
-            <h3 class="text-lg font-bold text-primary-green mb-2">Fonio Précuit Bio</h3>
-            <p class="text-sm text-neutral-slate">Sans gluten • Prêt en 10 min</p>
+        <div class="hero-image-wrap relative w-[380px] lg:w-[500px] h-[570px] lg:h-[720px]" class:loaded={heroVisible}>
+          <!-- Image Stack Container -->
+          <div class="relative w-full h-full">
+            {#each heroImages as image, index}
+              {@const offset = index - currentImageIndex}
+              {@const isVisible = Math.abs(offset) <= 1}
+              {#if isVisible}
+                <div 
+                  class="absolute inset-0 transition-all duration-700 ease-in-out"
+                  style="
+                    transform: translateY({offset * 120}px) scale({offset === 0 ? 1 : 0.8}) rotate({offset * 3}deg);
+                    opacity: {offset === 0 ? 1 : 0.35};
+                    z-index: {offset === 0 ? 10 : 5};
+                  "
+                >
+                  <div class="w-full h-full rounded-[30px] overflow-hidden shadow-2xl">
+                    <img 
+                      src={image}
+                      alt="Produits Angel's Floor"
+                      class="w-full h-full object-cover"
+                    />
+                    <!-- Overlay gradient -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary-green/40 via-transparent to-transparent"></div>
+                  </div>
+                </div>
+              {/if}
+            {/each}
           </div>
-        </div>
-
-        <!-- Product 2 - Baobab -->
-        <div class="relative animate-float" style="animation-delay: -2s;">
-          <!-- Orange/Gold glow for Baobab -->
-          <div class="absolute inset-0 bg-accent-sunset/20 rounded-3xl blur-2xl transform scale-110"></div>
-          <div class="relative bg-white rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
-            <div class="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1609251541848-72c45e5bad78?w=400&h=400&fit=crop&crop=center" 
-                alt="Pulpe de Baobab" 
-                class="w-full h-48 object-cover rounded-2xl mb-4"
+          
+          <!-- Navigation dots -->
+          <div class="absolute -right-16 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
+            {#each heroImages as _, index}
+              <button
+                class="w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 {currentImageIndex === index ? 'bg-white w-3 h-8' : 'bg-white/50'}"
+                on:click={() => currentImageIndex = index}
+                aria-label="Go to image {index + 1}"
               />
-              <!-- Floating fruits around product -->
-              <div class="absolute -top-4 -left-4 w-16 h-16">
-                <img 
-                  src="https://images.unsplash.com/photo-1515706886582-54c73c5eaf41?w=100&h=100&fit=crop&crop=center" 
-                  alt="Baobab fruit" 
-                  class="w-full h-full object-cover rounded-full shadow-lg"
-                />
-              </div>
-            </div>
-            <h3 class="text-lg font-bold text-primary-green mb-2">Pulpe de Baobab</h3>
-            <p class="text-sm text-neutral-slate">6x vitamine C • Antioxydant</p>
-          </div>
-        </div>
-
-        <!-- Product 3 - Biscuits -->
-        <div class="relative animate-float" style="animation-delay: -4s;">
-          <!-- Purple glow for Biscuits -->
-          <div class="absolute inset-0 bg-creative-purple/20 rounded-3xl blur-2xl transform scale-110"></div>
-          <div class="relative bg-white rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
-            <div class="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1549888834-3ec93abae044?w=400&h=400&fit=crop&crop=center" 
-                alt="Biscuits Baobab" 
-                class="w-full h-48 object-cover rounded-2xl mb-4"
-              />
-              <!-- Floating fruits around product -->
-              <div class="absolute -top-4 -right-4 w-16 h-16">
-                <img 
-                  src="https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=100&h=100&fit=crop&crop=center" 
-                  alt="Fruits" 
-                  class="w-full h-full object-cover rounded-full shadow-lg"
-                />
-              </div>
-            </div>
-            <h3 class="text-lg font-bold text-primary-green mb-2">Biscuits Enrichis</h3>
-            <p class="text-sm text-neutral-slate">Croustillants • Naturels</p>
+            {/each}
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Background Decorative Elements -->
-    <div class="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-    <div class="absolute bottom-20 right-20 w-40 h-40 bg-accent-gold/20 rounded-full blur-2xl"></div>
   </div>
+  
+  <!-- Background decoration -->
+  <div class="absolute top-20 left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-20 right-20 w-96 h-96 bg-accent-gold/10 rounded-full blur-3xl"></div>
 </section>
+
+<!-- Scrolling Banner -->
+<div class="relative -mt-24 z-30">
+  <ScrollingBanner />
+</div>
 
 <!-- Stats Section -->
 <section class="py-16 bg-white">
@@ -268,8 +275,8 @@
         <!-- Slide 1 - Green -->
         <div class="min-w-full flex justify-center">
           <div class="relative">
-            <!-- Green glow -->
-            <div class="absolute inset-2 bg-primary-green/20 rounded-3xl blur-xl"></div>
+            <!-- Green shadow -->
+            <div class="absolute inset-2 bg-primary-green/10 rounded-3xl"></div>
             <div class="relative bg-primary-green-bright rounded-3xl p-8 max-w-md mx-4">
             <img 
               src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=400&fit=crop&crop=center" 
@@ -290,8 +297,8 @@
         <!-- Slide 2 - Orange -->
         <div class="min-w-full flex justify-center">
           <div class="relative">
-            <!-- Orange glow -->
-            <div class="absolute inset-2 bg-accent-sunset/20 rounded-3xl blur-xl"></div>
+            <!-- Orange shadow -->
+            <div class="absolute inset-2 bg-accent-sunset/10 rounded-3xl"></div>
             <div class="relative bg-accent-sunset rounded-3xl p-8 max-w-md mx-4">
             <img 
               src="https://images.unsplash.com/photo-1609251541848-72c45e5bad78?w=600&h=400&fit=crop&crop=center" 
@@ -312,8 +319,8 @@
         <!-- Slide 3 - Purple -->
         <div class="min-w-full flex justify-center">
           <div class="relative">
-            <!-- Purple glow -->
-            <div class="absolute inset-2 bg-creative-purple/20 rounded-3xl blur-xl"></div>
+            <!-- Purple shadow -->
+            <div class="absolute inset-2 bg-creative-purple/10 rounded-3xl"></div>
             <div class="relative bg-creative-purple rounded-3xl p-8 max-w-md mx-4">
             <img 
               src="https://images.unsplash.com/photo-1549888834-3ec93abae044?w=600&h=400&fit=crop&crop=center" 
@@ -447,7 +454,7 @@
 </section>
 
 <!-- Testimonials Section -->
-<section class="py-20 bg-gradient-to-br from-neutral-sand to-white">
+<section class="py-20 bg-neutral-sand">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-16">
       <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
@@ -464,7 +471,7 @@
         <div class="flex items-center mb-4">
           <!-- Stars -->
           <div class="flex text-accent-gold">
-            {#each [1, 2, 3, 4, 5] as star}
+            {#each [1, 2, 3, 4, 5] as _star}
               <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
               </svg>
@@ -491,7 +498,7 @@
         <div class="flex items-center mb-4">
           <!-- Stars -->
           <div class="flex text-accent-gold">
-            {#each [1, 2, 3, 4, 5] as star}
+            {#each [1, 2, 3, 4, 5] as _star}
               <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
               </svg>
@@ -518,7 +525,7 @@
         <div class="flex items-center mb-4">
           <!-- Stars -->
           <div class="flex text-accent-gold">
-            {#each [1, 2, 3, 4, 5] as star}
+            {#each [1, 2, 3, 4, 5] as _star}
               <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
               </svg>
@@ -668,7 +675,7 @@
         </div>
         
         <!-- Decorative element -->
-        <div class="absolute -top-8 -right-8 w-32 h-32 bg-accent-gold/20 rounded-full blur-2xl"></div>
+        <div class="absolute -top-8 -right-8 w-32 h-32 bg-accent-gold/15 rounded-full"></div>
       </div>
     </div>
   </div>
@@ -677,8 +684,8 @@
 <!-- Final CTA -->
 <section class="py-20 bg-footer-green relative overflow-hidden">
   <div class="absolute inset-0">
-    <div class="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+    <div class="absolute top-0 left-0 w-96 h-96 bg-accent-gold/10 rounded-full"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-gold/10 rounded-full"></div>
   </div>
   
   <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -718,5 +725,36 @@
   
   .animate-float {
     animation: float 6s ease-in-out infinite;
+  }
+  
+  .hero-heading {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hero-heading.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .hero-desc {
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s;
+  }
+  
+  .hero-desc.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .hero-image-wrap {
+    opacity: 0;
+    transform: scale(0.95) translateX(30px);
+    transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+  }
+  
+  .hero-image-wrap.loaded {
+    opacity: 1;
+    transform: scale(1) translateX(0);
   }
 </style>

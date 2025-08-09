@@ -1,0 +1,228 @@
+[
+  {
+    "id": "1",
+    "slug": "fonio-precuit-bio",
+    "name": "Fonio Précuit Bio",
+    "category": "fonio",
+    "price": 2500,
+    "description": "Fonio précuit de qualité supérieure, prêt en 10 minutes. Cultivé par les femmes de l'Atacora selon des méthodes traditionnelles.",
+    "detailedDescription": "Notre fonio précuit bio est cultivé dans les montagnes de l'Atacora par des coopératives de femmes qui perpétuent des méthodes de culture ancestrales. Ce super-aliment africain, surnommé 'le grain des rois', est naturellement sans gluten et offre une alternative nutritive exceptionnelle aux céréales classiques. Sa préparation rapide en fait un allié idéal pour une alimentation saine au quotidien.",
+    "image": "/images/products/fonio-precuit.jpg",
+    "images": [
+      "/images/products/fonio-precuit.jpg",
+      "/images/products/fonio-precuit-2.jpg",
+      "/images/products/fonio-precuit-3.jpg"
+    ],
+    "benefits": [
+      "Riche en fibres alimentaires",
+      "Sans gluten naturellement",
+      "Facile à digérer",
+      "Source de protéines végétales",
+      "Cuisson rapide (10 min)",
+      "Indice glycémique bas",
+      "Riche en acides aminés essentiels"
+    ],
+    "nutritionalInfo": {
+      "calories": 341,
+      "protein": 10.4,
+      "carbs": 76.1,
+      "fiber": 8.5,
+      "fat": 1.9,
+      "vitamins": ["B1", "B2", "B3"],
+      "minerals": ["Fer", "Zinc", "Magnésium"]
+    },
+    "usage": "Versez 1 volume de fonio dans 2 volumes d'eau bouillante salée. Laissez cuire 10 minutes à feu doux. Égrainez à la fourchette et servez chaud en accompagnement ou en salade.",
+    "packaging": "Sachet de 500g",
+    "origin": "Montagnes de l'Atacora, Bénin",
+    "certification": "Agriculture biologique",
+    "inStock": true,
+    "featured": true
+  },
+  {
+    "id": "2",
+    "slug": "pulpe-baobab-pure",
+    "name": "Pulpe de Baobab Pure",
+    "category": "baobab",
+    "price": 3500,
+    "description": "Pulpe de baobab 100% naturelle, riche en vitamine C. Séchée au soleil et finement moulue.",
+    "detailedDescription": "La pulpe de baobab est extraite du fruit de l'arbre millénaire africain. Notre pulpe est récoltée à maturité, séchée naturellement au soleil puis finement moulue pour préserver tous ses nutriments. Avec 6 fois plus de vitamine C que l'orange et une richesse exceptionnelle en antioxydants, c'est un véritable trésor nutritionnel qui booste votre système immunitaire naturellement.",
+    "image": "/images/products/baobab-pulpe.jpg",
+    "images": [
+      "/images/products/baobab-pulpe.jpg",
+      "/images/products/baobab-pulpe-2.jpg",
+      "/images/products/baobab-pulpe-3.jpg"
+    ],
+    "benefits": [
+      "Riche en vitamine C (6x plus que l'orange)",
+      "Antioxydant naturel puissant",
+      "Renforce le système immunitaire",
+      "Améliore la digestion",
+      "Source de calcium et fer",
+      "Régule le transit intestinal",
+      "Boost d'énergie naturel"
+    ],
+    "nutritionalInfo": {
+      "calories": 162,
+      "protein": 2.3,
+      "carbs": 76.8,
+      "fiber": 44.5,
+      "fat": 0.3,
+      "vitaminC": 280,
+      "calcium": 295,
+      "potassium": 2310
+    },
+    "usage": "Ajoutez 1 à 2 cuillères à café dans vos smoothies, yaourts, jus de fruits ou eau. Peut également être utilisé en pâtisserie pour enrichir vos préparations.",
+    "packaging": "Pot de 250g",
+    "origin": "Régions du Nord Bénin",
+    "certification": "100% naturel, sans additifs",
+    "inStock": true,
+    "featured": true
+  },
+  {
+    "id": "3",
+    "slug": "farine-nere-bio",
+    "name": "Farine de Néré Bio",
+    "category": "nere-fagara",
+    "price": 1800,
+    "description": "Farine de néré traditionnelle, parfaite pour les sauces et assaisonnements africains.",
+    "detailedDescription": "La farine de néré est obtenue à partir des graines fermentées du néré (Parkia biglobosa), un arbre emblématique de l'Afrique de l'Ouest. Cette farine est un condiment essentiel de la cuisine béninoise, apportant une saveur umami unique à vos plats. Riche en protéines et en minéraux, elle est également reconnue pour ses propriétés nutritionnelles exceptionnelles.",
+    "image": "/images/products/nere-farine.jpg",
+    "images": [
+      "/images/products/nere-farine.jpg",
+      "/images/products/nere-farine-2.jpg"
+    ],
+    "benefits": [
+      "Riche en protéines (35%)",
+      "Améliore le goût des plats",
+      "Tradition culinaire béninoise",
+      "Source de minéraux",
+      "Favorise la digestion",
+      "Sans conservateurs"
+    ],
+    "nutritionalInfo": {
+      "calories": 432,
+      "protein": 35.6,
+      "carbs": 28.8,
+      "fiber": 10.2,
+      "fat": 29.6,
+      "iron": 15.2,
+      "calcium": 523
+    },
+    "usage": "Utilisez comme assaisonnement dans vos sauces, soupes et ragoûts. Une petite quantité suffit pour relever le goût de vos plats.",
+    "packaging": "Sachet de 200g",
+    "origin": "Centre Bénin",
+    "certification": "Production artisanale traditionnelle",
+    "inStock": true,
+    "featured": false
+  },
+  {
+    "id": "4",
+    "slug": "confiture-mangue-artisanale",
+    "name": "Confiture de Mangue Artisanale",
+    "category": "mangue",
+    "price": 2200,
+    "description": "Confiture de mangue Kent, préparée artisanalement avec 60% de fruits.",
+    "detailedDescription": "Notre confiture est élaborée à partir de mangues Kent sélectionnées à parfaite maturité. Préparée en petites quantités selon une recette traditionnelle, elle contient 60% de fruits pour un goût authentique et intense. Sans conservateurs artificiels, elle est cuite lentement pour préserver les saveurs et les nutriments du fruit.",
+    "image": "/images/products/confiture-mangue.jpg",
+    "images": [
+      "/images/products/confiture-mangue.jpg",
+      "/images/products/confiture-mangue-2.jpg"
+    ],
+    "benefits": [
+      "60% de fruits",
+      "Sans conservateurs artificiels",
+      "Préparation artisanale",
+      "Mangues locales de qualité",
+      "Riche en vitamine A",
+      "Source de fibres"
+    ],
+    "nutritionalInfo": {
+      "calories": 245,
+      "protein": 0.5,
+      "carbs": 60.2,
+      "fiber": 1.8,
+      "fat": 0.2,
+      "vitaminA": 180,
+      "vitaminC": 25
+    },
+    "usage": "Idéale sur vos tartines, crêpes, yaourts ou pour accompagner vos fromages. Peut également être utilisée en pâtisserie.",
+    "packaging": "Pot en verre de 350g",
+    "origin": "Sud Bénin",
+    "certification": "Fait maison, sans additifs",
+    "inStock": true,
+    "featured": false
+  },
+  {
+    "id": "5",
+    "slug": "biscuits-baobab",
+    "name": "Biscuits au Baobab",
+    "category": "bisbab",
+    "price": 1500,
+    "description": "Biscuits croustillants enrichis à la pulpe de baobab, sans additifs artificiels.",
+    "detailedDescription": "Nos biscuits allient le savoir-faire de la biscuiterie traditionnelle à la richesse nutritionnelle du baobab. Croustillants et savoureux, ils sont enrichis en pulpe de baobab qui leur confère un goût unique légèrement acidulé et une valeur nutritive exceptionnelle. Parfaits pour le goûter ou comme en-cas sain.",
+    "image": "/images/products/biscuits-baobab.jpg",
+    "images": [
+      "/images/products/biscuits-baobab.jpg",
+      "/images/products/biscuits-baobab-2.jpg"
+    ],
+    "benefits": [
+      "Enrichis en vitamine C",
+      "Texture croustillante",
+      "Sans additifs artificiels",
+      "Goût unique du baobab",
+      "Source d'énergie",
+      "Convient aux enfants"
+    ],
+    "nutritionalInfo": {
+      "calories": 485,
+      "protein": 6.8,
+      "carbs": 68.5,
+      "fiber": 3.2,
+      "fat": 20.1,
+      "vitaminC": 45,
+      "calcium": 85
+    },
+    "usage": "À déguster au petit-déjeuner, au goûter ou comme en-cas. Se conserve dans un endroit sec et frais.",
+    "packaging": "Paquet de 200g (environ 20 biscuits)",
+    "origin": "Cotonou, Bénin",
+    "certification": "Production locale artisanale",
+    "inStock": true,
+    "featured": true
+  },
+  {
+    "id": "6",
+    "slug": "epices-fagara-premium",
+    "name": "Épices Fagara Premium",
+    "category": "nere-fagara",
+    "price": 2800,
+    "description": "Fagara premium, épice rare aux propriétés aromatiques exceptionnelles.",
+    "detailedDescription": "Le fagara, aussi appelé poivre de Guinée, est une épice précieuse récoltée sur les lianes sauvages des forêts béninoises. Notre sélection premium est cueillie à la main et séchée traditionnellement pour préserver ses huiles essentielles. Son arôme complexe, à la fois poivré, citronné et légèrement anesthésiant, en fait une épice recherchée par les gastronomes.",
+    "image": "/images/products/fagara-epices.jpg",
+    "images": [
+      "/images/products/fagara-epices.jpg",
+      "/images/products/fagara-epices-2.jpg"
+    ],
+    "benefits": [
+      "Arôme unique et intense",
+      "Propriétés digestives",
+      "Récolte traditionnelle",
+      "Qualité premium",
+      "Anti-inflammatoire naturel",
+      "Stimule l'appétit"
+    ],
+    "nutritionalInfo": {
+      "calories": 315,
+      "protein": 10.4,
+      "carbs": 42.1,
+      "fiber": 25.3,
+      "fat": 8.7,
+      "antioxidants": "Très élevé"
+    },
+    "usage": "Utilisez avec parcimonie pour assaisonner viandes, poissons et légumes. Excellente dans les marinades et les sauces.",
+    "packaging": "Flacon en verre de 50g",
+    "origin": "Forêts du Centre Bénin",
+    "certification": "Cueillette sauvage durable",
+    "inStock": false,
+    "featured": false
+  }
+]

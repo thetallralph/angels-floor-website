@@ -3,10 +3,12 @@ import { writable } from 'svelte/store';
 // Product interface
 export interface Product {
   id: string;
+  slug: string;
   name: string;
   category: 'fonio' | 'baobab' | 'nere-fagara' | 'mangue' | 'bisbab';
   price: number;
   description: string;
+  detailedDescription?: string;
   image: string;
   images?: string[];
   benefits: string[];
@@ -16,7 +18,18 @@ export interface Product {
     carbs?: number;
     fiber?: number;
     fat?: number;
+    vitamins?: string[];
+    minerals?: string[];
+    vitaminC?: number;
+    calcium?: number;
+    potassium?: number;
+    iron?: number;
+    antioxidants?: string;
   };
+  usage?: string;
+  packaging?: string;
+  origin?: string;
+  certification?: string;
   inStock: boolean;
   featured: boolean;
 }
@@ -78,6 +91,7 @@ export const appStore = {
       const mockProducts: Product[] = [
         {
           id: '1',
+          slug: 'fonio-precuit-bio',
           name: 'Fonio Précuit Bio',
           category: 'fonio',
           price: 2500,
@@ -89,6 +103,7 @@ export const appStore = {
         },
         {
           id: '2',
+          slug: 'pulpe-baobab-pure',
           name: 'Pulpe de Baobab Pure',
           category: 'baobab',
           price: 3500,
