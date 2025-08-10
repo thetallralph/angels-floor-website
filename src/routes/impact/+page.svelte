@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { TrendingUp, Users, Heart, Leaf, MapPin, Award } from 'lucide-svelte';
+  import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   
   let statsVisible = false;
   let currentStat = { women: 0, villages: 0, income: 0, families: 0 };
@@ -138,16 +139,19 @@
   </div>
   
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center text-white mb-16">
-      <h1 class="text-5xl md:text-7xl font-bold mb-6">Notre Impact</h1>
-      <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-        Chaque produit Angel's Floor transforme des vies et construit un avenir durable
-      </p>
-    </div>
+    <ScrollReveal animation="fade-down">
+      <div class="text-center text-white mb-16">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6">Notre Impact</h1>
+        <p class="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
+          Chaque produit Angel's Floor transforme des vies et construit un avenir durable
+        </p>
+      </div>
+    </ScrollReveal>
     
     <!-- Animated Statistics Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       <!-- Stat 1 -->
+      <ScrollReveal animation="fade-up" delay={0}>
       <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 text-center transform hover:scale-105 transition-transform duration-300">
         <div class="text-5xl font-bold text-white mb-2">
           {currentStat.women}+
@@ -155,8 +159,10 @@
         <h3 class="text-xl font-semibold text-accent-gold mb-2">Femmes Autonomisées</h3>
         <p class="text-white/80 text-sm">Productrices actives dans notre réseau</p>
       </div>
+      </ScrollReveal>
       
       <!-- Stat 2 -->
+      <ScrollReveal animation="fade-up" delay={100}>
       <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 text-center transform hover:scale-105 transition-transform duration-300">
         <div class="text-5xl font-bold text-white mb-2">
           {currentStat.villages}
@@ -164,8 +170,10 @@
         <h3 class="text-xl font-semibold text-accent-gold mb-2">Villages Impactés</h3>
         <p class="text-white/80 text-sm">Dans la région de l'Atacora</p>
       </div>
+      </ScrollReveal>
       
       <!-- Stat 3 -->
+      <ScrollReveal animation="fade-up" delay={200}>
       <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 text-center transform hover:scale-105 transition-transform duration-300">
         <div class="text-5xl font-bold text-white mb-2">
           +{currentStat.income}%
@@ -173,8 +181,10 @@
         <h3 class="text-xl font-semibold text-accent-gold mb-2">Augmentation Revenus</h3>
         <p class="text-white/80 text-sm">Revenu moyen des productrices</p>
       </div>
+      </ScrollReveal>
       
       <!-- Stat 4 -->
+      <ScrollReveal animation="fade-up" delay={300}>
       <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 text-center transform hover:scale-105 transition-transform duration-300">
         <div class="text-5xl font-bold text-white mb-2">
           {currentStat.families}+
@@ -182,6 +192,7 @@
         <h3 class="text-xl font-semibold text-accent-gold mb-2">Familles Bénéficiaires</h3>
         <p class="text-white/80 text-sm">Impact indirect sur les communautés</p>
       </div>
+      </ScrollReveal>
     </div>
   </div>
 </section>
@@ -189,17 +200,20 @@
 <!-- Producer Stories Section -->
 <section class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
-        Histoires de Transformation
-      </h2>
-      <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
-        Rencontrez les femmes courageuses qui sont le cœur d'Angel's Floor
-      </p>
-    </div>
+    <ScrollReveal animation="fade-up">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
+          Histoires de Transformation
+        </h2>
+        <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
+          Rencontrez les femmes courageuses qui sont le cœur d'Angel's Floor
+        </p>
+      </div>
+    </ScrollReveal>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {#each producerStories as story}
+      {#each producerStories as story, i}
+        <ScrollReveal animation="fade-up" delay={i * 150}>
         <div class="group">
           <div class="relative overflow-hidden rounded-3xl mb-6">
             <img 
@@ -219,6 +233,7 @@
           </div>
           <p class="text-neutral-charcoal italic">"{story.story}"</p>
         </div>
+        </ScrollReveal>
       {/each}
     </div>
     
@@ -235,18 +250,21 @@
 <!-- Collaboration Process Timeline -->
 <section class="py-20 bg-neutral-sand">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
-        Notre Processus de Collaboration
-      </h2>
-      <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
-        Un partenariat équitable du champ à votre table
-      </p>
-    </div>
+    <ScrollReveal animation="fade-up">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
+          Notre Processus de Collaboration
+        </h2>
+        <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
+          Un partenariat équitable du champ à votre table
+        </p>
+      </div>
+    </ScrollReveal>
     
     <!-- Process Steps Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {#each processSteps as step, index}
+        <ScrollReveal animation="fade-up" delay={index * 100}>
         <div class="relative group">
           <!-- Connection Line (except for last item) -->
           {#if index < processSteps.length - 1}
@@ -269,6 +287,7 @@
             <p class="text-neutral-charcoal">{step.description}</p>
           </div>
         </div>
+        </ScrollReveal>
       {/each}
     </div>
   </div>
@@ -277,17 +296,20 @@
 <!-- Economic Impact Metrics -->
 <section class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
-        Impact Économique Mesurable
-      </h2>
-      <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
-        Des chiffres qui racontent une histoire de transformation durable
-      </p>
-    </div>
+    <ScrollReveal animation="fade-up">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
+          Impact Économique Mesurable
+        </h2>
+        <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
+          Des chiffres qui racontent une histoire de transformation durable
+        </p>
+      </div>
+    </ScrollReveal>
     
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
       <!-- Metrics -->
+      <ScrollReveal animation="fade-right">
       <div class="space-y-6">
         <!-- Metric 1 -->
         <div class="bg-gradient-to-r from-primary-green to-primary-green-vibrant rounded-2xl p-6 text-white">
@@ -325,8 +347,10 @@
           <p class="text-sm text-white/80 mt-2">Grâce aux revenus stables des mères productrices</p>
         </div>
       </div>
+      </ScrollReveal>
       
       <!-- Visual Impact -->
+      <ScrollReveal animation="fade-left" delay={200}>
       <div class="relative">
         <img 
           src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&h=600&fit=crop&crop=center" 
@@ -345,6 +369,7 @@
           </div>
         </div>
       </div>
+      </ScrollReveal>
     </div>
   </div>
 </section>
@@ -357,27 +382,29 @@
   </div>
   
   <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-    <h2 class="text-4xl md:text-5xl font-bold mb-6">
-      Faites Partie de Cet Impact
-    </h2>
-    <p class="text-xl text-white/90 mb-10">
-      Chaque achat contribue directement à transformer des vies et à bâtir 
-      un avenir durable pour les communautés béninoises.
-    </p>
+    <ScrollReveal animation="scale">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6">
+        Faites Partie de Cet Impact
+      </h2>
+      <p class="text-xl text-white/90 mb-10">
+        Chaque achat contribue directement à transformer des vies et à bâtir 
+        un avenir durable pour les communautés béninoises.
+      </p>
     
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
       <button 
         on:click={() => window.location.href='/produits'}
-        class="bg-white text-primary-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        class="w-full sm:w-auto bg-white text-primary-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
       >
         Acheter Nos Produits
       </button>
       <button 
         on:click={() => window.location.href='/grossistes'}
-        class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-primary-green transition-all duration-300"
+        class="w-full sm:w-auto bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-primary-green transition-all duration-300"
       >
         Devenir Partenaire
       </button>
     </div>
+    </ScrollReveal>
   </div>
 </section>

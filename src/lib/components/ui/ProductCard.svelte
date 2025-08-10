@@ -23,7 +23,7 @@
 </script>
 
 <a href="/produits/{product.slug}" class="block group">
-  <div class="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+  <div class="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden h-full">
     <!-- Product Image -->
     <div class="relative aspect-square overflow-hidden">
       <img 
@@ -68,6 +68,7 @@
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }

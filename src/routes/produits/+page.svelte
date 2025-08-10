@@ -1,9 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import ProductCard from '$lib/components/ui/ProductCard.svelte';
+  import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import { products, categories } from '$lib/data/products.js';
+  import { ChevronDown, Filter } from 'lucide-svelte';
   
   let activeCategory = 'fonio';
+  let mobileMenuOpen = false;
   
   // Group products by category
   const productsByCategory = products.reduce((acc, product) => {
@@ -17,9 +20,26 @@
   function scrollToCategory(categoryId: string) {
     const element = document.getElementById(`category-${categoryId}`);
     if (element) {
-      const offset = 100; // Account for fixed header
+      // Different offset for mobile (fixed menu) vs desktop
+      const offset = window.innerWidth < 1024 ? 140 : 100;
       const top = element.offsetTop - offset;
       window.scrollTo({ top, behavior: 'smooth' });
+    }
+  }
+  
+  // Close menu when clicking outside
+  function handleClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (mobileMenuOpen && !target.closest('.lg\\:hidden')) {
+      mobileMenuOpen = false;
+    }
+  }
+  
+  $: if (typeof window !== 'undefined') {
+    if (mobileMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+    } else {
+      document.removeEventListener('click', handleClickOutside);
     }
   }
   
@@ -75,10 +95,12 @@
   </div>
   
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">Nos Produits</h1>
-    <p class="text-lg text-white/90 max-w-2xl mx-auto">
-      Une sélection de produits béninois naturels, transformés avec soin par nos productrices
-    </p>
+    <ScrollReveal animation="fade-down">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Nos Produits</h1>
+      <p class="text-lg text-white/90 max-w-2xl mx-auto">
+        Une sélection de produits béninois naturels, transformés avec soin par nos productrices
+      </p>
+    </ScrollReveal>
   </div>
 </section>
 
@@ -86,8 +108,53 @@
 <section class="bg-white min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex flex-col lg:flex-row gap-12">
-      <!-- Left Navigation Panel -->
-      <aside class="lg:w-64 lg:sticky lg:top-24 lg:h-fit">
+      <!-- Mobile Category Navigation - Fixed/Sticky -->
+      <div class="lg:hidden">
+        <!-- Fixed Header Bar -->
+        <div class="fixed top-0 left-0 right-0 z-30 bg-white border-b border-neutral-light shadow-md">
+          <button
+            on:click={() => mobileMenuOpen = !mobileMenuOpen}
+            class="w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-sand transition-colors"
+          >
+            <div class="flex items-center gap-2">
+              <Filter class="w-5 h-5 text-primary-green" />
+              <span class="font-semibold text-neutral-charcoal">
+                {categories.find(c => c.id === activeCategory)?.name || 'Catégories'}
+              </span>
+            </div>
+            <ChevronDown class="w-5 h-5 text-neutral-charcoal transition-transform duration-200 {mobileMenuOpen ? 'rotate-180' : ''}" />
+          </button>
+          
+          <!-- Dropdown Menu -->
+          {#if mobileMenuOpen}
+            <div class="absolute top-full left-0 right-0 bg-white border-b border-neutral-light shadow-xl max-h-[70vh] overflow-y-auto">
+              <nav class="py-2">
+                {#each categories.filter(c => c.id !== 'all') as category}
+                  <button
+                    on:click={() => {
+                      scrollToCategory(category.id);
+                      mobileMenuOpen = false;
+                    }}
+                    class="w-full text-left px-4 py-3 flex items-center justify-between transition-colors
+                      {activeCategory === category.id 
+                        ? 'bg-primary-green text-white' 
+                        : 'hover:bg-neutral-sand text-neutral-charcoal'}"
+                  >
+                    <span class="font-medium">{category.name}</span>
+                    <span class="text-sm {activeCategory === category.id ? 'text-white/80' : 'text-neutral-slate'}">
+                      {category.count}
+                    </span>
+                  </button>
+                {/each}
+              </nav>
+            </div>
+          {/if}
+        </div>
+      </div>
+      
+      <!-- Desktop Left Navigation Panel -->
+      <aside class="hidden lg:block lg:w-64 lg:sticky lg:top-24 lg:h-fit">
+        <ScrollReveal animation="fade-right">
         <div>
           <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-slate mb-4">Catégories</h2>
           <nav class="space-y-1">
@@ -126,22 +193,27 @@
             </div>
           </div>
         </div>
+        </ScrollReveal>
       </aside>
       
       <!-- Products Content -->
-      <div class="flex-1">
+      <div class="flex-1 pt-14 lg:pt-0">
         {#each Object.entries(productsByCategory) as [category, categoryProducts]}
-          <div id="category-{category}" class="mb-16 scroll-mt-24">
+          <div id="category-{category}" class="mb-16 scroll-mt-36 lg:scroll-mt-24">
             <!-- Simple Category Header -->
-            <div class="mb-8 pb-4 border-b border-neutral-light">
-              <h2 class="text-2xl font-semibold text-neutral-charcoal">{categoryInfo[category]}</h2>
-              <p class="text-sm text-neutral-slate mt-1">{categoryProducts.length} produit{categoryProducts.length > 1 ? 's' : ''}</p>
-            </div>
+            <ScrollReveal animation="fade-up">
+              <div class="mb-8 pb-4 border-b border-neutral-light">
+                <h2 class="text-2xl font-semibold text-neutral-charcoal">{categoryInfo[category]}</h2>
+                <p class="text-sm text-neutral-slate mt-1">{categoryProducts.length} produit{categoryProducts.length > 1 ? 's' : ''}</p>
+              </div>
+            </ScrollReveal>
             
             <!-- Products Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {#each categoryProducts as product}
-                <ProductCard {product} />
+              {#each categoryProducts as product, i}
+                <ScrollReveal animation="fade-up" delay={i * 100}>
+                  <ProductCard {product} />
+                </ScrollReveal>
               {/each}
             </div>
           </div>

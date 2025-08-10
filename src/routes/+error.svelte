@@ -1,148 +1,123 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
+  import { Home, Package } from 'lucide-svelte';
   
-  let floatingItems = [
-    { id: 1, emoji: '🥣', delay: 0 },
-    { id: 2, emoji: '🌾', delay: 1 },
-    { id: 3, emoji: '🥜', delay: 2 },
-    { id: 4, emoji: '🍪', delay: 3 },
-    { id: 5, emoji: '🥄', delay: 4 }
-  ];
-  
-  let messages = [
-    "Cette page est partie chercher du fonio dans l'Atacora...",
-    "Oups! Cette page est en train de fermenter comme notre baobab...",
-    "404 - Page introuvable! Elle doit être cachée dans notre stock de biscuits...",
-    "Cette page est en pause goûter, revenez plus tard!",
-    "Nos productrices travaillent encore sur cette page..."
-  ];
-  
-  let currentMessage = 0;
+  let mounted = false;
+  let floatingSeeds: Array<{id: number, x: number, delay: number}> = [];
   
   onMount(() => {
-    const interval = setInterval(() => {
-      currentMessage = (currentMessage + 1) % messages.length;
-    }, 3000);
-    
-    return () => clearInterval(interval);
+    mounted = true;
+    // Generate random floating seeds
+    floatingSeeds = Array.from({length: 12}, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      delay: Math.random() * 5
+    }));
   });
 </script>
 
 <svelte:head>
-  <title>404 - Page Introuvable | Angel's Floor</title>
+  <title>404 - Page Non Trouvée | Angel's Floor</title>
+  <meta name="description" content="La page que vous recherchez n'existe pas. Retournez à l'accueil ou découvrez nos produits africains naturels." />
 </svelte:head>
 
-<div class="min-h-screen bg-gradient-to-br from-neutral-sand via-white to-accent-gold/10 relative overflow-hidden">
-  <!-- Floating Food Elements -->
-  <div class="absolute inset-0">
-    {#each floatingItems as item}
-      <div 
-        class="absolute text-6xl animate-float opacity-20"
-        style="
-          left: {20 + item.id * 15}%;
-          top: {10 + item.id * 10}%;
-          animation-delay: {item.delay}s;
-        "
-      >
-        {item.emoji}
-      </div>
-    {/each}
-  </div>
-
-  <!-- Main Content -->
-  <div class="relative z-10 min-h-screen flex items-center justify-center px-4">
-    <div class="text-center max-w-2xl mx-auto">
-      <!-- Big 404 -->
-      <div class="relative inline-block mb-8">
-        <h1 class="text-9xl md:text-[200px] font-bold text-primary-green opacity-10">404</h1>
+<!-- Hero Section with 404 -->
+<section class="relative overflow-hidden bg-primary-green min-h-screen flex items-center">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="text-center">
+      <!-- Animated 404 Number -->
+      <div class="relative mb-8">
+        <h1 class="text-[150px] md:text-[200px] lg:text-[250px] font-bold text-white/10 select-none animate-pulse-slow">
+          404
+        </h1>
+        
+        <!-- Overlay text -->
         <div class="absolute inset-0 flex items-center justify-center">
-          <div class="text-6xl md:text-8xl">🍽️</div>
+          <div class="transform {mounted ? 'scale-100 opacity-100' : 'scale-50 opacity-0'} transition-all duration-700">
+            <span class="text-6xl md:text-7xl lg:text-8xl font-bold text-white">Oops!</span>
+          </div>
         </div>
       </div>
       
-      <!-- Dynamic Message -->
-      <div class="mb-8 h-20">
-        <p class="text-2xl md:text-3xl font-bold text-primary-green transition-all duration-500">
-          {messages[currentMessage]}
-        </p>
-      </div>
-      
-      <!-- Fun Recipe Card -->
-      <div class="bg-white rounded-3xl p-8 shadow-xl max-w-md mx-auto mb-8">
-        <h2 class="text-xl font-bold text-primary-green mb-4">
-          Recette de la Page Introuvable:
+      <!-- Error Message -->
+      <div class="max-w-2xl mx-auto {mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'} transition-all duration-700 delay-300">
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+          Cette Page S'est Égarée
         </h2>
-        <ul class="text-left text-neutral-charcoal space-y-2">
-          <li>• 404g de confusion</li>
-          <li>• Une pincée d'erreur de navigation</li>
-          <li>• 3 cuillères de "où suis-je?"</li>
-          <li>• Un zeste de surprise</li>
-          <li>• Beaucoup de patience</li>
-        </ul>
-        <p class="text-sm text-neutral-slate mt-4 italic">
-          Mélangez le tout et vous obtenez... cette page!
+        <p class="text-lg md:text-xl text-white/90 mb-10 leading-relaxed">
+          Comme une graine de fonio dans le vent du Sahel, cette page semble s'être envolée. 
+          Mais ne vous inquiétez pas, nous avons plein d'autres délices à vous proposer!
         </p>
-      </div>
-      
-      <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a 
-          href="/" 
-          class="bg-primary-green text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-primary-green-vibrant transform hover:scale-105 transition-all duration-300"
-        >
-          Retour à l'Accueil
-        </a>
-        <a 
-          href="/produits" 
-          class="bg-accent-gold text-primary-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-        >
-          Voir Nos Produits
-        </a>
-      </div>
-      
-      <!-- Additional Fun Message -->
-      <div class="mt-12 text-neutral-charcoal">
-        <p class="text-lg mb-2">Pendant que vous êtes ici...</p>
-        <p class="text-sm">
-          Saviez-vous que notre fonio peut être préparé en moins de temps 
-          qu'il n'en faut pour retrouver cette page? 😄
-        </p>
-      </div>
-      
-      <!-- Status Code Display -->
-      {#if $page.status}
-        <div class="mt-8 text-sm text-neutral-slate">
-          Code d'erreur: {$page.status} | 
-          {#if $page.error?.message}
-            {$page.error.message}
-          {:else}
-            Page introuvable
-          {/if}
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
+          <a 
+            href="/"
+            class="inline-flex items-center justify-center gap-3 bg-white text-primary-green px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
+          >
+            <Home class="w-5 h-5" />
+            <span>Retour à l'Accueil</span>
+          </a>
+          <a 
+            href="/produits"
+            class="inline-flex items-center justify-center gap-3 bg-transparent border-2 border-white text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all duration-300 w-full sm:w-auto"
+          >
+            <Package class="w-5 h-5" />
+            <span>Voir Nos Produits</span>
+          </a>
         </div>
-      {/if}
+        
+        <!-- Error Status Display -->
+        {#if $page.status}
+          <div class="mt-12 text-sm text-white/50">
+            Code d'erreur: {$page.status} | 
+            {#if $page.error?.message}
+              {$page.error.message}
+            {:else}
+              Page introuvable
+            {/if}
+          </div>
+        {/if}
+      </div>
     </div>
   </div>
   
-  <!-- Bottom Wave Decoration -->
-  <div class="absolute bottom-0 left-0 right-0">
-    <svg viewBox="0 0 1440 120" class="w-full h-24 fill-primary-green/10">
-      <path d="M0,64 C240,96 480,32 720,48 C960,64 1200,96 1440,64 L1440,120 L0,120 Z"></path>
-    </svg>
-  </div>
-</div>
+  <!-- Floating Seeds Animation -->
+  {#if mounted}
+    {#each floatingSeeds as seed}
+      <div 
+        class="absolute w-2 h-3 bg-accent-gold rounded-full opacity-20"
+        style="
+          left: {seed.x}%;
+          animation: float-up 15s infinite linear;
+          animation-delay: {seed.delay}s;
+        "
+      />
+    {/each}
+  {/if}
+  
+  <!-- Background decorations -->
+  <div class="absolute top-20 left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-20 right-20 w-96 h-96 bg-accent-gold/10 rounded-full blur-3xl"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl"></div>
+</section>
 
 <style>
-  @keyframes float {
-    0%, 100% { 
-      transform: translateY(0px) rotate(0deg); 
+  @keyframes float-up {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
     }
-    50% { 
-      transform: translateY(-30px) rotate(10deg); 
+    10% {
+      opacity: 0.2;
     }
-  }
-  
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+    90% {
+      opacity: 0.2;
+    }
+    100% {
+      transform: translateY(-100vh) rotate(360deg);
+      opacity: 0;
+    }
   }
 </style>

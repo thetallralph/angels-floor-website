@@ -1,14 +1,47 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Leaf } from 'lucide-svelte';
+  import { ArrowRight, Dumbbell, Briefcase, Sun, Heart, Store, TrendingUp, Package, Users } from 'lucide-svelte';
   import AnimatedText from '$lib/components/ui/AnimatedText.svelte';
   import ScrollingBanner from '$lib/components/ui/ScrollingBanner.svelte';
+  import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import { appStore } from '$lib/stores/app.js';
+  import { featuredProducts } from '$lib/data/products.js';
 
-  let currentSlide = 0;
-  let slideInterval: number;
   let heroVisible = false;
   let currentImageIndex = 0;
+  // let showAnniversaryBanner = false;
+  let impactCounter = 0;
+  let impactSectionVisible = false;
+  
+  // Get first three featured products
+  const displayProducts = featuredProducts.slice(0, 3);
+  
+  // function dismissBanner() {
+  //   showAnniversaryBanner = false;
+  //   if (typeof localStorage !== 'undefined') {
+  //     localStorage.setItem('anniversaryBannerDismissed', 'true');
+  //   }
+  // }
+  
+  function startCounter() {
+    if (impactSectionVisible) return; // Only run once
+    impactSectionVisible = true;
+    
+    const duration = 2000; // 2 seconds
+    const targetValue = 100;
+    const increment = targetValue / (duration / 16); // 60fps
+    
+    const animate = () => {
+      if (impactCounter < targetValue) {
+        impactCounter = Math.min(impactCounter + increment, targetValue);
+        requestAnimationFrame(animate);
+      } else {
+        impactCounter = targetValue;
+      }
+    };
+    
+    animate();
+  }
   
   const heroImages = [
     'https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=600&h=900&fit=crop',
@@ -22,79 +55,121 @@
     appStore.initialize();
     heroVisible = true;
     
-    // Auto-advance slider
-    slideInterval = setInterval(() => {
-      currentSlide = (currentSlide + 1) % 3;
-    }, 4000);
+    // Check if banner should be shown - commented out for now
+    // if (typeof localStorage !== 'undefined') {
+    //   const bannerDismissed = localStorage.getItem('anniversaryBannerDismissed');
+    //   showAnniversaryBanner = !bannerDismissed;
+    // }
     
     // Auto-advance hero images
     const imageInterval = setInterval(() => {
       currentImageIndex = (currentImageIndex + 1) % heroImages.length;
     }, 4000);
     
+    // Set up intersection observer for impact section
+    const impactSection = document.querySelector('#impact-section');
+    if (impactSection) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              startCounter();
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      observer.observe(impactSection);
+      
+      return () => {
+        clearInterval(imageInterval);
+        observer.disconnect();
+      };
+    }
+    
     return () => {
-      if (slideInterval) clearInterval(slideInterval);
       clearInterval(imageInterval);
     };
   });
-
-  function goToSlide(index: number) {
-    currentSlide = index;
+  
+  function formatPrice(price: number): string {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
   }
 </script>
 
 <svelte:head>
   <title>Angel's Floor - Accueil</title>
-  <meta name="description" content="Découvrez nos produits naturels du Bénin : fonio, baobab, néré et plus encore. Qualité artisanale, impact communautaire." />
+  <meta name="description" content="Spécialiste de la transformation artisanale de produits africains naturels : fonio précuit, poudre de baobab, farines enrichies. Produits prêts à consommer, certifiés biologiques." />
 </svelte:head>
 
-<!-- Top Call Banner -->
-<div class="bg-accent-gold text-primary-green py-3 text-center">
-  <div class="flex items-center justify-center space-x-3">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-    </svg>
-    <span class="text-sm md:text-base font-semibold">Appelez-nous maintenant : +229 XX XX XX XX</span>
-    <span class="hidden md:inline text-sm">| Lun-Ven 8h-18h • Sam 9h-16h</span>
+<!-- Anniversary Banner - Hidden for now -->
+<!-- {#if showAnniversaryBanner}
+  <div class="fixed top-0 left-0 right-0 z-50" style="background-color: #EACF0F;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex-1 flex items-center justify-center gap-4">
+          <span class="text-2xl">🎉</span>
+          <div class="text-center">
+            <a href="/blog/10-ans-excellence" class="group">
+              <span class="font-bold text-neutral-obsidian text-lg">Angel's Floor célèbre 10 ans d'excellence!</span>
+              <span class="text-neutral-charcoal ml-2 group-hover:underline">Découvrez notre histoire →</span>
+            </a>
+          </div>
+        </div>
+        <button 
+          on:click={dismissBanner}
+          class="text-neutral-charcoal hover:text-neutral-obsidian p-2"
+          aria-label="Fermer"
+        >
+          <X class="w-5 h-5" />
+        </button>
+      </div>
+    </div>
   </div>
-</div>
+  <div class="h-14"></div>
+{/if} -->
 
 <!-- Hero Section with Animated Text -->
-<section class="relative overflow-hidden py-16 lg:py-24 bg-primary-green">
+<section class="relative overflow-x-hidden overflow-y-visible py-16 lg:py-24 bg-primary-green">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
       
       <!-- Text Content -->
-      <div class="relative z-10">
+      <div class="relative z-10 text-center lg:text-left flex flex-col items-center lg:items-start">
         <div class="hero-heading" class:visible={heroVisible}>
-          <h1 class="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-8 leading-tight">
+          <h1 class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center lg:text-left">
             <AnimatedText 
-              text="Où chaque bouchée est une célébration du Bénin" 
+              text="Produits africains transformés avec expertise et tradition" 
               className="inline" 
               delay={100}
             />
           </h1>
           
           <div class="hero-desc opacity-0 translate-y-8" class:show={heroVisible}>
-            <p class="text-lg md:text-xl lg:text-2xl text-white/90 mb-8 leading-relaxed max-w-xl">
-              Angel's Floor - une expérience culinaire authentique.
-              Toujours naturelle, toujours premium. Suivez-nous
-              pour découvrir nos saveurs ancestrales!
+            <p class="text-lg md:text-xl lg:text-xl text-white/90 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Spécialistes de la transformation artisanale de produits africains naturels.
+              Du fonio au baobab, nous valorisons les richesses du terroir béninois
+              pour vous offrir des produits prêts à consommer de qualité premium.
             </p>
             
-            <div class="flex flex-wrap gap-4">
-              <button 
-                on:click={() => window.location.href='/produits'}
-                class="bg-white text-primary-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full lg:w-auto">
+              <a 
+                href="/produits"
+                class="block sm:inline-block w-full sm:w-auto text-center bg-white text-primary-green px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
               >
                 Découvrir Nos Produits
-              </button>
-              <button 
-                on:click={() => window.location.href='/a-propos'}
-                class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-primary-green transition-all duration-300"
+              </a>
+              <a 
+                href="/a-propos"
+                class="block sm:inline-block w-full sm:w-auto text-center bg-transparent border-2 border-white text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all duration-300"
               >
                 Notre Histoire
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -137,7 +212,7 @@
           </div>
           
           <!-- Navigation dots -->
-          <div class="absolute -right-16 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
+          <div class="absolute -right-8 lg:-right-16 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
             {#each heroImages as _, index}
               <button
                 class="w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 {currentImageIndex === index ? 'bg-white w-3 h-8' : 'bg-white/50'}"
@@ -157,316 +232,253 @@
 </section>
 
 <!-- Scrolling Banner -->
-<div class="relative -mt-24 z-30">
+<div class="relative -mt-8 z-30 bg-green-700">
   <ScrollingBanner />
 </div>
 
+
 <!-- Stats Section -->
-<section class="py-16 bg-white">
+<section class="py-20 -mt-8 pt-24 bg-green-700/10">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
       <!-- Stat 1 -->
+      <ScrollReveal animation="fade-up" delay={0}>
       <div class="text-center">
-        <div class="text-4xl md:text-5xl font-bold text-primary-green mb-2">500+</div>
-        <p class="text-neutral-charcoal font-semibold">Femmes Productrices</p>
-        <p class="text-sm text-neutral-slate mt-1">Autonomisées depuis 2015</p>
+        <div class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">500+</div>
+        <p class="text-black font-bold text-lg md:text-xl">Femmes Productrices</p>
+        <p class="text-base text-black mt-2">Autonomisées depuis 2015</p>
       </div>
+      </ScrollReveal>
       
       <!-- Stat 2 -->
+      <ScrollReveal animation="fade-up" delay={100}>
       <div class="text-center">
-        <div class="text-4xl md:text-5xl font-bold text-accent-sunset mb-2">10</div>
-        <p class="text-neutral-charcoal font-semibold">Années d'Excellence</p>
-        <p class="text-sm text-neutral-slate mt-1">De savoir-faire artisanal</p>
+        <div class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">10</div>
+        <p class="text-black font-bold text-lg md:text-xl">Années d'Excellence</p>
+        <p class="text-base text-black mt-2">De savoir-faire artisanal</p>
       </div>
+      </ScrollReveal>
       
       <!-- Stat 3 -->
+      <ScrollReveal animation="fade-up" delay={200}>
       <div class="text-center">
-        <div class="text-4xl md:text-5xl font-bold text-creative-purple mb-2">15+</div>
-        <p class="text-neutral-charcoal font-semibold">Points de Vente</p>
-        <p class="text-sm text-neutral-slate mt-1">À travers le Bénin</p>
+        <div class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">15+</div>
+        <p class="text-black font-bold text-lg md:text-xl">Points de Vente</p>
+        <p class="text-base text-black mt-2">À travers le Bénin</p>
       </div>
+      </ScrollReveal>
       
       <!-- Stat 4 -->
+      <ScrollReveal animation="fade-up" delay={300}>
       <div class="text-center">
-        <div class="text-4xl md:text-5xl font-bold text-primary-green mb-2">100%</div>
-        <p class="text-neutral-charcoal font-semibold">Produits Naturels</p>
-        <p class="text-sm text-neutral-slate mt-1">Certifiés biologiques</p>
+        <div class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">100%</div>
+        <p class="text-black font-bold text-lg md:text-xl">Produits Naturels</p>
+        <p class="text-base text-black mt-2">Certifiés biologiques</p>
       </div>
+      </ScrollReveal>
     </div>
   </div>
 </section>
 
-<!-- 10 Years of Excellence Section -->
-<section class="py-20 bg-neutral-sand">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <!-- Content -->
-      <div>
-        <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-6">
-          10 Ans d'Excellence
-        </h2>
-        <p class="text-xl text-neutral-charcoal mb-8">
-          Depuis 2015, Angel's Floor transforme les saveurs ancestrales du Bénin en produits d'exception. 
-          Notre voyage a commencé avec 5 femmes productrices dans l'Atacora et s'est développé en un réseau 
-          de plus de 500 femmes autonomisées à travers le pays.
-        </p>
-        <p class="text-lg text-neutral-charcoal mb-8">
-          Une décennie d'innovation, de croissance et d'impact social qui a transformé non seulement 
-          des produits locaux, mais aussi des vies et des communautés entières.
-        </p>
-        <button 
-          on:click={() => window.location.href='/a-propos'}
-          class="bg-primary-green text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-primary-green-vibrant transform hover:scale-105 transition-all duration-300"
-        >
-          Découvrir Notre Histoire Complète
-        </button>
-      </div>
-      
-      <!-- Image -->
-      <div class="relative">
-        <img 
-          src="https://images.unsplash.com/photo-1521790945508-9859a19edb6e?w=800&h=600&fit=crop&crop=center" 
-          alt="10 ans d'Angel's Floor" 
-          class="rounded-3xl shadow-2xl"
-        />
-        <!-- Decorative badge -->
-        <div class="absolute -top-6 -right-6 bg-accent-gold rounded-full w-32 h-32 flex items-center justify-center shadow-lg">
-          <div class="text-center">
-            <div class="text-4xl font-bold text-white">10</div>
-            <div class="text-sm font-semibold text-white">ANS</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- Product Preview Slider (Noka Style) -->
+<!-- Featured Products Section -->
 <section class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <ScrollReveal animation="fade-up">
     <div class="text-center mb-12">
-      <h2 class="text-4xl md:text-5xl font-bold text-neutral-obsidian mb-4">
-        Savourez la Tradition Béninoise
+      <p class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">Nos Produits</p>
+      <h2 class="text-4xl md:text-5xl font-bold text-black mb-4">
+        Produits Transformés du Terroir Béninois
       </h2>
       <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto mb-6">
         Découvrez nos gammes de produits soigneusement sélectionnés, transformés avec amour 
         par nos productrices pour vous offrir le meilleur du terroir béninois.
       </p>
       <div class="flex flex-wrap justify-center gap-4 text-sm">
-        <span class="bg-primary-green/10 text-primary-green px-4 py-2 rounded-full font-medium">
+        <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
           Sans Gluten
         </span>
-        <span class="bg-accent-sunset/10 text-accent-sunset px-4 py-2 rounded-full font-medium">
+        <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
           100% Naturel
         </span>
-        <span class="bg-creative-purple/10 text-creative-purple px-4 py-2 rounded-full font-medium">
+        <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
           Prêt à Consommer
         </span>
-        <span class="bg-accent-gold/10 text-accent-gold px-4 py-2 rounded-full font-medium">
+        <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
           Certifié Bio
         </span>
       </div>
     </div>
+    </ScrollReveal>
     
-    <!-- Slider Container -->
-    <div class="relative overflow-hidden">
-      <div class="flex transition-transform duration-500 ease-in-out py-8" style="transform: translateX(-{currentSlide * 100}%)">
-        
-        <!-- Slide 1 - Green -->
-        <div class="min-w-full flex justify-center">
-          <div class="relative">
-            <!-- Green shadow -->
-            <div class="absolute inset-2 bg-primary-green/10 rounded-3xl"></div>
-            <div class="relative bg-primary-green-bright rounded-3xl p-8 max-w-md mx-4">
-            <img 
-              src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=400&fit=crop&crop=center" 
-              alt="Fonio" 
-              class="w-full h-64 object-cover rounded-2xl mb-6"
-            />
-            <h3 class="text-2xl font-bold text-white mb-3">Fonio + Moringa</h3>
-            <p class="text-white/80 mb-4">Le super duo nutritionnel de l'Atacora</p>
-            <button 
-              on:click={() => window.location.href='/produits'}
-              class="bg-white text-primary-green px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform">
-              Découvrir
-            </button>
+    <!-- Three Featured Products -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+      {#each displayProducts as product, i}
+        <ScrollReveal animation="fade-up" delay={i * 100}>
+        <a href="/produits/{product.slug}" class="block group">
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full">
+            <!-- Product Image -->
+            <div class="relative aspect-square overflow-hidden">
+              <img 
+                src={product.image || `https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=600&fit=crop`}
+                alt={product.name}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            
+            <!-- Product Info -->
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-neutral-obsidian mb-2 group-hover:text-primary-green transition-colors">
+                {product.name}
+              </h3>
+              <p class="text-neutral-charcoal text-sm mb-4 line-clamp-2">
+                {product.description}
+              </p>
+              
+              <!-- Price and Link -->
+              <div class="flex items-center justify-between">
+                <span class="text-lg font-semibold text-primary-green">
+                  {formatPrice(product.price)}
+                </span>
+                <ArrowRight class="w-5 h-5 text-neutral-slate group-hover:text-primary-green group-hover:translate-x-1 transition-all" />
+              </div>
             </div>
           </div>
-        </div>
-
-        <!-- Slide 2 - Orange -->
-        <div class="min-w-full flex justify-center">
-          <div class="relative">
-            <!-- Orange shadow -->
-            <div class="absolute inset-2 bg-accent-sunset/10 rounded-3xl"></div>
-            <div class="relative bg-accent-sunset rounded-3xl p-8 max-w-md mx-4">
-            <img 
-              src="https://images.unsplash.com/photo-1609251541848-72c45e5bad78?w=600&h=400&fit=crop&crop=center" 
-              alt="Baobab" 
-              class="w-full h-64 object-cover rounded-2xl mb-6"
-            />
-            <h3 class="text-2xl font-bold text-white mb-3">Baobab + Gingembre</h3>
-            <p class="text-white/80 mb-4">L'alliance vitaminée et énergisante</p>
-            <button 
-              on:click={() => window.location.href='/produits'}
-              class="bg-white text-accent-sunset px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform">
-              Découvrir
-            </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Slide 3 - Purple -->
-        <div class="min-w-full flex justify-center">
-          <div class="relative">
-            <!-- Purple shadow -->
-            <div class="absolute inset-2 bg-creative-purple/10 rounded-3xl"></div>
-            <div class="relative bg-creative-purple rounded-3xl p-8 max-w-md mx-4">
-            <img 
-              src="https://images.unsplash.com/photo-1549888834-3ec93abae044?w=600&h=400&fit=crop&crop=center" 
-              alt="Biscuits" 
-              class="w-full h-64 object-cover rounded-2xl mb-6"
-            />
-            <h3 class="text-2xl font-bold text-white mb-3">Biscuits + Baobab</h3>
-            <p class="text-white/80 mb-4">Le plaisir croustillant et nutritif</p>
-            <button 
-              on:click={() => window.location.href='/produits'}
-              class="bg-white text-creative-purple px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform">
-              Découvrir
-            </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dots Navigation -->
-    <div class="flex justify-center mt-8 space-x-3">
-      {#each [0, 1, 2] as index}
-        <button 
-          class="w-3 h-3 rounded-full transition-all duration-300 {currentSlide === index ? 'bg-primary-green w-8' : 'bg-neutral-light'}"
-          on:click={() => goToSlide(index)}
-          aria-label="Aller au slide {index + 1}"
-        ></button>
+        </a>
+        </ScrollReveal>
       {/each}
     </div>
     
     <!-- Call to Action -->
+    <ScrollReveal animation="fade">
     <div class="text-center mt-12">
-      <p class="text-neutral-charcoal mb-6">
-        Ce n'est qu'un aperçu de notre riche collection de produits authentiques du Bénin.
-      </p>
-      <button 
-        on:click={() => window.location.href='/produits'}
-        class="bg-primary-green text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-primary-green-vibrant hover:shadow-xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+      <a 
+        href="/produits"
+        class="inline-flex items-center gap-3 bg-primary-green text-white px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:bg-primary-green-vibrant hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
       >
         <span>Voir Tous Nos Produits</span>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
-      </button>
+      </a>
     </div>
+    </ScrollReveal>
   </div>
 </section>
 
-<!-- Lifestyle Section (Yellow Background - Noka Style) -->
-<section class="py-20 bg-yellow-400">
+<!-- Lifestyle Section - Votre Allié Nutrition au Quotidien -->
+<section class="py-20 relative overflow-hidden" style="background-color: #EACF0F;">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      
-      <!-- Text Content -->
-      <div>
-        <h2 class="text-4xl md:text-5xl font-bold text-black mb-6">
-          Votre Allié Nutrition au Quotidien
-        </h2>
-        <p class="text-xl text-black mb-8">
-          Que ce soit pour démarrer votre journée, une pause gourmande ou un repas équilibré, 
-          nos produits s'adaptent à votre rythme de vie tout en vous apportant le meilleur du Bénin.
-        </p>
-        
-        <!-- Feature Cards -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-white rounded-2xl p-6 text-center">
-            <div class="w-20 h-20 mx-auto mb-3 overflow-hidden rounded-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1493770348161-369560ae357d?auto=format&fit=crop&w=200&h=200" 
-                alt="Petit-déjeuner" 
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <h4 class="font-bold text-black">Petit-Déjeuner</h4>
-            <p class="text-sm text-gray-600">Fonio au lait de coco</p>
-          </div>
-          <div class="bg-white rounded-2xl p-6 text-center">
-            <div class="w-20 h-20 mx-auto mb-3 overflow-hidden rounded-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1538220856186-0be0e085984e?auto=format&fit=crop&w=200&h=200" 
-                alt="Sport et énergie" 
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <h4 class="font-bold text-black">Sport & Énergie</h4>
-            <p class="text-sm text-gray-600">Smoothie baobab boost</p>
-          </div>
-          <div class="bg-white rounded-2xl p-6 text-center">
-            <div class="w-20 h-20 mx-auto mb-3 overflow-hidden rounded-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&w=200&h=200" 
-                alt="En famille" 
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <h4 class="font-bold text-black">En Famille</h4>
-            <p class="text-sm text-gray-600">Goûter biscuits maison</p>
-          </div>
-          <div class="bg-white rounded-2xl p-6 text-center">
-            <div class="w-20 h-20 mx-auto mb-3 overflow-hidden rounded-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=200&h=200" 
-                alt="Au bureau" 
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <h4 class="font-bold text-black">Au Bureau</h4>
-            <p class="text-sm text-gray-600">Pause nutritive</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lifestyle Image -->
-      <div class="relative">
-        <img 
-          src="https://images.unsplash.com/photo-1594736797933-d0ed62e8681a?w=800&h=600&fit=crop&crop=center" 
-          alt="Femmes productrices heureuses" 
-          class="rounded-3xl shadow-2xl"
-        />
-        <!-- Floating elements -->
-        <div class="absolute -top-8 -right-8 w-24 h-24">
-          <img 
-            src="https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=200&h=200&fit=crop&crop=center" 
-            alt="Produit naturel" 
-            class="w-full h-full object-cover rounded-full shadow-lg animate-float"
-          />
-        </div>
-      </div>
+    <!-- Header -->
+    <ScrollReveal animation="fade-up">
+    <div class="text-center mb-12">
+      <p class="text-sm font-semibold text-neutral-obsidian uppercase tracking-wider mb-3">Mode de Vie</p>
+      <h2 class="text-4xl md:text-5xl font-bold text-black mb-4">
+        Votre Allié Nutrition au Quotidien
+      </h2>
+      <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
+        Nos produits s'adaptent à votre rythme de vie tout en vous apportant le meilleur du Bénin.
+      </p>
     </div>
+    </ScrollReveal>
+    
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Morning Card -->
+      <ScrollReveal animation="fade-up" delay={0}>
+      <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+        <Sun class="w-10 h-10 text-orange-500 mb-6" />
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">Petit-Déjeuner</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Commencez votre journée avec énergie et vitalité grâce à nos produits riches en nutriments</p>
+        <div class="border-t pt-4">
+          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
+          <a href="/produits/fonio-precuit" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            Fonio au lait de coco
+          </a>
+        </div>
+      </div>
+      </ScrollReveal>
+      
+      <!-- Sport Card -->
+      <ScrollReveal animation="fade-up" delay={100}>
+      <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+        <Dumbbell class="w-10 h-10 text-green-500 mb-6" />
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">Sport & Énergie</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Boostez vos performances naturellement avec nos super-aliments adaptés aux sportifs</p>
+        <div class="border-t pt-4">
+          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
+          <a href="/produits/baobab-poudre" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            Smoothie baobab boost
+          </a>
+        </div>
+      </div>
+      </ScrollReveal>
+      
+      <!-- Family Card -->
+      <ScrollReveal animation="fade-up" delay={200}>
+      <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+        <Heart class="w-10 h-10 text-pink-500 mb-6" />
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">En Famille</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Des moments de partage savoureux autour de nos produits sains et délicieux</p>
+        <div class="border-t pt-4">
+          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
+          <a href="/produits/biscuits-baobab" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            Goûter biscuits maison
+          </a>
+        </div>
+      </div>
+      </ScrollReveal>
+      
+      <!-- Work Card -->
+      <ScrollReveal animation="fade-up" delay={300}>
+      <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+        <Briefcase class="w-10 h-10 text-blue-500 mb-6" />
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">Au Bureau</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">La pause saine et productive pour maintenir votre concentration toute la journée</p>
+        <div class="border-t pt-4">
+          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
+          <a href="/produits/biscuits-baobab" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            Snacks nutritifs
+          </a>
+        </div>
+      </div>
+      </ScrollReveal>
+    </div>
+    
+    <!-- CTA -->
+    <ScrollReveal animation="fade">
+    <div class="text-center mt-12">
+      <a 
+        href="/produits"
+        class="inline-flex items-center gap-3 bg-neutral-obsidian/10 text-neutral-obsidian border-2 border-neutral-obsidian/20 px-6 py-3 rounded-full font-semibold text-base hover:bg-neutral-obsidian hover:text-white hover:border-neutral-obsidian transition-all duration-300"
+      >
+        <span>Découvrir Nos Produits</span>
+        <ArrowRight class="w-5 h-5" />
+      </a>
+    </div>
+    </ScrollReveal>
   </div>
 </section>
+
 
 <!-- Testimonials Section -->
 <section class="py-20 bg-neutral-sand">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <ScrollReveal animation="fade-up">
     <div class="text-center mb-16">
-      <h2 class="text-4xl md:text-5xl font-bold text-primary-green mb-4">
+      <p class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">Témoignages</p>
+      <h2 class="text-4xl md:text-5xl font-bold text-black mb-4">
         Ce Que Disent Nos Clients
       </h2>
       <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
         Des milliers de béninois ont adopté nos produits pour une alimentation saine et savoureuse
       </p>
     </div>
+    </ScrollReveal>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       <!-- Testimonial 1 -->
+      <ScrollReveal animation="fade-up" delay={0}>
       <div class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div class="flex items-center mb-4">
           <!-- Stars -->
@@ -492,8 +504,10 @@
           </div>
         </div>
       </div>
+      </ScrollReveal>
       
       <!-- Testimonial 2 -->
+      <ScrollReveal animation="fade-up" delay={150}>
       <div class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div class="flex items-center mb-4">
           <!-- Stars -->
@@ -519,8 +533,10 @@
           </div>
         </div>
       </div>
+      </ScrollReveal>
       
       <!-- Testimonial 3 -->
+      <ScrollReveal animation="fade-up" delay={300}>
       <div class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div class="flex items-center mb-4">
           <!-- Stars -->
@@ -546,6 +562,7 @@
           </div>
         </div>
       </div>
+      </ScrollReveal>
     </div>
     
     <!-- Additional testimonials slider indicator -->
@@ -557,138 +574,141 @@
   </div>
 </section>
 
-<!-- Brand Philosophy (White Background) -->
+
+<!-- Wholesaler Section -->
 <section class="py-20 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h2 class="text-4xl font-bold text-neutral-obsidian mb-16">
-      Nutrition Authentique. Impact Réel. Saveurs Délicieuses.
-    </h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Feature 1 -->
-      <div class="text-center">
-        <div class="w-20 h-20 bg-primary-green rounded-full flex items-center justify-center mx-auto mb-4">
-          <Leaf class="w-10 h-10 text-white" />
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <!-- Left Content -->
+      <ScrollReveal animation="fade-right">
+      <div>
+        <p class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3 text-center lg:text-left">Partenariat</p>
+        <h2 class="text-4xl md:text-5xl font-bold text-black mb-6 text-center lg:text-left">
+          Devenez Partenaire Distributeur
+        </h2>
+        <p class="text-xl text-neutral-charcoal mb-8 text-center lg:text-left">
+          Rejoignez notre réseau de distribution avec des marges attractives jusqu'à 35%.
+        </p>
+        
+        <!-- Benefits Grid - Simplified -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <div class="flex items-center gap-3">
+            <TrendingUp class="w-6 h-6 text-primary-green" />
+            <span class="font-semibold text-neutral-obsidian">Marges 35%</span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <Package class="w-6 h-6 text-accent-gold" />
+            <span class="font-semibold text-neutral-obsidian">Livraison 48h</span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <Users class="w-6 h-6 text-creative-purple" />
+            <span class="font-semibold text-neutral-obsidian">Support Dédié</span>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <Store class="w-6 h-6 text-primary-green" />
+            <span class="font-semibold text-neutral-obsidian">Marketing Inclus</span>
+          </div>
         </div>
-        <h3 class="font-bold text-lg text-primary-green mb-2">Bio + Naturel</h3>
-        <p class="text-neutral-slate">Sans pesticides, sans additifs artificiels</p>
+        
+        <!-- CTA Button -->
+        <a 
+          href="/grossistes"
+          class="inline-flex items-center gap-3 bg-primary-green text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-primary-green-vibrant hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+        >
+          <span>Devenir Grossiste</span>
+          <ArrowRight class="w-5 h-5" />
+        </a>
       </div>
+      </ScrollReveal>
       
-      <!-- Feature 2 -->
-      <div class="text-center">
-        <div class="w-20 h-20 bg-accent-sunset rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h3 class="font-bold text-lg text-primary-green mb-2">Impact Local</h3>
-        <p class="text-neutral-slate">500+ femmes productrices soutenues</p>
+      <!-- Right Image -->
+      <ScrollReveal animation="fade-left" delay={200}>
+      <div>
+        <img 
+          src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800&h=600&fit=crop"
+          alt="Supermarché moderne avec nos produits"
+          class="rounded-3xl w-full"
+        />
       </div>
-      
-      <!-- Feature 3 -->
-      <div class="text-center">
-        <div class="w-20 h-20 bg-creative-purple rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </div>
-        <h3 class="font-bold text-lg text-primary-green mb-2">Eco-Responsable</h3>
-        <p class="text-neutral-slate">Emballages recyclables et durables</p>
-      </div>
+      </ScrollReveal>
     </div>
   </div>
 </section>
 
-<!-- Community Impact Preview Section -->
-<section class="py-20 bg-primary-green text-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <!-- Content -->
-      <div>
-        <h2 class="text-4xl md:text-5xl font-bold mb-6">
-          Notre Impact Au-Delà du Produit
-        </h2>
-        <p class="text-xl text-white/90 mb-8">
-          Chaque achat Angel's Floor contribue directement à l'autonomisation des femmes 
-          béninoises et au développement durable de nos communautés rurales.
-        </p>
-        
-        <!-- Impact Stats Grid -->
-        <div class="grid grid-cols-2 gap-6">
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <div class="text-3xl font-bold text-accent-gold mb-2">500+</div>
-            <p class="text-white/80 text-sm">Femmes productrices autonomisées</p>
-          </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <div class="text-3xl font-bold text-accent-gold mb-2">10</div>
-            <p class="text-white/80 text-sm">Villages impactés dans l'Atacora</p>
-          </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <div class="text-3xl font-bold text-accent-gold mb-2">250%</div>
-            <p class="text-white/80 text-sm">Augmentation du revenu moyen</p>
-          </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <div class="text-3xl font-bold text-accent-gold mb-2">2000+</div>
-            <p class="text-white/80 text-sm">Familles bénéficiaires indirectes</p>
-          </div>
+<!-- Community Impact Preview Section - Hidden for now -->
+<!-- <section id="impact-section" class="py-20 bg-primary-green text-white relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="text-center">
+      <p class="text-sm font-semibold text-white/80 uppercase tracking-wider mb-3">Notre Impact</p>
+      <h2 class="text-4xl md:text-5xl font-bold mb-6">
+        Notre Impact Au-Delà du Produit
+      </h2>
+      <p class="text-xl text-white/90 mb-12 max-w-3xl mx-auto">
+        Chaque achat Angel's Floor contribue directement à l'autonomisation des femmes 
+        béninoises et au développement durable de nos communautés rurales.
+      </p>
+      
+      <div class="flex flex-wrap justify-center gap-6 mb-12">
+        <div class="bg-white p-3 shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+          <img 
+            src="https://images.unsplash.com/photo-1594736797933-d0ed62e8681a?w=250&h=300&fit=crop" 
+            alt="Femme productrice" 
+            class="w-[250px] h-[300px] object-cover grayscale"
+          />
+          <p class="text-center mt-3 text-gray-700 text-sm font-handwriting">Marie, Atacora</p>
         </div>
         
-        <button 
-          on:click={() => window.location.href='/impact'}
-          class="mt-8 bg-white text-primary-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-        >
-          Découvrir Notre Impact Complet
-        </button>
+        <div class="bg-white p-3 shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-300">
+          <img 
+            src="https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?w=250&h=300&fit=crop" 
+            alt="Femme productrice" 
+            class="w-[250px] h-[300px] object-cover grayscale"
+          />
+          <p class="text-center mt-3 text-gray-700 text-sm font-handwriting">Awa, Natitingou</p>
+        </div>
+        
+        <div class="bg-white p-3 shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+          <img 
+            src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=250&h=300&fit=crop" 
+            alt="Femme productrice" 
+            class="w-[250px] h-[300px] object-cover grayscale"
+          />
+          <p class="text-center mt-3 text-gray-700 text-sm font-handwriting">Fatou, Djougou</p>
+        </div>
+        
+        <div class="bg-white p-3 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
+          <img 
+            src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=250&h=300&fit=crop" 
+            alt="Femme productrice" 
+            class="w-[250px] h-[300px] object-cover grayscale"
+          />
+          <p class="text-center mt-3 text-gray-700 text-sm font-handwriting">Grace, Tanguiéta</p>
+        </div>
       </div>
       
-      <!-- Visual -->
-      <div class="relative">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-4">
-            <img 
-              src="https://images.unsplash.com/photo-1594736797933-d0ed62e8681a?w=400&h=300&fit=crop&crop=center" 
-              alt="Femme productrice au travail" 
-              class="rounded-2xl shadow-xl animate-float"
-              style="animation-delay: 0s;"
-            />
-            <img 
-              src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=400&h=300&fit=crop&crop=center" 
-              alt="Récolte de fonio" 
-              class="rounded-2xl shadow-xl animate-float"
-              style="animation-delay: -2s;"
-            />
-          </div>
-          <div class="space-y-4 mt-8">
-            <img 
-              src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=400&h=300&fit=crop&crop=center" 
-              alt="Formation des productrices" 
-              class="rounded-2xl shadow-xl animate-float"
-              style="animation-delay: -1s;"
-            />
-            <img 
-              src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=400&h=300&fit=crop&crop=center" 
-              alt="Produits finis Angel's Floor" 
-              class="rounded-2xl shadow-xl animate-float"
-              style="animation-delay: -3s;"
-            />
-          </div>
-        </div>
-        
-        <!-- Decorative element -->
-        <div class="absolute -top-8 -right-8 w-32 h-32 bg-accent-gold/15 rounded-full"></div>
-      </div>
+      <a 
+        href="/impact"
+        class="inline-block bg-white text-primary-green px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+      >
+        Découvrir Notre Impact Complet
+      </a>
     </div>
   </div>
-</section>
+  
+  <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 select-none pointer-events-none">
+    <span class="text-[200px] md:text-[300px] lg:text-[400px] font-black text-white opacity-10">
+      +{Math.floor(impactCounter)}
+    </span>
+  </div>
+</section> -->
 
 <!-- Final CTA -->
 <section class="py-20 bg-footer-green relative overflow-hidden">
-  <div class="absolute inset-0">
-    <div class="absolute top-0 left-0 w-96 h-96 bg-accent-gold/10 rounded-full"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-gold/10 rounded-full"></div>
-  </div>
-  
-  <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+  <ScrollReveal animation="scale">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h2 class="text-4xl md:text-6xl font-bold text-white mb-8">
       Prêt à Transformer Votre Alimentation ?
     </h2>
@@ -697,36 +717,28 @@
       pour une alimentation saine et authentique.
     </p>
     
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <button 
-        on:click={() => window.location.href='/produits'}
-        class="bg-accent-gold text-footer-green px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+    <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
+      <a 
+        href="/produits"
+        class="block sm:inline-block w-full sm:w-auto text-center bg-accent-gold text-footer-green px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
       >
         Commander Maintenant
-      </button>
-      <button 
-        on:click={() => window.location.href='/grossistes'}
-        class="bg-transparent border-2 border-accent-gold text-accent-gold px-8 py-4 rounded-full font-bold text-lg hover:bg-accent-gold hover:text-footer-green transition-all duration-300"
+      </a>
+      <a 
+        href="/grossistes"
+        class="block sm:inline-block w-full sm:w-auto text-center bg-transparent border-2 border-accent-gold text-accent-gold px-6 py-3 rounded-full font-semibold text-base hover:bg-accent-gold/10 transition-all duration-300"
       >
         Devenir Distributeur
-      </button>
+      </a>
     </div>
   </div>
+  </ScrollReveal>
   
   <!-- Divider at bottom -->
   <div class="absolute bottom-0 left-0 right-0 h-px bg-white/10"></div>
 </section>
 
 <style>
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-  }
-  
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-  
   .hero-heading {
     opacity: 0;
     transform: translateY(30px);
@@ -756,5 +768,13 @@
   .hero-image-wrap.loaded {
     opacity: 1;
     transform: scale(1) translateX(0);
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 </style>

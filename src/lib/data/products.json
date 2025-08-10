@@ -7,11 +7,11 @@
     "price": 2500,
     "description": "Fonio précuit de qualité supérieure, prêt en 10 minutes. Cultivé par les femmes de l'Atacora selon des méthodes traditionnelles.",
     "detailedDescription": "Notre fonio précuit bio est cultivé dans les montagnes de l'Atacora par des coopératives de femmes qui perpétuent des méthodes de culture ancestrales. Ce super-aliment africain, surnommé 'le grain des rois', est naturellement sans gluten et offre une alternative nutritive exceptionnelle aux céréales classiques. Sa préparation rapide en fait un allié idéal pour une alimentation saine au quotidien.",
-    "image": "/images/products/fonio-precuit.jpg",
+    "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&h=600&fit=crop",
     "images": [
-      "/images/products/fonio-precuit.jpg",
-      "/images/products/fonio-precuit-2.jpg",
-      "/images/products/fonio-precuit-3.jpg"
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1563865436874-9aef32095fad?w=600&h=600&fit=crop"
     ],
     "benefits": [
       "Riche en fibres alimentaires",
@@ -46,11 +46,11 @@
     "price": 3500,
     "description": "Pulpe de baobab 100% naturelle, riche en vitamine C. Séchée au soleil et finement moulue.",
     "detailedDescription": "La pulpe de baobab est extraite du fruit de l'arbre millénaire africain. Notre pulpe est récoltée à maturité, séchée naturellement au soleil puis finement moulue pour préserver tous ses nutriments. Avec 6 fois plus de vitamine C que l'orange et une richesse exceptionnelle en antioxydants, c'est un véritable trésor nutritionnel qui booste votre système immunitaire naturellement.",
-    "image": "/images/products/baobab-pulpe.jpg",
+    "image": "https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=600&h=600&fit=crop",
     "images": [
-      "/images/products/baobab-pulpe.jpg",
-      "/images/products/baobab-pulpe-2.jpg",
-      "/images/products/baobab-pulpe-3.jpg"
+      "https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&h=600&fit=crop"
     ],
     "benefits": [
       "Riche en vitamine C (6x plus que l'orange)",
@@ -86,10 +86,10 @@
     "price": 1800,
     "description": "Farine de néré traditionnelle, parfaite pour les sauces et assaisonnements africains.",
     "detailedDescription": "La farine de néré est obtenue à partir des graines fermentées du néré (Parkia biglobosa), un arbre emblématique de l'Afrique de l'Ouest. Cette farine est un condiment essentiel de la cuisine béninoise, apportant une saveur umami unique à vos plats. Riche en protéines et en minéraux, elle est également reconnue pour ses propriétés nutritionnelles exceptionnelles.",
-    "image": "/images/products/nere-farine.jpg",
+    "image": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=600&fit=crop",
     "images": [
-      "/images/products/nere-farine.jpg",
-      "/images/products/nere-farine-2.jpg"
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=600&fit=crop"
     ],
     "benefits": [
       "Riche en protéines (35%)",
@@ -123,10 +123,10 @@
     "price": 2200,
     "description": "Confiture de mangue Kent, préparée artisanalement avec 60% de fruits.",
     "detailedDescription": "Notre confiture est élaborée à partir de mangues Kent sélectionnées à parfaite maturité. Préparée en petites quantités selon une recette traditionnelle, elle contient 60% de fruits pour un goût authentique et intense. Sans conservateurs artificiels, elle est cuite lentement pour préserver les saveurs et les nutriments du fruit.",
-    "image": "/images/products/confiture-mangue.jpg",
+    "image": "https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=600&h=600&fit=crop",
     "images": [
-      "/images/products/confiture-mangue.jpg",
-      "/images/products/confiture-mangue-2.jpg"
+      "https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=600&h=600&fit=crop"
     ],
     "benefits": [
       "60% de fruits",
@@ -160,10 +160,10 @@
     "price": 1500,
     "description": "Biscuits croustillants enrichis à la pulpe de baobab, sans additifs artificiels.",
     "detailedDescription": "Nos biscuits allient le savoir-faire de la biscuiterie traditionnelle à la richesse nutritionnelle du baobab. Croustillants et savoureux, ils sont enrichis en pulpe de baobab qui leur confère un goût unique légèrement acidulé et une valeur nutritive exceptionnelle. Parfaits pour le goûter ou comme en-cas sain.",
-    "image": "/images/products/biscuits-baobab.jpg",
+    "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=600&fit=crop",
     "images": [
-      "/images/products/biscuits-baobab.jpg",
-      "/images/products/biscuits-baobab-2.jpg"
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1548365328-8c6db3220e4c?w=600&h=600&fit=crop"
     ],
     "benefits": [
       "Enrichis en vitamine C",
@@ -197,10 +197,10 @@
     "price": 2800,
     "description": "Fagara premium, épice rare aux propriétés aromatiques exceptionnelles.",
     "detailedDescription": "Le fagara, aussi appelé poivre de Guinée, est une épice précieuse récoltée sur les lianes sauvages des forêts béninoises. Notre sélection premium est cueillie à la main et séchée traditionnellement pour préserver ses huiles essentielles. Son arôme complexe, à la fois poivré, citronné et légèrement anesthésiant, en fait une épice recherchée par les gastronomes.",
-    "image": "/images/products/fagara-epices.jpg",
+    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&h=600&fit=crop",
     "images": [
-      "/images/products/fagara-epices.jpg",
-      "/images/products/fagara-epices-2.jpg"
+      "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1599909533169-c5e625f29dd5?w=600&h=600&fit=crop"
     ],
     "benefits": [
       "Arôme unique et intense",

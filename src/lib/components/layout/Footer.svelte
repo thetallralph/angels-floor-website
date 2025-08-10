@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Mail, Phone, MapPin, ArrowRight, Building, Users, MessageCircle } from 'lucide-svelte';
+  import { Mail, Phone, MapPin, ArrowRight, MessageCircle } from 'lucide-svelte';
   
   let whatsappNumber = '';
   
@@ -47,11 +47,11 @@
 
   <!-- Main Content -->
   <div class="relative z-10 max-w-7xl mx-auto px-4 py-16">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-center md:text-left">
       
       <!-- Logo & Contact Column -->
       <div class="space-y-6 lg:col-span-1">
-        <div class="w-48">
+        <div class="w-48 mx-auto md:mx-0">
           <svg viewBox="0 0 848 381" class="w-full h-auto fill-white">
             <g>
               <path fill-rule="evenodd" d="m743.2 294.3c-0.9 2.9-2.7 5.4-4.9 7.5-3.8 3.6-8 6-13.4 4-4.5-1.8-6.4-5.7-6.2-12.3 0-2 1.4-4.3-0.8-6.5-3.1 1-4.4 3.8-5.9 6.3-4.6 7.6-7.4 15.9-9.7 24.4-0.6 2.1-1.1 4.2-1.9 6.3-1.3 3-3.8 4.4-7.2 4.5-3.7 0.1-6.4-1.3-8-4.6-2.3-4.9-2-10.2-2.3-15.4-0.1-1.7 0.6-4.3-2-4.6-2.7-0.2-5.8-0.6-7.4 2.3-1.1 1.9-1.6 4.1-2.6 6-4.8 9.4-11.8 15.8-23 16.2-12.7 0.4-21.3-5.7-25.3-17.8-0.8-2.4 0-6.1-3.7-6.5-4.3-0.6-5.1 2.9-6.4 6.1-5.7 13.2-15.6 19.2-29 18.2-6.8-0.5-11.6-4.5-16.4-9-6.5 5-13 9.2-21.6 9.2-8.8-0.1-14.6-3.9-18.4-11.4-3.5-6.7-5-14-5.2-21.5-0.2-6.3-0.1-12.6-0.1-19.9-5.2 7.3-12.4 5.8-19.3 6-4.4 0.1-9.5-1.6-12.9 0.9-3.3 2.4-1.6 7.7-2.6 11.7-1.5 5.5-2.7 11.2-5.3 16.4-5.8 11.3-15 17-27.6 17.7-11 0.6-20.7-2.1-28.6-10-3.3-3.3-5.2-7.1-4.1-11.9 0.5-2.4 1.4-4.7 4.1-5.7 2.8-0.9 4.8 0.5 6.6 2.3 1.9 2 3.5 4.3 5.5 6.2 8.7 8.1 20.6 6.2 26.2-4.4 3.7-6.9 4.3-14.6 5-22.2-2.2-1.6-4.5-0.7-6.6-1.1-4.9-1-6.8-3.3-6.7-7.8 0.1-4.7 2.1-7 6.7-8 2.7-0.6 6.1 1 7.8-1.2 2.3-2.7 2-6.7 2.1-10.2 0.2-7.1 2.3-14.1 1.6-21.7-5.8 0.4-11.1 1.3-16.2 3.2-7.3 2.8-9.3 7.8-6.7 15.1 2.4 6.7 1.9 9-2.4 10.8-5.2 2.2-10.8 0.2-13.3-4.7-6-11.5-1.6-26 10.1-32.9 9.7-5.7 20.5-7.5 31.5-8.7 19-2 37.9-1.2 56.8 0.6 3.5 0.3 5.7-0.2 7.5-3.3 2-3.3 4.7-6.1 8.1-8.1 9-5.4 17.6-2.6 21.1 7.3 3.1 8.8 2.4 17.9 0.7 26.9-4.3 21.4-14.3 40.2-26.2 58.2-1 1.6-2.3 3.1-3.2 4.7-2.5 4.7 0.5 10.4 5.7 11.1 7.7 1 14.3-4.8 14.4-12.8 0.1-8.1 1.9-15.8 6.5-22.6 4.7-6.9 11.1-11.4 19.5-12.4 13.1-1.7 22.5 4.6 26.8 17.8 0.8 2.2 0 5.1 3.7 5.4 4 0.4 4.9-2.1 6.3-5 4.8-10.8 12.7-17.8 25.1-18.3 12.5-0.6 20.6 5.4 24.3 18.8 1.3 4.7 3.6 4.6 7.1 4.3 2.8-0.2 3.5-2 4-4.3 0.7-3.5 1.4-7.1 2.5-10.4 2.1-6.6 6.5-9.1 13.2-8.5q5.3 0.5 4.3 5.5c-1 4.8-2.3 9.6-3.4 14.4 0.4 0.8 0.6 1.8 1.9 1.3 2.5-5 5.7-9.4 9.6-13.3 2.7-2.8 5.7-5.1 9.4-6.6 9.6-3.8 15.3-0.1 14.5 10.1-0.3 3.9-0.2 6.4 3.9 8.3 3.8 1.8 3.5 6 2.4 9.6zm-216.9-61.6q-14.4-0.2-28.8-0.4c-2.3-0.1-3.6 0.8-3.8 3.2-0.9 9.7-1.9 19.3-2.8 28.7 11.1 2.9 22.3-2.9 32 5.1 2-11 3.7-21.8 7-32.2 1.1-3.4-0.5-4.4-3.6-4.4zm13.2 50.1c10.1-18.6 18.2-36 18.7-56 0-2.5-0.3-4.9-0.7-7.4-0.1-1-0.8-2.1-1.9-2.3-1.3-0.3-2.3 0.6-2.7 1.5-1.5 2.9-3 5.9-4.1 8.9-4.1 12-6.6 24.4-8.1 36.9-0.7 5.5-2.1 11-1.2 18.4zm57.3 16.5c-4.8-5.1-6.3-11.2-5.9-19.3-7 2-9.9 6.3-10.7 12-1 6.7-2.2 13.7 3.5 19.2 3 2.9 7.7 2.4 11-0.7 3.7-3.5 4.8-8.3 2.1-11.2zm60.6 1.3c-5.8-5.4-7.5-12.3-7.3-20.6-10.8 5.3-14.8 22-8.2 30 0.5 0.6 1.1 1.2 1.7 1.7 3.1 2.2 7.4 1.7 10.4-1.2 3-2.8 5.2-8.2 3.4-9.9z"/>
@@ -72,7 +72,7 @@
         
         <!-- Contact Info -->
         <div class="space-y-4 mt-6">
-          <div class="flex items-start space-x-3 group">
+          <div class="flex items-start space-x-3 group justify-center md:justify-start">
             <div class="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
               <MapPin class="w-4 h-4 text-accent-gold" />
             </div>
@@ -82,7 +82,7 @@
             </div>
           </div>
           
-          <a href="tel:+22901961219171" class="flex items-start space-x-3 group">
+          <a href="tel:+22901961219171" class="flex items-start space-x-3 group justify-center md:justify-start">
             <div class="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
               <Phone class="w-4 h-4 text-accent-gold" />
             </div>
@@ -91,7 +91,7 @@
             </span>
           </a>
           
-          <a href="mailto:contact@angelsfloor.bj" class="flex items-start space-x-3 group">
+          <a href="mailto:contact@angelsfloor.bj" class="flex items-start space-x-3 group justify-center md:justify-start">
             <div class="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
               <Mail class="w-4 h-4 text-accent-gold" />
             </div>
@@ -102,45 +102,46 @@
         </div>
         
         <div class="space-y-3 pt-4">
-          <a href="/a-propos" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
+          <a href="/a-propos" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Notre Histoire</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/impact" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
+          <!-- Impact link hidden for now -->
+          <!-- <a href="/impact" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Impact Communautaire</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </a>
+          </a> -->
         </div>
       </div>
       
       <!-- Produits Column -->
-      <div class="space-y-4">
+      <div class="space-y-4 flex flex-col items-center md:items-start">
         <h3 class="text-xl font-bold mb-6 relative">
           Nos Produits
-          <span class="absolute bottom-0 left-0 w-12 h-1 bg-accent-gold rounded-full"></span>
+          <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 w-12 h-1 bg-accent-gold rounded-full"></span>
         </h3>
-        <div class="space-y-3">
-          <a href="/produits?category=fonio" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
+        <div class="space-y-3 w-full">
+          <a href="/produits?category=fonio" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Gamme Fonio</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/produits?category=baobab" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
+          <a href="/produits?category=baobab" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Pulpe de Baobab</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/produits?category=nere-fagara" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
+          <a href="/produits?category=nere-fagara" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Néré & Fagara</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/produits?category=mangue" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
+          <a href="/produits?category=mangue" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Produits Mangue</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/produits?category=bisbab" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
+          <a href="/produits?category=bisbab" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Biscuits Baobab</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/produits" class="inline-flex items-center text-accent-gold hover:text-accent-gold-bright transition-colors text-sm font-medium mt-2">
+          <a href="/produits" class="inline-flex items-center text-accent-gold hover:text-accent-gold-bright transition-colors text-sm font-medium mt-2 justify-center md:justify-start">
             Voir tous les produits
             <ArrowRight class="w-3 h-3 ml-1" />
           </a>
@@ -148,55 +149,45 @@
       </div>
       
       <!-- Wholesalers Column -->
-      <div class="space-y-4">
+      <div class="space-y-4 flex flex-col items-center md:items-start">
         <h3 class="text-xl font-bold mb-6 relative">
-          Grossistes
-          <span class="absolute bottom-0 left-0 w-12 h-1 bg-accent-gold rounded-full"></span>
+          Partenaires
+          <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 w-12 h-1 bg-accent-gold rounded-full"></span>
         </h3>
-        <div class="space-y-4">
-          <div class="flex items-start space-x-3 group">
-            <div class="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-              <Building class="w-4 h-4 text-accent-gold" />
-            </div>
-            <div class="text-white/70 text-sm">
-              <p class="font-medium text-white/90">Programme Partenaire</p>
-              <p>Conditions avantageuses pour les professionnels</p>
-            </div>
-          </div>
-          
-          <div class="flex items-start space-x-3 group">
-            <div class="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-              <Users class="w-4 h-4 text-accent-gold" />
-            </div>
-            <div class="text-white/70 text-sm">
-              <p class="font-medium text-white/90">Support Dédié</p>
-              <p>Une équipe à votre écoute</p>
-            </div>
-          </div>
-          
-          <div class="pt-2">
-            <a href="/grossistes" class="inline-flex items-center text-accent-gold hover:text-accent-gold-bright transition-colors text-sm font-medium">
-              Devenir Grossiste
-              <ArrowRight class="w-3 h-3 ml-1" />
-            </a>
-          </div>
+        <div class="space-y-3 w-full">
+          <a href="/grossistes" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">Devenir Grossiste</span>
+            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </a>
+          <a href="/grossistes#avantages" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">Programme Partenaire</span>
+            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </a>
+          <a href="/contact" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">Support Commercial</span>
+            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </a>
+          <a href="/grossistes#processus" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">Comment Ça Marche</span>
+            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </a>
         </div>
       </div>
       
       <!-- Newsletter & Social Column -->
-      <div class="space-y-4">
+      <div class="space-y-4 flex flex-col items-center md:items-start">
         <h3 class="text-xl font-bold mb-6 relative">
           Restez Connectés
-          <span class="absolute bottom-0 left-0 w-12 h-1 bg-accent-gold rounded-full"></span>
+          <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 w-12 h-1 bg-accent-gold rounded-full"></span>
         </h3>
         
         <!-- WhatsApp Signup -->
-        <div class="space-y-4">
-          <p class="text-white/80 text-sm">
+        <div class="space-y-4 w-full">
+          <p class="text-white/80 text-sm text-center md:text-left">
             Recevez nos actualités sur WhatsApp
           </p>
           <form on:submit={handleWhatsAppSubmit} class="space-y-2">
-            <div class="relative">
+            <div class="relative max-w-xs mx-auto md:mx-0 w-full">
               <input
                 type="tel"
                 bind:value={whatsappNumber}
@@ -213,15 +204,15 @@
               </button>
             </div>
           </form>
-          <p class="text-white/60 text-xs">
+          <p class="text-white/60 text-xs text-center md:text-left">
             En vous inscrivant, vous acceptez de recevoir nos messages promotionnels
           </p>
         </div>
         
         <!-- Social Links -->
         <div class="space-y-4 pt-4">
-          <p class="text-white/80 text-sm">Suivez-nous</p>
-          <div class="flex space-x-3">
+          <p class="text-white/80 text-sm text-center md:text-left">Suivez-nous</p>
+          <div class="flex space-x-3 justify-center md:justify-start">
             <a
               href="https://facebook.com/angelsfloor"
               target="_blank"
@@ -252,16 +243,13 @@
     <!-- Bottom Section -->
     <div class="mt-16 pt-8 border-t border-white/10">
       <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-        <div class="text-white/60 text-sm">
+        <div class="text-white/60 text-sm text-center md:text-left">
           <p>&copy; {currentYear} Angel's Floor. Tous droits réservés.</p>
         </div>
         
         <div class="flex flex-wrap justify-center md:justify-end gap-6 text-sm">
           <a href="/mentions-legales" class="text-white/60 hover:text-white transition-colors">
             Mentions légales
-          </a>
-          <a href="/politique-confidentialite" class="text-white/60 hover:text-white transition-colors">
-            Politique de confidentialité
           </a>
           <a href="/cgv" class="text-white/60 hover:text-white transition-colors">
             CGV

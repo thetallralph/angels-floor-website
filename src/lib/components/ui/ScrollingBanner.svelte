@@ -4,6 +4,7 @@
   let bannerOffset = 0;
   let animationFrame: number;
   let rotation = 0;
+  let isPaused = false;
   
   const taglines = [
     "100% NATUREL",
@@ -25,15 +26,18 @@
     const baseSpeed = 0.05; // Slow constant speed
     
     const animate = () => {
-      // Update banner offset with constant speed
-      bannerOffset -= baseSpeed;
-      
-      // Rotate separator based on movement
-      rotation -= baseSpeed * 10; // Rotation speed proportional to movement
-      
-      // Reset when banner has scrolled enough
-      if (Math.abs(bannerOffset) > 33.33) {
-        bannerOffset += 33.33;
+      // Only update if not paused
+      if (!isPaused) {
+        // Update banner offset with constant speed
+        bannerOffset -= baseSpeed;
+        
+        // Rotate separator based on movement
+        rotation -= baseSpeed * 10; // Rotation speed proportional to movement
+        
+        // Reset when banner has scrolled enough
+        if (Math.abs(bannerOffset) > 33.33) {
+          bannerOffset += 33.33;
+        }
       }
       
       animationFrame = requestAnimationFrame(animate);
@@ -45,9 +49,20 @@
       if (animationFrame) cancelAnimationFrame(animationFrame);
     };
   });
+  
+  function handleMouseEnter() {
+    isPaused = true;
+  }
+  
+  function handleMouseLeave() {
+    isPaused = false;
+  }
 </script>
 
-<div class="banner-container">
+<div 
+  class="banner-container"
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}>
   <div 
     class="banner-track"
     style="transform: translateX({bannerOffset}%)"
@@ -66,8 +81,8 @@
     position: relative;
     width: 100%;
     height: 60px;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    transform: rotate(-2deg) scale(1.1);
+    background: #FFD700;
+    transform: rotate(-2deg);
     overflow: hidden;
     margin: 2rem 0;
     box-shadow: 
@@ -89,7 +104,7 @@
     align-items: center;
     font-size: 1.125rem;
     font-weight: 700;
-    color: #2B7A0B;
+    color: #000;
     padding: 0 2rem;
     letter-spacing: 0.05em;
   }

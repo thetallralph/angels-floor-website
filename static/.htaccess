@@ -1,0 +1,11 @@
+# Block search engine crawlers during development
+# Remove this file when the site goes live
+
+# Set X-Robots-Tag header
+Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+
+# Password protection (optional - uncomment to use)
+# AuthType Basic
+# AuthName "Development Site - Restricted Access"
+# AuthUserFile /path/to/.htpasswd
+# Require valid-user
