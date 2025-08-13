@@ -1,0 +1,254 @@
+# Sveltia CMS Configuration for Angel's Floor
+
+# Production setup with GitHub
+backend:
+  name: github
+  repo: thetallralph/angels-floor-website
+  branch: main
+  # Using free Netlify Identity for authentication
+  base_url: https://sveltia-cms-auth.netlify.app
+  auth_endpoint: oauth
+
+# Uncomment for GitLab
+# backend:
+#   name: gitlab
+#   repo: username/angels-floor-website
+#   branch: main
+
+# Uncomment for local development
+# backend:
+#   name: local
+
+media_folder: static/uploads
+public_folder: /uploads
+
+# Sveltia CMS specific settings
+site_url: https://angelsfloor.com
+display_url: https://angelsfloor.com
+logo_url: /logo.png
+
+locale: fr
+default_locale: fr
+
+# Collections
+collections:
+  # Products Collection
+  - name: products
+    label: Produits
+    label_singular: Produit
+    folder: src/content/products
+    create: true
+    format: json
+    slug: "{{slug}}"
+    preview_path: "produits/{{slug}}"
+    sortable_fields: ['name', 'category', 'price', 'commit_date']
+    summary: "{{name}} - {{category}} - {{price}} FCFA"
+    fields:
+      - { label: "ID", name: "id", widget: "string", hint: "Identifiant unique du produit" }
+      - { label: "Slug", name: "slug", widget: "string", hint: "URL du produit (ex: fonio-precuit-bio)" }
+      - { label: "Nom", name: "name", widget: "string" }
+      - label: "Catégorie"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "Fonio", value: "fonio" }
+          - { label: "Baobab", value: "baobab" }
+          - { label: "Néré & Fagara", value: "nere-fagara" }
+          - { label: "Mangue", value: "mangue" }
+          - { label: "Biscuits Baobab", value: "bisbab" }
+      - { label: "Prix (FCFA)", name: "price", widget: "number", value_type: "int", min: 0 }
+      - { label: "Description courte", name: "description", widget: "text", hint: "Description affichée sur les cartes produit" }
+      - { label: "Description détaillée", name: "detailedDescription", widget: "markdown", required: false }
+      - { label: "Image principale", name: "image", widget: "image" }
+      - label: "Galerie d'images"
+        name: "images"
+        widget: "list"
+        required: false
+        field: { label: "Image", name: "image", widget: "image" }
+      - label: "Bénéfices"
+        name: "benefits"
+        widget: "list"
+        field: { label: "Bénéfice", name: "benefit", widget: "string" }
+      - label: "Informations nutritionnelles"
+        name: "nutritionalInfo"
+        widget: "object"
+        required: false
+        collapsed: true
+        fields:
+          - { label: "Calories", name: "calories", widget: "number", required: false }
+          - { label: "Protéines (g)", name: "protein", widget: "number", required: false }
+          - { label: "Glucides (g)", name: "carbs", widget: "number", required: false }
+          - { label: "Fibres (g)", name: "fiber", widget: "number", required: false }
+          - { label: "Lipides (g)", name: "fat", widget: "number", required: false }
+          - { label: "Vitamine C (mg)", name: "vitaminC", widget: "number", required: false }
+          - { label: "Calcium (mg)", name: "calcium", widget: "number", required: false }
+          - { label: "Potassium (mg)", name: "potassium", widget: "number", required: false }
+          - { label: "Fer (mg)", name: "iron", widget: "number", required: false }
+          - label: "Vitamines"
+            name: "vitamins"
+            widget: "list"
+            required: false
+            field: { label: "Vitamine", name: "vitamin", widget: "string" }
+          - label: "Minéraux"
+            name: "minerals"
+            widget: "list"
+            required: false
+            field: { label: "Minéral", name: "mineral", widget: "string" }
+          - { label: "Antioxydants", name: "antioxidants", widget: "string", required: false }
+      - { label: "Utilisation", name: "usage", widget: "text", required: false }
+      - { label: "Conditionnement", name: "packaging", widget: "string", required: false }
+      - { label: "Origine", name: "origin", widget: "string", required: false, default: "Bénin" }
+      - { label: "Certification", name: "certification", widget: "string", required: false }
+      - { label: "En stock", name: "inStock", widget: "boolean", default: true }
+      - { label: "Produit vedette", name: "featured", widget: "boolean", default: false }
+
+  # Blog Collection
+  - name: blog
+    label: Blog
+    label_singular: Article
+    folder: src/content/blog
+    create: true
+    format: json
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "blog/{{slug}}"
+    sortable_fields: ['title', 'date', 'category']
+    summary: "{{title}} - {{date}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Résumé", name: "excerpt", widget: "text", hint: "Courte description de l'article" }
+      - { label: "Contenu", name: "content", widget: "markdown" }
+      - { label: "Image de couverture", name: "image", widget: "image" }
+      - label: "Catégorie"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "Recettes", value: "Recettes" }
+          - { label: "Bienfaits", value: "Bienfaits" }
+          - { label: "Actualités Entreprise", value: "Actualités Entreprise" }
+          - { label: "Communauté", value: "Communauté" }
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD", time_format: false }
+      - { label: "Auteur", name: "author", widget: "string", default: "Équipe Angel's Floor" }
+      - { label: "Temps de lecture (minutes)", name: "readTime", widget: "number", value_type: "int", min: 1 }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        field: { label: "Tag", name: "tag", widget: "string" }
+
+  # Sales Points Collection
+  - name: salesPoints
+    label: Points de vente
+    label_singular: Point de vente
+    folder: src/content/sales-points
+    create: true
+    format: json
+    slug: "{{slug}}"
+    sortable_fields: ['name', 'type']
+    summary: "{{name}} - {{type}}"
+    fields:
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "Nom", name: "name", widget: "string" }
+      - { label: "Adresse", name: "address", widget: "text" }
+      - label: "Coordonnées GPS"
+        name: "coordinates"
+        widget: "list"
+        max: 2
+        min: 2
+        fields:
+          - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
+          - { label: "Longitude", name: "lng", widget: "number", value_type: "float" }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "Siège", value: "siege" }
+          - { label: "Grossiste", value: "grossiste" }
+          - { label: "Détaillant", value: "detaillant" }
+      - { label: "Contact", name: "contact", widget: "string" }
+      - { label: "Email", name: "email", widget: "string", required: false }
+      - { label: "Horaires", name: "hours", widget: "string", required: false }
+
+  # Pages Collection (for editable page content)
+  - name: pages
+    label: Pages
+    label_singular: Page
+    files:
+      - label: "Page d'accueil"
+        name: "home"
+        file: "src/content/pages/home.json"
+        fields:
+          - label: "Section Héro"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "Titre", name: "title", widget: "string" }
+              - { label: "Sous-titre", name: "subtitle", widget: "text" }
+              - { label: "Bouton CTA", name: "ctaText", widget: "string" }
+              - { label: "Image", name: "image", widget: "image" }
+          
+          - label: "Statistiques"
+            name: "stats"
+            widget: "list"
+            fields:
+              - { label: "Nombre", name: "number", widget: "string" }
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Icône", name: "icon", widget: "string", hint: "Nom de l'icône Lucide" }
+
+      - label: "À propos"
+        name: "about"
+        file: "src/content/pages/about.json"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Introduction", name: "intro", widget: "markdown" }
+          - label: "Notre histoire"
+            name: "story"
+            widget: "object"
+            fields:
+              - { label: "Titre", name: "title", widget: "string" }
+              - { label: "Contenu", name: "content", widget: "markdown" }
+              - { label: "Image", name: "image", widget: "image" }
+          - label: "Valeurs"
+            name: "values"
+            widget: "list"
+            fields:
+              - { label: "Titre", name: "title", widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - { label: "Icône", name: "icon", widget: "string" }
+
+      - label: "Impact"
+        name: "impact"
+        file: "src/content/pages/impact.json"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Introduction", name: "intro", widget: "markdown" }
+          - label: "Impacts"
+            name: "impacts"
+            widget: "list"
+            fields:
+              - { label: "Titre", name: "title", widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - { label: "Statistique", name: "stat", widget: "string" }
+              - { label: "Image", name: "image", widget: "image" }
+
+  # Site Settings
+  - name: settings
+    label: Paramètres
+    files:
+      - label: "Informations générales"
+        name: "general"
+        file: "src/content/settings/general.json"
+        fields:
+          - { label: "Nom du site", name: "siteName", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Email", name: "email", widget: "string" }
+          - { label: "Téléphone", name: "phone", widget: "string" }
+          - { label: "Adresse", name: "address", widget: "text" }
+          - label: "Réseaux sociaux"
+            name: "social"
+            widget: "object"
+            fields:
+              - { label: "Facebook", name: "facebook", widget: "string", required: false }
+              - { label: "Instagram", name: "instagram", widget: "string", required: false }
+              - { label: "Twitter", name: "twitter", widget: "string", required: false }
+              - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+              - { label: "YouTube", name: "youtube", widget: "string", required: false }

@@ -1,0 +1,39 @@
+{
+  "id": "1",
+  "slug": "fonio-precuit-bio",
+  "name": "Fonio Précuit Bio",
+  "category": "fonio",
+  "price": 2500,
+  "description": "Fonio précuit de qualité supérieure, prêt en 10 minutes. Une céréale ancestrale africaine naturellement sans gluten.",
+  "detailedDescription": "Notre fonio précuit bio est cultivé dans les montagnes de l'Atacora au Bénin, selon des méthodes traditionnelles respectueuses de l'environnement. Cette céréale millénaire, surnommée 'le germe de l'univers' par les Dogons du Mali, est reconnue pour ses qualités nutritionnelles exceptionnelles.\n\nFacile et rapide à préparer, notre fonio précuit ne nécessite que 10 minutes de cuisson. Il peut remplacer le riz, la semoule ou le quinoa dans toutes vos recettes.",
+  "image": "/uploads/fonio-precuit.jpg",
+  "images": [
+    "/uploads/fonio-precuit-2.jpg",
+    "/uploads/fonio-precuit-3.jpg"
+  ],
+  "benefits": [
+    "Riche en fibres alimentaires",
+    "Sans gluten naturellement",
+    "Facile à digérer",
+    "Index glycémique bas",
+    "Source de protéines végétales",
+    "Riche en acides aminés essentiels"
+  ],
+  "nutritionalInfo": {
+    "calories": 360,
+    "protein": 9,
+    "carbs": 75,
+    "fiber": 3.8,
+    "fat": 1.8,
+    "vitamins": ["B1", "B2", "B3"],
+    "minerals": ["Fer", "Zinc", "Magnésium"],
+    "iron": 1.5,
+    "calcium": 44
+  },
+  "usage": "Rincer le fonio et le faire bouillir dans 2 volumes d'eau salée pendant 10 minutes. Laisser reposer 5 minutes hors du feu. Égrainer à la fourchette avant de servir.",
+  "packaging": "Sachet de 500g",
+  "origin": "Bénin - Montagnes de l'Atacora",
+  "certification": "Agriculture Biologique",
+  "inStock": true,
+  "featured": true
+}

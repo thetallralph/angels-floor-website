@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Connexion Admin - Angel's Floor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .login-container {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      color: #2d3748;
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: #718096;
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      color: #4a5568;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .error {
+      color: #e53e3e;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .error.show {
+      display: block;
+    }
+    
+    .info {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      font-size: 0.875rem;
+      color: #4a5568;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>Angel's Floor</h1>
+      <p class="subtitle">Administration du contenu</p>
+    </div>
+    
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Entrez votre mot de passe"
+          required
+          autofocus
+        />
+        <div class="error" id="errorMessage">Mot de passe incorrect</div>
+      </div>
+      
+      <button type="submit" id="submitBtn">
+        <span id="btnText">Se connecter</span>
+      </button>
+    </form>
+    
+    <div class="info">
+      <strong>Note:</strong> Pour le développement local, utilisez le mode test dans config.yml qui ne nécessite pas d'authentification.
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Hide error message
+      errorMessage.classList.remove('show');
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      btnText.innerHTML = '<span class="spinner"></span>Connexion...';
+      
+      const password = passwordInput.value;
+      
+      try {
+        // Try to authenticate with the API
+        const response = await fetch('/api/cms-auth', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store token in localStorage
+          localStorage.setItem('cms_token', data.token);
+          localStorage.setItem('cms_user', JSON.stringify(data.user));
+          
+          // Redirect to CMS
+          window.location.href = '/admin/index.html';
+        } else {
+          throw new Error('Invalid password');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        
+        // For local development, check a simple password
+        if (password === 'admin123') {
+          localStorage.setItem('cms_token', 'local_dev_token');
+          localStorage.setItem('cms_user', JSON.stringify({
+            email: 'admin@local',
+            name: 'Local Admin'
+          }));
+          window.location.href = '/admin/index.html';
+        } else {
+          errorMessage.classList.add('show');
+          passwordInput.focus();
+          passwordInput.select();
+        }
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        btnText.textContent = 'Se connecter';
+      }
+    });
+    
+    // Clear error on input
+    passwordInput.addEventListener('input', () => {
+      errorMessage.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

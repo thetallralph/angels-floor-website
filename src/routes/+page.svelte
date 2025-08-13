@@ -566,7 +566,7 @@
     </div>
     
     <!-- Additional testimonials slider indicator -->
-    <div class="flex justify-center mt-12 space-x-2">
+    <div class="hidden md:flex justify-center mt-12 space-x-2">
       <div class="w-2 h-2 bg-primary-green rounded-full"></div>
       <div class="w-2 h-2 bg-neutral-light rounded-full"></div>
       <div class="w-2 h-2 bg-neutral-light rounded-full"></div>

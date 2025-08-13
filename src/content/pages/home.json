@@ -1,0 +1,30 @@
+{
+  "hero": {
+    "title": "Saveurs authentiques d'Afrique, directement du Bénin",
+    "subtitle": "Découvrez notre gamme de produits naturels et nutritifs : fonio bio, pulpe de baobab, et bien plus. Des aliments sains cultivés avec passion par les communautés locales.",
+    "ctaText": "Découvrir nos produits",
+    "image": "/images/hero-products.jpg"
+  },
+  "stats": [
+    {
+      "number": "500+",
+      "label": "Familles d'agriculteurs partenaires",
+      "icon": "Users"
+    },
+    {
+      "number": "100%",
+      "label": "Produits naturels et bio",
+      "icon": "Leaf"
+    },
+    {
+      "number": "10 000+",
+      "label": "Clients satisfaits",
+      "icon": "Heart"
+    },
+    {
+      "number": "15+",
+      "label": "Points de vente au Bénin",
+      "icon": "MapPin"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "2",
+  "slug": "pulpe-baobab-pure",
+  "name": "Pulpe de Baobab Pure",
+  "category": "baobab",
+  "price": 3500,
+  "description": "Pulpe de baobab 100% naturelle, riche en vitamine C. Un super-aliment africain aux propriétés antioxydantes exceptionnelles.",
+  "detailedDescription": "La pulpe de baobab Angel's Floor est récoltée à partir des fruits du majestueux baobab, l'arbre de vie africain. Notre pulpe est obtenue par un processus de séchage naturel qui préserve toutes ses qualités nutritionnelles.\n\nAvec 6 fois plus de vitamine C que l'orange et 2 fois plus de calcium que le lait, la pulpe de baobab est un véritable trésor nutritionnel. Son goût acidulé et fruité en fait un ingrédient parfait pour vos smoothies, yaourts et pâtisseries.",
+  "image": "/uploads/baobab-pulpe.jpg",
+  "images": [
+    "/uploads/baobab-tree.jpg",
+    "/uploads/baobab-powder.jpg"
+  ],
+  "benefits": [
+    "6x plus de vitamine C que l'orange",
+    "Antioxydant naturel puissant",
+    "Renforce le système immunitaire",
+    "Améliore la digestion",
+    "Source de calcium végétal",
+    "Régule la glycémie"
+  ],
+  "nutritionalInfo": {
+    "calories": 250,
+    "protein": 2.3,
+    "carbs": 80,
+    "fiber": 44,
+    "fat": 0.5,
+    "vitaminC": 280,
+    "calcium": 295,
+    "potassium": 2250,
+    "iron": 2,
+    "antioxidants": "Très élevé"
+  },
+  "usage": "Ajouter 1 à 2 cuillères à soupe dans vos smoothies, jus de fruits, yaourts ou pâtisseries. Peut également être mélangé à de l'eau pour une boisson rafraîchissante.",
+  "packaging": "Pot de 250g",
+  "origin": "Bénin - Région Nord",
+  "certification": "Produit naturel certifié",
+  "inStock": true,
+  "featured": true
+}

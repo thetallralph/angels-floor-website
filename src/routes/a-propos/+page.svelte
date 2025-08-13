@@ -116,8 +116,8 @@
     
     <!-- Timeline Container -->
     <div class="relative">
-      <!-- Timeline Vertical Line - Desktop only -->
-      <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-primary-green/20"></div>
+      <!-- Timeline Vertical Line - Desktop only with gradient -->
+      <div class="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-primary-green/5 via-primary-green/20 to-primary-green/5"></div>
       
       <!-- Timeline Events -->
       <div class="space-y-12 md:space-y-16">
@@ -148,8 +148,10 @@
                   <div class="w-14 h-14 bg-white border-4 border-primary-green rounded-full flex items-center justify-center text-primary-green font-bold shadow-lg {activeTimelineItem >= index ? 'scale-100' : 'scale-75'} transition-transform duration-500">
                     {event.year}
                   </div>
-                  <!-- Vertical Line for Mobile -->
-                  <div class="absolute top-14 left-1/2 transform -translate-x-1/2 w-1 h-20 bg-primary-green/20"></div>
+                  <!-- Vertical Line for Mobile with gradient -->
+                  {#if index < timelineEvents.length - 1}
+                    <div class="absolute top-14 left-1/2 transform -translate-x-1/2 w-1 h-20 bg-gradient-to-b from-primary-green/20 to-primary-green/5"></div>
+                  {/if}
                 </div>
                 
                 <!-- Mobile Content -->
@@ -171,9 +173,9 @@
           <div class="timeline-item hidden md:block relative">
             <div class="flex items-center">
               {#if index === timelineEvents.length - 1}
-                <!-- Last Item - Centered -->
-                <div class="w-full flex justify-center">
-                  <div class="max-w-lg bg-primary-green text-white rounded-3xl p-10 shadow-2xl hover:shadow-3xl {activeTimelineItem >= index ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} transition-all duration-700">
+                <!-- Last Item - Centered with proper spacing -->
+                <div class="w-full flex justify-center relative">
+                  <div class="max-w-lg bg-primary-green text-white rounded-3xl p-10 shadow-2xl hover:shadow-3xl {activeTimelineItem >= index ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} transition-all duration-700 mt-8">
                     <h3 class="text-3xl font-bold text-white mb-4 text-center">{event.title}</h3>
                     <p class="text-white/90 mb-6 text-center text-lg">{event.description}</p>
                     <div class="flex justify-center">
@@ -217,7 +219,7 @@
               {/if}
               
               <!-- Center Timeline Dot - Absolute positioned -->
-              <div class="absolute left-1/2 transform -translate-x-1/2 z-20">
+              <div class="absolute left-1/2 transform -translate-x-1/2 {index === timelineEvents.length - 1 ? '-top-4' : 'top-0'} z-20">
                 <div class="relative">
                   <!-- Pulse animation for active items -->
                   {#if activeTimelineItem >= index}

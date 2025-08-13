@@ -1,21 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import type { PageData } from './$types';
   import ProductCard from '$lib/components/ui/ProductCard.svelte';
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
-  import { products, categories } from '$lib/data/products.js';
   import { ChevronDown, Filter } from 'lucide-svelte';
+  
+  export let data: PageData;
   
   let activeCategory = 'fonio';
   let mobileMenuOpen = false;
   
-  // Group products by category
-  const productsByCategory = products.reduce((acc, product) => {
-    if (!acc[product.category]) {
-      acc[product.category] = [];
-    }
-    acc[product.category].push(product);
-    return acc;
-  }, {} as Record<string, typeof products>);
+  $: ({ categories, productsByCategory } = data);
   
   function scrollToCategory(categoryId: string) {
     const element = document.getElementById(`category-${categoryId}`);
