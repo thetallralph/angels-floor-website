@@ -64,7 +64,7 @@
     // Auto-advance hero images
     const imageInterval = setInterval(() => {
       currentImageIndex = (currentImageIndex + 1) % heroImages.length;
-    }, 4000);
+    }, 6000);
     
     // Set up intersection observer for impact section
     const impactSection = document.querySelector('#impact-section');
@@ -142,12 +142,8 @@
       <!-- Text Content -->
       <div class="relative z-10 text-center lg:text-left flex flex-col items-center lg:items-start">
         <div class="hero-heading" class:visible={heroVisible}>
-          <h1 class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center lg:text-left">
-            <AnimatedText 
-              text="Produits africains transformés avec expertise et tradition" 
-              className="inline" 
-              delay={100}
-            />
+          <h1 class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center lg:text-left hero-title">
+            Produits africains transformés avec expertise et tradition
           </h1>
           
           <div class="hero-desc opacity-0 translate-y-8" class:show={heroVisible}>
@@ -190,7 +186,7 @@
               {@const isVisible = Math.abs(offset) <= 1}
               {#if isVisible}
                 <div 
-                  class="absolute inset-0 transition-all duration-700 ease-in-out"
+                  class="absolute inset-0 transition-all duration-1000 ease-in-out"
                   style="
                     transform: translateY({offset * 120}px) scale({offset === 0 ? 1 : 0.8}) rotate({offset * 3}deg);
                     opacity: {offset === 0 ? 1 : 0.35};
@@ -211,16 +207,7 @@
             {/each}
           </div>
           
-          <!-- Navigation dots -->
-          <div class="absolute -right-8 lg:-right-16 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-20">
-            {#each heroImages as _, index}
-              <button
-                class="w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 {currentImageIndex === index ? 'bg-white w-3 h-8' : 'bg-white/50'}"
-                on:click={() => currentImageIndex = index}
-                aria-label="Go to image {index + 1}"
-              />
-            {/each}
-          </div>
+          <!-- Navigation dots removed -->
         </div>
       </div>
     </div>
@@ -741,8 +728,8 @@
 <style>
   .hero-heading {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
   }
   
   .hero-heading.visible {
@@ -750,8 +737,25 @@
     transform: translateY(0);
   }
   
+  .hero-title {
+    opacity: 0;
+    animation: smoothFadeIn 0.8s ease-out forwards;
+    animation-delay: 0.1s;
+  }
+  
+  @keyframes smoothFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
   .hero-desc {
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
   }
   
   .hero-desc.show {

@@ -356,7 +356,8 @@
   </div>
 </section>
 
-<!-- Team Section -->
+<!-- Team Section (Hidden) -->
+{#if false}
 <section class="py-20 bg-neutral-sand">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <ScrollReveal animation="fade-up">
@@ -431,8 +432,10 @@
     </div>
   </div>
 </section>
+{/if}
 
-<!-- Certifications & Partners Section -->
+<!-- Certifications & Partners Section (Hidden) -->
+{#if false}
 <section class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-12">
@@ -516,6 +519,7 @@
     </div>
   </div>
 </section>
+{/if}
 
 <!-- Call to Action -->
 <section class="py-20 bg-primary-green relative overflow-hidden">

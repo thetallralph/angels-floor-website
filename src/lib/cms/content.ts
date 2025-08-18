@@ -45,8 +45,15 @@ export async function loadSalesPoints(): Promise<SalesPoint[]> {
 // Load page content
 export async function loadPageContent(pageName: string): Promise<Record<string, unknown> | null> {
   try {
-    const module = await import(`/src/content/pages/${pageName}.json`);
-    return module.default || module;
+    const pageModules = import.meta.glob('/src/content/pages/*.json');
+    const path = `/src/content/pages/${pageName}.json`;
+    
+    if (path in pageModules) {
+      const module = await pageModules[path]() as { default?: Record<string, unknown> } | Record<string, unknown>;
+      return 'default' in module ? module.default || null : module as Record<string, unknown>;
+    }
+    
+    return null;
   } catch (error) {
     console.error(`Failed to load page content for ${pageName}:`, error);
     return null;
@@ -56,8 +63,15 @@ export async function loadPageContent(pageName: string): Promise<Record<string, 
 // Load site settings
 export async function loadSettings(settingName: string): Promise<Record<string, unknown> | null> {
   try {
-    const module = await import(`/src/content/settings/${settingName}.json`);
-    return module.default || module;
+    const settingsModules = import.meta.glob('/src/content/settings/*.json');
+    const path = `/src/content/settings/${settingName}.json`;
+    
+    if (path in settingsModules) {
+      const module = await settingsModules[path]() as { default?: Record<string, unknown> } | Record<string, unknown>;
+      return 'default' in module ? module.default || null : module as Record<string, unknown>;
+    }
+    
+    return null;
   } catch (error) {
     console.error(`Failed to load settings for ${settingName}:`, error);
     return null;

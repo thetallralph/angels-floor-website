@@ -135,17 +135,18 @@
 
 <div class="min-h-screen bg-neutral-sand">
 	<!-- Hero Section -->
-	<section class="relative bg-primary-green text-white py-16 lg:py-24 overflow-hidden">
-		<div class="absolute inset-0 bg-gradient-to-br from-primary-green via-primary-green to-green-800"></div>
-		<div class="absolute top-10 right-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-		<div class="absolute bottom-10 left-10 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+	<section class="relative bg-primary-green py-16 lg:py-24 overflow-hidden">
+		<div class="absolute inset-0">
+			<div class="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+			<div class="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+		</div>
 		
-		<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 			<div class="text-center">
-				<h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+				<h1 class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-6 leading-tight">
 					Nos Points de Vente
 				</h1>
-				<p class="text-xl md:text-2xl leading-relaxed max-w-3xl mx-auto">
+				<p class="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
 					Trouvez nos produits dans plus de {salesPoints.length} points de vente à travers le Bénin
 				</p>
 			</div>
