@@ -13,6 +13,13 @@ build/
 .env.local
 .env.production
 .env.*.local
+api/.env
+
+# CMS data (managed on server, not in repo)
+api/data/draft/
+api/data/live/
+api/uploads/
+api/data/.rate_limit.json
 
 # IDE files
 .vscode/

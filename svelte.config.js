@@ -14,8 +14,9 @@ const config = {
 		}),
 		prerender: {
 			handleHttpError: ({ path }) => {
-				// Les routes dynamiques seront gérées par le fallback SPA
-				if (path.startsWith('/produits/') || path.startsWith('/admin/')) {
+				// Routes dynamiques et assets gérés par le serveur
+				if (path.startsWith('/produits/') || path.startsWith('/admin/') ||
+				    path.startsWith('/uploads/') || path.startsWith('/api/')) {
 					return;
 				}
 				throw new Error(`404: ${path}`);

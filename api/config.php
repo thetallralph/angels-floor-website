@@ -3,8 +3,33 @@
  * Angel's Floor CMS — Configuration
  */
 
-// CORS pour le frontend SvelteKit
-header('Access-Control-Allow-Origin: *');
+// Charger le .env si présent
+$envFile = __DIR__ . '/.env';
+if (file_exists($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (str_starts_with(trim($line), '#')) continue;
+        if (strpos($line, '=') === false) continue;
+        [$key, $value] = explode('=', $line, 2);
+        $_ENV[trim($key)] = trim($value);
+        putenv(trim($key) . '=' . trim($value));
+    }
+}
+
+function env(string $key, string $default = ''): string {
+    return $_ENV[$key] ?? getenv($key) ?: $default;
+}
+
+// --- CORS ---
+$allowedOrigins = env('CMS_ALLOWED_ORIGINS', '*');
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if ($allowedOrigins === '*') {
+    header('Access-Control-Allow-Origin: *');
+} elseif ($origin && str_contains($allowedOrigins, $origin)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Vary: Origin');
+}
+
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json; charset=utf-8');
@@ -16,30 +41,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // --- Configuration ---
 
-// Clé secrète pour les tokens JWT (CHANGER EN PRODUCTION)
-define('JWT_SECRET', getenv('CMS_JWT_SECRET') ?: 'change-me-in-production-angels-floor-2024');
-
-// Durée de validité du token (24h)
+define('JWT_SECRET', env('CMS_JWT_SECRET', 'change-me-in-production-' . md5(__DIR__)));
 define('TOKEN_EXPIRY', 86400);
 
-// Chemin vers les données
 define('DATA_DIR', __DIR__ . '/data');
 define('UPLOAD_DIR', __DIR__ . '/uploads');
 define('UPLOAD_URL', '/api/uploads');
 
-// Types de contenu autorisés
 define('CONTENT_TYPES', ['products', 'blog', 'pages', 'sales-points', 'settings']);
-
-// Extensions d'images autorisées
 define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif']);
-
-// Taille max upload (5MB)
 define('MAX_UPLOAD_SIZE', 5 * 1024 * 1024);
 
-// Identifiants admin (CHANGER EN PRODUCTION)
-// Peut être défini via variables d'environnement
-define('ADMIN_EMAIL', getenv('CMS_ADMIN_EMAIL') ?: 'admin@angelsfloor.bj');
-define('ADMIN_PASSWORD_HASH', getenv('CMS_ADMIN_PASSWORD_HASH') ?: password_hash('admin123', PASSWORD_DEFAULT));
+// Credentials — MUST be set via .env or environment variables in production
+define('ADMIN_EMAIL', env('CMS_ADMIN_EMAIL', 'admin@angelsfloor.bj'));
+// Si pas de hash configuré, utiliser le mot de passe par défaut (dev seulement)
+$passwordHash = env('CMS_ADMIN_PASSWORD_HASH');
+define('ADMIN_PASSWORD_HASH', $passwordHash ?: password_hash('admin123', PASSWORD_DEFAULT));
+
+// Rate limiting fichier
+define('RATE_LIMIT_FILE', __DIR__ . '/data/.rate_limit.json');
+define('RATE_LIMIT_MAX_ATTEMPTS', 5);
+define('RATE_LIMIT_WINDOW', 900); // 15 minutes
+
+// --- Rate Limiting ---
+
+function checkRateLimit(string $ip): void {
+    $file = RATE_LIMIT_FILE;
+    $data = [];
+
+    if (file_exists($file)) {
+        $data = json_decode(file_get_contents($file), true) ?: [];
+    }
+
+    $now = time();
+
+    // Nettoyer les entrées expirées
+    foreach ($data as $key => $entry) {
+        if ($entry['expires'] < $now) {
+            unset($data[$key]);
+        }
+    }
+
+    $key = md5($ip);
+    $entry = $data[$key] ?? ['attempts' => 0, 'expires' => $now + RATE_LIMIT_WINDOW];
+
+    if ($entry['attempts'] >= RATE_LIMIT_MAX_ATTEMPTS && $entry['expires'] > $now) {
+        $wait = ceil(($entry['expires'] - $now) / 60);
+        jsonError("Trop de tentatives. Réessayez dans {$wait} minute(s).", 429);
+    }
+
+    $entry['attempts']++;
+    $entry['expires'] = $now + RATE_LIMIT_WINDOW;
+    $data[$key] = $entry;
+
+    file_put_contents($file, json_encode($data));
+}
+
+function resetRateLimit(string $ip): void {
+    $file = RATE_LIMIT_FILE;
+    if (!file_exists($file)) return;
+
+    $data = json_decode(file_get_contents($file), true) ?: [];
+    unset($data[md5($ip)]);
+    file_put_contents($file, json_encode($data));
+}
+
+function getClientIp(): string {
+    return $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+}
 
 // --- Helpers ---
 
@@ -79,7 +148,6 @@ function requireAuth(): array {
         jsonError('Token expiré', 401);
     }
 
-    // Vérifier la signature
     $header_part = $parts[0];
     $payload_part = $parts[1];
     $signature = hash_hmac('sha256', "$header_part.$payload_part", JWT_SECRET);

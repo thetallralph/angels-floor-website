@@ -2,7 +2,13 @@
  * Angel's Floor CMS — Types
  */
 
-export interface Product {
+export interface SEOFields {
+	metaTitle?: string;
+	metaDescription?: string;
+	ogImage?: string;
+}
+
+export interface Product extends SEOFields {
 	_id?: string;
 	_status?: 'published' | 'draft' | 'modified';
 	_hasDraft?: boolean;
@@ -36,7 +42,7 @@ export interface Product {
 	featured: boolean;
 }
 
-export interface BlogPost {
+export interface BlogPost extends SEOFields {
 	_id?: string;
 	_status?: 'published' | 'draft' | 'modified';
 	id: string;

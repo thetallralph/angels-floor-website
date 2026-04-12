@@ -440,6 +440,25 @@
 						<span class="text-sm text-neutral-charcoal">Produit vedette</span>
 					</label>
 				</div>
+
+				<!-- SEO -->
+				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+					<h2 class="font-semibold text-neutral-obsidian">SEO</h2>
+					<div>
+						<label for="metaTitle" class="block text-xs font-medium text-neutral-charcoal mb-1">Meta Title</label>
+						<input id="metaTitle" type="text" bind:value={product.metaTitle}
+							class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-xs"
+							placeholder="{product.name || 'Nom du produit'} — Angel's Floor" />
+						<p class="text-xs text-neutral-slate mt-1">{(product.metaTitle || '').length}/60</p>
+					</div>
+					<div>
+						<label for="metaDesc" class="block text-xs font-medium text-neutral-charcoal mb-1">Meta Description</label>
+						<textarea id="metaDesc" bind:value={product.metaDescription} rows="2"
+							class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-xs resize-y"
+							placeholder="{product.description || 'Description du produit...'}"></textarea>
+						<p class="text-xs text-neutral-slate mt-1">{(product.metaDescription || '').length}/160</p>
+					</div>
+				</div>
 			</div>
 		</div>
 	{/if}

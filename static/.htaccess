@@ -2,6 +2,9 @@
 
 RewriteEngine On
 
+# Sitemap dynamique
+RewriteRule ^sitemap\.xml$ /api/sitemap.php [L]
+
 # Ne pas toucher aux fichiers API PHP
 RewriteRule ^api/ - [L]
 
