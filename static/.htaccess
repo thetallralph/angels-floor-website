@@ -1,11 +1,36 @@
-# Block search engine crawlers during development
-# Remove this file when the site goes live
+# Angel's Floor — Apache Configuration
 
-# Set X-Robots-Tag header
-Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+RewriteEngine On
 
-# Password protection (optional - uncomment to use)
-# AuthType Basic
-# AuthName "Development Site - Restricted Access"
-# AuthUserFile /path/to/.htpasswd
-# Require valid-user
+# Ne pas toucher aux fichiers API PHP
+RewriteRule ^api/ - [L]
+
+# Ne pas toucher aux fichiers qui existent (CSS, JS, images)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# SPA fallback pour les routes admin (client-side routing)
+RewriteRule ^admin(.*)$ /200.html [L]
+
+# SPA fallback pour les routes dynamiques (ex: /produits/fonio-precuit)
+RewriteRule ^produits/.+$ /200.html [L]
+
+# Bloquer l'indexation en dev (retirer en production)
+# Header set X-Robots-Tag "noindex, nofollow"
+
+# Cache des assets statiques
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

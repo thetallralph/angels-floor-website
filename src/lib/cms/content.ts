@@ -50,7 +50,7 @@ export async function loadPageContent(pageName: string): Promise<Record<string, 
     
     if (path in pageModules) {
       const module = await pageModules[path]() as { default?: Record<string, unknown> } | Record<string, unknown>;
-      return 'default' in module ? module.default || null : module as Record<string, unknown>;
+      return ('default' in module ? module.default ?? null : module) as Record<string, unknown> | null;
     }
     
     return null;
@@ -68,7 +68,7 @@ export async function loadSettings(settingName: string): Promise<Record<string, 
     
     if (path in settingsModules) {
       const module = await settingsModules[path]() as { default?: Record<string, unknown> } | Record<string, unknown>;
-      return 'default' in module ? module.default || null : module as Record<string, unknown>;
+      return ('default' in module ? module.default ?? null : module) as Record<string, unknown> | null;
     }
     
     return null;

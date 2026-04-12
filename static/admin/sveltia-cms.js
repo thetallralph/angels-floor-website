@@ -1,1 +1,0 @@
-Redirecting to /@sveltia/cms@0.97.0/dist/app.js
