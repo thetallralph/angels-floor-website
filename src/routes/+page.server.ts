@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
+import { loadCmsOverrides } from '$lib/cms/load';
 
 export const load: PageServerLoad = async () => {
-  // This is just for the home page, no error needed
-  return {};
+  const cms = await loadCmsOverrides('home');
+  return { cms };
 };

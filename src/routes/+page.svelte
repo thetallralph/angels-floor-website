@@ -6,6 +6,10 @@
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import { appStore } from '$lib/stores/app.js';
   import { featuredProducts } from '$lib/data/products.js';
+  import { CmsText } from '$lib/components/cms';
+
+  let { data } = $props();
+  const cms = data.cms || {};
 
   let heroVisible = false;
   let currentImageIndex = 0;
@@ -142,16 +146,10 @@
       <!-- Text Content -->
       <div class="relative z-10 text-center lg:text-left flex flex-col items-center lg:items-start">
         <div class="hero-heading" class:visible={heroVisible}>
-          <h1 class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center lg:text-left hero-title">
-            Produits africains transformés avec expertise et tradition
-          </h1>
+          <CmsText key="home.hero.title" tag="h1" class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center lg:text-left hero-title" override={cms['home.hero.title']}>Produits africains transformés avec expertise et tradition</CmsText>
           
           <div class="hero-desc opacity-0 translate-y-8" class:show={heroVisible}>
-            <p class="text-lg md:text-xl lg:text-xl text-white/90 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Spécialistes de la transformation artisanale de produits africains naturels.
-              Du fonio au baobab, nous valorisons les richesses du terroir béninois
-              pour vous offrir des produits prêts à consommer de qualité premium.
-            </p>
+            <CmsText key="home.hero.subtitle" tag="p" class="text-lg md:text-xl lg:text-xl text-white/90 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0" override={cms['home.hero.subtitle']}>Spécialistes de la transformation artisanale de produits africains naturels. Du fonio au baobab, nous valorisons les richesses du terroir béninois pour vous offrir des produits prêts à consommer de qualité premium.</CmsText>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full lg:w-auto">
               <a 
