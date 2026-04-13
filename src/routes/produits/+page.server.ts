@@ -1,7 +1,7 @@
-import type { PageLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import { loadProducts, getCategories } from '$lib/cms/content';
 
-export const load: PageLoad = async () => {
+export const load: PageServerLoad = async () => {
   const [products, categories] = await Promise.all([
     loadProducts(),
     getCategories()

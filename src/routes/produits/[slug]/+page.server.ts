@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
-import type { PageLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import { getProductBySlug } from '$lib/cms/content';
 
-export const load: PageLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
   const product = await getProductBySlug(params.slug);
 
   if (!product) {
