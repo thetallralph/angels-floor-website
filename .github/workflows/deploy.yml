@@ -34,16 +34,14 @@ jobs:
           # .htaccess principal
           cp static/.htaccess deploy/.htaccess 2>/dev/null || true
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Deploy via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_HOST }}
+          port: 22
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./deploy/
-          server-dir: /
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            api/migrate.php
+          local_path: ./deploy/*
+          remote_path: /
+          sftp_only: true
+          delete_remote_files: false
