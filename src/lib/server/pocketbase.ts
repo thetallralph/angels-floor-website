@@ -1,8 +1,6 @@
 import PocketBase from 'pocketbase';
-import { env } from '$env/dynamic/private';
-
-const POCKETBASE_URL = env.POCKETBASE_URL || 'http://127.0.0.1:8090';
+import { POCKETBASE_URL } from '$env/static/private';
 
 export function createPB(): PocketBase {
-	return new PocketBase(POCKETBASE_URL);
+	return new PocketBase(POCKETBASE_URL || 'http://127.0.0.1:8090');
 }

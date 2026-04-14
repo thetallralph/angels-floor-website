@@ -11,11 +11,11 @@
   let { data } = $props();
   const cms = data.cms || {};
 
-  let heroVisible = false;
-  let currentImageIndex = 0;
+  let heroVisible = $state(false);
+  let currentImageIndex = $state(0);
   // let showAnniversaryBanner = false;
-  let impactCounter = 0;
-  let impactSectionVisible = false;
+  let impactCounter = $state(0);
+  let impactSectionVisible = $state(false);
   
   // Get first three featured products
   const displayProducts = featuredProducts.slice(0, 3);
@@ -735,7 +735,7 @@
     transform: translateY(0);
   }
   
-  .hero-title {
+  .hero-heading :global(.hero-title) {
     opacity: 0;
     animation: smoothFadeIn 0.8s ease-out forwards;
     animation-delay: 0.1s;

@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { isLoggedIn, getUser, logout } from '$lib/admin/api';
+	import { initPB, isLoggedIn, getUser, logout } from '$lib/admin/api';
 	import {
 		LayoutDashboard,
 		Package,
@@ -31,7 +31,8 @@
 		{ href: '/admin/settings', label: 'Paramètres', icon: Settings }
 	];
 
-	onMount(() => {
+	onMount(async () => {
+		await initPB();
 		const isLogin = $page.url.pathname === '/admin/login';
 
 		if (!isLoggedIn() && !isLogin) {

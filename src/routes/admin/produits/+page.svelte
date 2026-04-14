@@ -53,7 +53,9 @@
 		loading = true;
 		try {
 			products = await getContentList('products');
-		} catch {
+			console.log('Products loaded:', products.length, products);
+		} catch (err) {
+			console.error('Failed to load products:', err);
 			products = [];
 		} finally {
 			loading = false;
