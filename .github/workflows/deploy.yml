@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Trigger Coolify deployment
         env:
-          COOLIFY_URL: http://coolify.82.165.163.62.nip.io
+          COOLIFY_URL: https://coolify.ttmcabinet.com
           COOLIFY_APP_UUID: u13eg070u723zaf11n10nyoy
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
         run: |
