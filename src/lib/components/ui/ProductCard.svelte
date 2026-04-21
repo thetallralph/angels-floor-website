@@ -27,7 +27,7 @@
     <!-- Product Image -->
     <div class="relative aspect-square overflow-hidden">
       <img 
-        src={placeholderImages[product.category] || product.image} 
+        src={product.image || placeholderImages[product.category]}
         alt={product.name} 
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
