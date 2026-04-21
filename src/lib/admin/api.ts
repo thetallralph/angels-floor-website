@@ -107,11 +107,25 @@ function getCollection(type: string): string {
 	return TYPE_MAP[type] || type;
 }
 
+/**
+ * Enrich a PocketBase record with derived image URL fields the admin UI expects.
+ * PB stores file fields as filenames; admin templates bind to `image` (single URL)
+ * and `images` (URL array) for preview.
+ */
+function enrichRecordImages(p: PocketBase, record: Record<string, unknown>): Record<string, unknown> {
+	const files = record.images;
+	if (Array.isArray(files) && files.length > 0 && typeof files[0] === 'string') {
+		const urls = (files as string[]).map(f => p.files.getURL(record as never, f));
+		return { ...record, image: urls[0], images: urls };
+	}
+	return { ...record };
+}
+
 export async function getContentList(type: string) {
 	const p = await initPB();
 	const collection = getCollection(type);
 	const records = await p.collection(collection).getFullList();
-	return records.map(r => ({ ...r }));
+	return records.map(r => enrichRecordImages(p, r));
 }
 
 /**
@@ -134,10 +148,10 @@ export async function getContent(type: string, id: string, _status: 'draft' | 'l
 	const collection = getCollection(type);
 	try {
 		const record = await p.collection(collection).getOne(id);
-		return { ...record };
+		return enrichRecordImages(p, record);
 	} catch {
 		const record = await p.collection(collection).getFirstListItem(`slug = "${id}"`);
-		return { ...record };
+		return enrichRecordImages(p, record);
 	}
 }
 
@@ -147,27 +161,29 @@ export async function getLiveContent(type: string, id?: string) {
 	if (id) {
 		try {
 			const record = await p.collection(collection).getOne(id);
-			return { ...record };
+			return enrichRecordImages(p, record);
 		} catch {
 			const record = await p.collection(collection).getFirstListItem(`slug = "${id}"`);
-			return { ...record };
+			return enrichRecordImages(p, record);
 		}
 	}
 	const records = await p.collection(collection).getFullList({ sort: '-created' });
-	return records.map(r => ({ ...r }));
+	return records.map(r => enrichRecordImages(p, r));
 }
 
 export async function saveContent(type: string, id: string, data: Record<string, unknown>) {
 	const p = await initPB();
 	const collection = getCollection(type);
 
-	// Remove PocketBase system fields from data
+	// Remove PocketBase system fields + virtual image URL fields added by enrichRecordImages
 	const cleanData = { ...data };
 	delete cleanData.id;
 	delete cleanData.created;
 	delete cleanData.updated;
 	delete cleanData.collectionId;
 	delete cleanData.collectionName;
+	delete cleanData.image;
+	delete cleanData.images;
 
 	// Try update via direct id or via slug lookup; fall back to create
 	try {
