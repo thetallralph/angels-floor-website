@@ -114,19 +114,44 @@ export async function getContentList(type: string) {
 	return records.map(r => ({ ...r }));
 }
 
+/**
+ * Resolve an id-or-slug to a PocketBase record id.
+ * Admin URLs use the slug for readability; most PB operations need the record id.
+ */
+async function resolvePBId(collection: string, idOrSlug: string): Promise<string> {
+	const p = await initPB();
+	try {
+		const rec = await p.collection(collection).getOne(idOrSlug);
+		return rec.id;
+	} catch {
+		const rec = await p.collection(collection).getFirstListItem(`slug = "${idOrSlug}"`);
+		return rec.id;
+	}
+}
+
 export async function getContent(type: string, id: string, _status: 'draft' | 'live' = 'draft') {
 	const p = await initPB();
 	const collection = getCollection(type);
-	const record = await p.collection(collection).getOne(id);
-	return { ...record };
+	try {
+		const record = await p.collection(collection).getOne(id);
+		return { ...record };
+	} catch {
+		const record = await p.collection(collection).getFirstListItem(`slug = "${id}"`);
+		return { ...record };
+	}
 }
 
 export async function getLiveContent(type: string, id?: string) {
 	const p = await initPB();
 	const collection = getCollection(type);
 	if (id) {
-		const record = await p.collection(collection).getOne(id);
-		return { ...record };
+		try {
+			const record = await p.collection(collection).getOne(id);
+			return { ...record };
+		} catch {
+			const record = await p.collection(collection).getFirstListItem(`slug = "${id}"`);
+			return { ...record };
+		}
 	}
 	const records = await p.collection(collection).getFullList({ sort: '-created' });
 	return records.map(r => ({ ...r }));
@@ -144,13 +169,13 @@ export async function saveContent(type: string, id: string, data: Record<string,
 	delete cleanData.collectionId;
 	delete cleanData.collectionName;
 
+	// Try update via direct id or via slug lookup; fall back to create
 	try {
-		// Try update first
-		const record = await p.collection(collection).update(id, cleanData);
+		const pbId = await resolvePBId(collection, id);
+		const record = await p.collection(collection).update(pbId, cleanData);
 		return { success: true, id: record.id };
 	} catch {
-		// If not found, create
-		const record = await p.collection(collection).create({ ...cleanData, id });
+		const record = await p.collection(collection).create(cleanData);
 		return { success: true, id: record.id };
 	}
 }
@@ -158,21 +183,24 @@ export async function saveContent(type: string, id: string, data: Record<string,
 export async function publishContent(type: string, id: string) {
 	const p = await initPB();
 	const collection = getCollection(type);
-	await p.collection(collection).update(id, { published: true });
+	const pbId = await resolvePBId(collection, id);
+	await p.collection(collection).update(pbId, { published: true });
 	return { success: true };
 }
 
 export async function unpublishContent(type: string, id: string) {
 	const p = await initPB();
 	const collection = getCollection(type);
-	await p.collection(collection).update(id, { published: false });
+	const pbId = await resolvePBId(collection, id);
+	await p.collection(collection).update(pbId, { published: false });
 	return { success: true };
 }
 
 export async function deleteContent(type: string, id: string) {
 	const p = await initPB();
 	const collection = getCollection(type);
-	await p.collection(collection).delete(id);
+	const pbId = await resolvePBId(collection, id);
+	await p.collection(collection).delete(pbId);
 	return { success: true };
 }
 
