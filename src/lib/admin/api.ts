@@ -191,6 +191,146 @@ export async function deleteContent(type: string, id: string) {
 	return { success: true };
 }
 
+// --- CMS Content (key-value overrides per page) ---
+
+export type CmsOverrideType = 'text' | 'richtext' | 'image' | 'gallery';
+
+export type CmsOverride = {
+	id?: string;
+	type: CmsOverrideType;
+	value: string;
+	imageUrl?: string;
+	galleryUrls?: string[];
+};
+
+export async function getCmsOverrides(page: string): Promise<Record<string, CmsOverride>> {
+	const p = await initPB();
+	try {
+		const records = await p.collection('cms_content').getFullList({
+			filter: `page = "${page}"`
+		});
+		const overrides: Record<string, CmsOverride> = {};
+		for (const r of records) {
+			const type = (r.type || 'text') as CmsOverrideType;
+			const entry: CmsOverride = { id: r.id, type, value: r.value || '' };
+			if (type === 'image' && r.image) {
+				entry.imageUrl = p.files.getURL(r, r.image);
+			}
+			if (type === 'gallery' && Array.isArray(r.images)) {
+				entry.galleryUrls = r.images.map((f: string) => p.files.getURL(r, f));
+			}
+			overrides[r.key] = entry;
+		}
+		return overrides;
+	} catch {
+		return {};
+	}
+}
+
+async function findOrCreate(page: string, key: string, type: CmsOverrideType) {
+	const p = await initPB();
+	try {
+		return await p.collection('cms_content').getFirstListItem(
+			`page = "${page}" && key = "${key}"`
+		);
+	} catch {
+		return await p.collection('cms_content').create({
+			page,
+			key,
+			type,
+			value: ''
+		});
+	}
+}
+
+export async function saveCmsText(
+	page: string,
+	key: string,
+	value: string,
+	type: 'text' | 'richtext' = 'text'
+) {
+	const p = await initPB();
+	const record = await findOrCreate(page, key, type);
+	await p.collection('cms_content').update(record.id, { value, type });
+}
+
+/** Legacy alias — keeps old admin code working. `key` must be the full `page.section.field` form. */
+export async function saveCmsOverride(page: string, key: string, value: string) {
+	const fullKey = key.startsWith(`${page}.`) ? key : `${page}.${key}`;
+	return saveCmsText(page, fullKey, value, 'text');
+}
+
+export async function saveCmsImage(page: string, key: string, file: File) {
+	const p = await initPB();
+	const record = await findOrCreate(page, key, 'image');
+	const formData = new FormData();
+	formData.append('image', file);
+	formData.append('type', 'image');
+	await p.collection('cms_content').update(record.id, formData);
+}
+
+export async function saveCmsGallery(page: string, key: string, files: File[]) {
+	const p = await initPB();
+	const record = await findOrCreate(page, key, 'gallery');
+	const formData = new FormData();
+	formData.append('type', 'gallery');
+	// Replace the whole images list with the provided files.
+	formData.append('images', '');
+	for (const file of files) {
+		formData.append('images', file);
+	}
+	await p.collection('cms_content').update(record.id, formData);
+}
+
+export async function appendCmsGalleryImages(page: string, key: string, files: File[]) {
+	const p = await initPB();
+	const record = await findOrCreate(page, key, 'gallery');
+	const formData = new FormData();
+	formData.append('type', 'gallery');
+	for (const file of files) {
+		formData.append('images+', file);
+	}
+	await p.collection('cms_content').update(record.id, formData);
+}
+
+export async function removeCmsGalleryImage(page: string, key: string, filename: string) {
+	const p = await initPB();
+	const record = await findOrCreate(page, key, 'gallery');
+	await p.collection('cms_content').update(record.id, {
+		'images-': [filename]
+	});
+}
+
+export async function reorderCmsGallery(page: string, key: string, filenames: string[]) {
+	const p = await initPB();
+	const record = await findOrCreate(page, key, 'gallery');
+	await p.collection('cms_content').update(record.id, { images: filenames });
+}
+
+export async function getCmsGalleryFilenames(page: string, key: string): Promise<string[]> {
+	const p = await initPB();
+	try {
+		const record = await p.collection('cms_content').getFirstListItem(
+			`page = "${page}" && key = "${key}"`
+		);
+		return Array.isArray(record.images) ? (record.images as string[]) : [];
+	} catch {
+		return [];
+	}
+}
+
+export async function clearCmsOverride(page: string, key: string) {
+	const p = await initPB();
+	try {
+		const record = await p.collection('cms_content').getFirstListItem(
+			`page = "${page}" && key = "${key}"`
+		);
+		await p.collection('cms_content').delete(record.id);
+	} catch {
+		// already missing
+	}
+}
+
 // --- Upload ---
 
 export async function uploadFile(file: File) {

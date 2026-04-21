@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { Menu, X, Phone, ArrowRight, Home, ShoppingBag, MapPin, Users, Mail } from 'lucide-svelte';
-  import Button from '$lib/components/ui/Button.svelte';
   import { fade, fly } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   

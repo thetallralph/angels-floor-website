@@ -1,2 +1,0 @@
-# Bloquer tout accès direct aux fichiers JSON
-Deny from all

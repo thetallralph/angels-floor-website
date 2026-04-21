@@ -1,18 +1,17 @@
 <script lang="ts">
-	interface Props {
+	import { useCms } from '$lib/cms/context';
+
+	type Props = {
 		key: string;
 		src: string;
-		alt?: string;
+		alt: string;
 		class?: string;
-		override?: string | null;
-	}
+		[x: string]: unknown;
+	};
 
-	let { key, src, alt = '', class: className = '', override = null }: Props = $props();
+	let { key, src, alt, class: className, ...rest }: Props = $props();
+	const cms = useCms();
+	const finalSrc = $derived(cms.image[key] || src);
 </script>
 
-<img
-	src={override || src}
-	{alt}
-	class={className}
-	data-cms-key={key}
-/>
+<img data-cms={key} data-cms-type="image" src={finalSrc} {alt} class={className} {...rest} />

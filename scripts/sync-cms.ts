@@ -15,9 +15,14 @@ import PocketBase from 'pocketbase';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PB_URL = process.env.POCKETBASE_URL || 'http://pb.82.165.163.62.nip.io';
-const PB_EMAIL = process.env.PB_EMAIL || 'admin@angelsfloor.bj';
-const PB_PASSWORD = process.env.PB_PASSWORD || 'Coolify@2026!';
+const PB_URL = process.env.POCKETBASE_URL;
+const PB_EMAIL = process.env.PB_ADMIN_EMAIL || process.env.PB_EMAIL;
+const PB_PASSWORD = process.env.PB_ADMIN_PASSWORD || process.env.PB_PASSWORD;
+
+if (!PB_URL || !PB_EMAIL || !PB_PASSWORD) {
+	console.error('Missing env: POCKETBASE_URL, PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD');
+	process.exit(1);
+}
 const SRC_DIR = path.resolve(__dirname, '../src');
 
 interface CmsEntry {

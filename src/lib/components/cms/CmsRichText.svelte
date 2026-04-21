@@ -1,19 +1,22 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { useCms } from '$lib/cms/context';
 
-	interface Props {
+	type Props = {
 		key: string;
 		class?: string;
-		override?: string | null;
 		children: Snippet;
-	}
+	};
 
-	let { key, class: className = '', override = null, children }: Props = $props();
+	let { key, class: className, children }: Props = $props();
+	const cms = useCms();
+	const value = $derived(cms.text[key]);
 </script>
 
-<div class={className} data-cms-key={key}>
-	{#if override}
-		{@html override}
+<div data-cms={key} data-cms-type="richtext" class={className}>
+	{#if value}
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+		{@html value}
 	{:else}
 		{@render children()}
 	{/if}

@@ -4,43 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Angel's Floor website - A SvelteKit e-commerce platform for a Beninese company specializing in natural African food products (fonio, baobab, etc.). Deployed on IONOS shared hosting (no Node.js server).
+Angel's Floor website - A SvelteKit e-commerce platform for a Beninese company specializing in natural African food products (fonio, baobab, etc.). Deployed on VPS via Coolify with PocketBase as backend.
 
 ## Architecture
 
 ```
 angels-floor-website/
-├── src/routes/              ← Pages publiques (SvelteKit static)
-├── src/routes/admin/        ← Admin panel custom (SPA, client-side)
+├── src/routes/(public)/     ← Pages publiques (SvelteKit)
+├── src/routes/(admin)/admin/← Admin panel custom (SPA, client-side)
 ├── src/lib/admin/           ← API client + types pour l'admin
-├── api/                     ← Backend PHP (déployé sur IONOS)
-│   ├── config.php           ← Configuration + helpers
-│   ├── storage.php          ← Abstraction storage (JSON → MySQL plus tard)
-│   ├── auth.php             ← Authentification JWT
-│   ├── content.php          ← CRUD contenu (draft/live)
-│   └── upload.php           ← Gestion des médias
-├── api/data/                ← Stockage JSON (draft/ + live/)
-└── .github/workflows/       ← Déploiement auto FTP vers IONOS
+├── src/lib/cms/             ← Chargement contenu PocketBase
+├── src/lib/server/          ← PocketBase client côté serveur
+└── .github/workflows/       ← CI/CD
 ```
 
 ### CMS Workflow
-- Admin modifie → sauvé en draft (api/data/draft/)
-- Admin clique "Publier" → copie dans live (api/data/live/)
-- Site public lit depuis live/
-- Preview disponible dans l'admin depuis draft/
-
-### Storage Abstraction
-Le fichier `api/storage.php` contient `JsonStorage` (fichiers JSON).
-Pour migrer vers MySQL : créer `DatabaseStorage` et changer 1 ligne dans `content.php`.
+- Admin modifie → sauvé dans PocketBase
+- Admin clique "Publier" → champ `published` mis à true
+- Site public lit les données publiées depuis PocketBase
+- Preview disponible dans l'admin
 
 ## Development Commands
 
 ### Essential Commands
 ```bash
 npm run dev          # Start development server on localhost:5173
-npm run build        # Build for production (adapter-static)
+npm run build        # Build for production (adapter-node)
 npm run preview      # Preview production build locally
-php -S localhost:8000 -t api  # API PHP locale (optionnel)
 ```
 
 ### Code Quality Commands
@@ -54,13 +44,13 @@ npm run format       # Format code with Prettier
 **IMPORTANT**: Always run `npm run check` and `npm run lint` before completing any task to ensure code quality.
 
 ## Deployment
-- Push to `main` → GitHub Actions builds SvelteKit + uploads via FTP to IONOS
-- Secrets requis : FTP_HOST, FTP_USER, FTP_PASSWORD
+- Déployé sur VPS via Coolify (adapter-node)
+- PocketBase hébergé sur le même VPS
 - Admin accessible à : domaine.com/admin
 
 ## How to Add a Feature
-1. Créer le endpoint PHP dans api/ (si besoin de données)
-2. Créer la page admin dans src/routes/admin/
+1. Créer la collection PocketBase (si besoin de données)
+2. Créer la page admin dans src/routes/(admin)/admin/
 3. Créer la page publique dans src/routes/(public)/
 4. Push sur main → déploiement auto
 
