@@ -1,23 +1,25 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getContentList } from '$lib/admin/api';
+	import { getContentList, listFiles } from '$lib/admin/api';
 	import { Package, FileText, Type, Image, ArrowRight } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 
-	let stats = $state({ products: 0, blog: 0, cms_content: 0 });
+	let stats = $state({ products: 0, blog: 0, cms_content: 0, media: 0 });
 	let loading = $state(true);
 
 	onMount(async () => {
 		try {
-			const [products, blog, cms] = await Promise.all([
+			const [products, blog, cms, media] = await Promise.all([
 				getContentList('products').catch(() => []),
 				getContentList('blog').catch(() => []),
-				getContentList('cms_content').catch(() => [])
+				getContentList('cms_content').catch(() => []),
+				listFiles().catch(() => [])
 			]);
 			stats = {
 				products: products.length,
 				blog: blog.length,
-				cms_content: cms.length
+				cms_content: cms.length,
+				media: media.length
 			};
 		} finally {
 			loading = false;
@@ -28,7 +30,7 @@
 		{ label: 'Produits', count: () => stats.products, icon: Package, href: '/admin/produits', color: 'text-emerald-600 bg-emerald-50' },
 		{ label: 'Articles', count: () => stats.blog, icon: FileText, href: '/admin/blog', color: 'text-amber-600 bg-amber-50' },
 		{ label: 'Contenu CMS', count: () => stats.cms_content, icon: Type, href: '/admin/pages', color: 'text-blue-600 bg-blue-50' },
-		{ label: 'Médias', count: () => '-', icon: Image, href: '/admin/medias', color: 'text-purple-600 bg-purple-50' }
+		{ label: 'Médias', count: () => stats.media, icon: Image, href: '/admin/medias', color: 'text-purple-600 bg-purple-50' }
 	];
 </script>
 
