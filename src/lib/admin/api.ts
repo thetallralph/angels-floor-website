@@ -7,26 +7,12 @@
 import PocketBase from 'pocketbase';
 
 let pb: PocketBase | null = null;
-let pbUrlPromise: Promise<string> | null = null;
-
-async function fetchPBUrl(): Promise<string> {
-	try {
-		const res = await fetch('/api/config');
-		const data = await res.json();
-		return data.pocketbaseUrl;
-	} catch {
-		return 'http://localhost:8090';
-	}
-}
 
 export async function initPB(): Promise<PocketBase> {
 	if (pb) return pb;
 
-	if (!pbUrlPromise) {
-		pbUrlPromise = fetchPBUrl();
-	}
-	const url = await pbUrlPromise;
-	pb = new PocketBase(url);
+	// Same-origin: nginx proxies /api/ and /_/ to PocketBase on this host.
+	pb = new PocketBase(typeof window === 'undefined' ? '/' : window.location.origin);
 
 	// Restore auth from localStorage
 	if (typeof window !== 'undefined') {
@@ -43,8 +29,7 @@ export async function initPB(): Promise<PocketBase> {
 
 function getPB(): PocketBase {
 	if (!pb) {
-		// Sync fallback — initPB() should be called first
-		pb = new PocketBase('http://localhost:8090');
+		pb = new PocketBase(typeof window === 'undefined' ? '/' : window.location.origin);
 	}
 	return pb;
 }
