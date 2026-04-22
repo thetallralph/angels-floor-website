@@ -5,7 +5,8 @@
 	import { getContent, saveContent, publishContent, saveProductImages } from '$lib/admin/api';
 	import { listCategories } from '$lib/admin/categories';
 	import { DEFAULT_CATEGORIES, type Category, type Product } from '$lib/admin/types';
-	import { ArrowLeft, Save, Send, X, Plus, Eye, ImagePlus } from 'lucide-svelte';
+	import MediaPickerModal from '$lib/admin/MediaPickerModal.svelte';
+	import { ArrowLeft, Save, Send, X, Plus, Eye, ImagePlus, FolderOpen } from 'lucide-svelte';
 
 	const MAX_IMAGES = 10;
 
@@ -45,7 +46,9 @@
 	let existingImages = $state<Array<{ filename: string; url: string }>>([]);
 	let removedFilenames = $state<string[]>([]);
 	let pendingFiles = $state<PendingFile[]>([]);
+	let mediaPickerOpen = $state(false);
 	const totalImages = $derived(existingImages.length + pendingFiles.length);
+	const remainingSlots = $derived(Math.max(0, MAX_IMAGES - totalImages));
 
 	function getSlug(): string {
 		return product.slug || id;
@@ -194,6 +197,14 @@
 		const removed = pendingFiles[index];
 		if (removed) URL.revokeObjectURL(removed.previewUrl);
 		pendingFiles = pendingFiles.filter((_, i) => i !== index);
+	}
+
+	function addFilesFromPicker(files: File[]) {
+		const toAdd = files.slice(0, remainingSlots);
+		pendingFiles = [
+			...pendingFiles,
+			...toAdd.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }))
+		];
 	}
 
 	function addBenefit() {
@@ -496,17 +507,27 @@
 					{/if}
 
 					{#if totalImages < MAX_IMAGES}
-						<label class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-neutral-light text-neutral-slate text-sm cursor-pointer hover:border-primary-green hover:text-primary-green transition-all">
-							<ImagePlus class="w-4 h-4" />
-							{existingImages.length + pendingFiles.length === 0 ? 'Ajouter des images' : 'Ajouter plus'}
-							<input
-								type="file"
-								accept="image/*"
-								multiple
-								onchange={handleImagesSelected}
-								class="hidden"
-							/>
-						</label>
+						<div class="grid grid-cols-2 gap-2">
+							<label class="flex items-center justify-center gap-2 px-3 py-3 rounded-xl border-2 border-dashed border-neutral-light text-neutral-slate text-sm cursor-pointer hover:border-primary-green hover:text-primary-green transition-all">
+								<ImagePlus class="w-4 h-4" />
+								<span>Uploader</span>
+								<input
+									type="file"
+									accept="image/*"
+									multiple
+									onchange={handleImagesSelected}
+									class="hidden"
+								/>
+							</label>
+							<button
+								type="button"
+								onclick={() => (mediaPickerOpen = true)}
+								class="flex items-center justify-center gap-2 px-3 py-3 rounded-xl border-2 border-dashed border-neutral-light text-neutral-slate text-sm cursor-pointer hover:border-primary-green hover:text-primary-green transition-all"
+							>
+								<FolderOpen class="w-4 h-4" />
+								<span>Depuis la galerie</span>
+							</button>
+						</div>
 					{/if}
 				</div>
 
@@ -555,3 +576,5 @@
 		</div>
 	{/if}
 </div>
+
+<MediaPickerModal bind:open={mediaPickerOpen} maxSelect={remainingSlots} onConfirm={addFilesFromPicker} />
