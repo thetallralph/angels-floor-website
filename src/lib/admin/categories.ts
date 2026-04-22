@@ -26,18 +26,43 @@ export async function listCategories(): Promise<Category[] | null> {
 export async function createCategory(data: Omit<Category, 'id'>): Promise<Category> {
 	const pb = await initPB();
 	const record = await pb.collection('categories').create(data);
+	await ensureCategoryInProductsSchema(data.slug);
 	return map(record as Record<string, unknown>);
 }
 
 export async function updateCategory(id: string, data: Partial<Omit<Category, 'id'>>): Promise<Category> {
 	const pb = await initPB();
 	const record = await pb.collection('categories').update(id, data);
+	if (data.slug) await ensureCategoryInProductsSchema(data.slug);
 	return map(record as Record<string, unknown>);
 }
 
 export async function deleteCategory(id: string): Promise<void> {
 	const pb = await initPB();
 	await pb.collection('categories').delete(id);
+	// Leave the slug in products.category values as an orphan — removing it
+	// would break any legacy product still referencing it.
+}
+
+/**
+ * Ensure the given slug is in the products.category select's allowed values.
+ * No-op if already present. Requires superuser.
+ */
+async function ensureCategoryInProductsSchema(slug: string): Promise<void> {
+	if (!slug) return;
+	const pb = await initPB();
+	const coll = await pb.collections.getOne('products');
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const fields = (coll as any).fields as Array<Record<string, unknown>>;
+	const categoryField = fields.find((f) => f.name === 'category');
+	if (!categoryField || categoryField.type !== 'select') return;
+	const values = Array.isArray(categoryField.values) ? [...categoryField.values] : [];
+	if (values.includes(slug)) return;
+	values.push(slug);
+	const nextFields = fields.map((f) =>
+		f.name === 'category' ? { ...f, values } : f
+	);
+	await pb.collections.update('products', { fields: nextFields });
 }
 
 /**

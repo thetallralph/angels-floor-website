@@ -2,10 +2,12 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { getContent, saveContent, publishContent, uploadFile } from '$lib/admin/api';
+	import { getContent, saveContent, publishContent, saveProductImages } from '$lib/admin/api';
 	import { listCategories } from '$lib/admin/categories';
 	import { DEFAULT_CATEGORIES, type Category, type Product } from '$lib/admin/types';
-	import { ArrowLeft, Save, Send, Upload, X, Plus, Eye } from 'lucide-svelte';
+	import { ArrowLeft, Save, Send, X, Plus, Eye, ImagePlus } from 'lucide-svelte';
+
+	const MAX_IMAGES = 10;
 
 	const id = $derived($page.params.id ?? '');
 	const isNew = $derived(id === 'nouveau');
@@ -36,9 +38,14 @@
 	let loading = $state(id !== 'nouveau');
 	let saving = $state(false);
 	let publishing = $state(false);
-	let uploading = $state(false);
 	let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
 	let newBenefit = $state('');
+
+	type PendingFile = { file: File; previewUrl: string };
+	let existingImages = $state<Array<{ filename: string; url: string }>>([]);
+	let removedFilenames = $state<string[]>([]);
+	let pendingFiles = $state<PendingFile[]>([]);
+	const totalImages = $derived(existingImages.length + pendingFiles.length);
 
 	function getSlug(): string {
 		return product.slug || id;
@@ -58,9 +65,20 @@
 					message = { type: 'error', text: 'Produit introuvable' };
 				}
 			}
+			syncExistingImagesFromProduct();
 			loading = false;
 		}
 	});
+
+	function syncExistingImagesFromProduct() {
+		const filenames = product.imageFilenames ?? [];
+		const urls = product.images ?? [];
+		existingImages = filenames.map((filename, i) => ({
+			filename,
+			url: urls[i] || ''
+		}));
+		removedFilenames = [];
+	}
 
 	async function loadCategoryList() {
 		try {
@@ -104,11 +122,24 @@
 		try {
 			const saveId = getSlug();
 			const { _id, _hasDraft, _isPublished, _status, ...data } = product as Record<string, unknown>;
-			await saveContent('products', saveId, data);
+			const { id: savedId } = await saveContent('products', saveId, data);
+
+			const newFiles = pendingFiles.map((p) => p.file);
+			if (newFiles.length > 0 || removedFilenames.length > 0) {
+				await saveProductImages(savedId, newFiles, removedFilenames);
+			}
+
 			message = { type: 'success', text: 'Brouillon sauvegardé' };
 
 			if (id === 'nouveau') {
 				goto(`/admin/produits/${saveId}`, { replaceState: true });
+			} else if (newFiles.length > 0 || removedFilenames.length > 0) {
+				// Re-fetch to pick up the new server-side filenames/URLs.
+				const refreshed = await getContent('products', saveId, 'draft');
+				product = refreshed as unknown as Product;
+				pendingFiles.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+				pendingFiles = [];
+				syncExistingImagesFromProduct();
 			}
 		} catch (err) {
 			message = { type: 'error', text: err instanceof Error ? err.message : 'Erreur' };
@@ -132,21 +163,37 @@
 		}
 	}
 
-	async function handleImageUpload(e: Event) {
+	function handleImagesSelected(e: Event) {
 		const input = e.target as HTMLInputElement;
-		const file = input.files?.[0];
-		if (!file) return;
+		const files = Array.from(input.files ?? []);
+		if (files.length === 0) return;
 
-		uploading = true;
-		try {
-			const result = await uploadFile(file);
-			product.image = result.url;
-		} catch (err) {
-			message = { type: 'error', text: err instanceof Error ? err.message : 'Erreur upload' };
-		} finally {
-			uploading = false;
-			input.value = '';
+		const capacity = MAX_IMAGES - totalImages;
+		const toAdd = files.slice(0, Math.max(0, capacity));
+		if (files.length > toAdd.length) {
+			message = {
+				type: 'error',
+				text: `Maximum ${MAX_IMAGES} images par produit. ${files.length - toAdd.length} image(s) ignorée(s).`
+			};
 		}
+		pendingFiles = [
+			...pendingFiles,
+			...toAdd.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }))
+		];
+		input.value = '';
+	}
+
+	function removeExistingImage(filename: string) {
+		existingImages = existingImages.filter((img) => img.filename !== filename);
+		if (!removedFilenames.includes(filename)) {
+			removedFilenames = [...removedFilenames, filename];
+		}
+	}
+
+	function removePendingFile(index: number) {
+		const removed = pendingFiles[index];
+		if (removed) URL.revokeObjectURL(removed.previewUrl);
+		pendingFiles = pendingFiles.filter((_, i) => i !== index);
 	}
 
 	function addBenefit() {
@@ -395,47 +442,72 @@
 
 			<!-- Sidebar -->
 			<div class="space-y-6">
-				<!-- Image principale -->
+				<!-- Images -->
 				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
-					<h2 class="font-semibold text-neutral-obsidian">Image principale</h2>
+					<div class="flex items-center justify-between">
+						<h2 class="font-semibold text-neutral-obsidian">Images</h2>
+						<span class="text-xs text-neutral-slate">{totalImages}/{MAX_IMAGES}</span>
+					</div>
+					<p class="text-xs text-neutral-slate">
+						La première image est utilisée comme visuel principal. Les changements sont appliqués au clic sur « Sauvegarder ».
+					</p>
 
-					{#if product.image}
-						<div class="relative group">
-							<img
-								src={product.image}
-								alt={product.name || ''}
-								class="w-full aspect-square rounded-xl object-cover bg-neutral-sand"
-							/>
-							<button
-								onclick={() => (product.image = '')}
-								class="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-							>
-								<X class="w-3 h-3" />
-							</button>
+					{#if existingImages.length > 0 || pendingFiles.length > 0}
+						<div class="grid grid-cols-3 gap-2">
+							{#each existingImages as img, i (img.filename)}
+								<div class="relative group aspect-square">
+									<img
+										src={img.url}
+										alt="Image {i + 1}"
+										class="w-full h-full rounded-lg object-cover bg-neutral-sand"
+									/>
+									{#if i === 0 && pendingFiles.length === 0}
+										<span class="absolute bottom-1 left-1 bg-primary-green text-white text-[10px] px-1.5 py-0.5 rounded">Principal</span>
+									{/if}
+									<button
+										type="button"
+										onclick={() => removeExistingImage(img.filename)}
+										class="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+										title="Supprimer"
+									>
+										<X class="w-3 h-3" />
+									</button>
+								</div>
+							{/each}
+							{#each pendingFiles as pf, i (pf.previewUrl)}
+								<div class="relative group aspect-square">
+									<img
+										src={pf.previewUrl}
+										alt="Nouveau {i + 1}"
+										class="w-full h-full rounded-lg object-cover bg-neutral-sand ring-2 ring-primary-green/50"
+									/>
+									<span class="absolute bottom-1 left-1 bg-accent-gold text-neutral-obsidian text-[10px] px-1.5 py-0.5 rounded">À envoyer</span>
+									<button
+										type="button"
+										onclick={() => removePendingFile(i)}
+										class="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+										title="Retirer"
+									>
+										<X class="w-3 h-3" />
+									</button>
+								</div>
+							{/each}
 						</div>
 					{/if}
 
-					<label class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-neutral-light text-neutral-slate text-sm cursor-pointer hover:border-primary-green hover:text-primary-green transition-all">
-						<Upload class="w-4 h-4" />
-						{uploading ? 'Upload en cours...' : 'Choisir une image'}
-						<input
-							type="file"
-							accept="image/*"
-							onchange={handleImageUpload}
-							class="hidden"
-						/>
-					</label>
-
-					<div>
-						<label for="imageUrl" class="block text-xs text-neutral-slate mb-1">ou URL directe</label>
-						<input
-							id="imageUrl"
-							type="text"
-							bind:value={product.image}
-							class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-xs"
-							placeholder="/uploads/image.jpg"
-						/>
-					</div>
+					{#if totalImages < MAX_IMAGES}
+						<label class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-neutral-light text-neutral-slate text-sm cursor-pointer hover:border-primary-green hover:text-primary-green transition-all">
+							<ImagePlus class="w-4 h-4" />
+							{existingImages.length + pendingFiles.length === 0 ? 'Ajouter des images' : 'Ajouter plus'}
+							<input
+								type="file"
+								accept="image/*"
+								multiple
+								onchange={handleImagesSelected}
+								class="hidden"
+							/>
+						</label>
+					{/if}
 				</div>
 
 				<!-- Options -->

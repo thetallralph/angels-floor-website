@@ -22,6 +22,8 @@ export interface Product extends SEOFields {
 	detailedDescription?: string;
 	image: string;
 	images?: string[];
+	/** Raw PocketBase filenames for the `images` file field. Set by enrichRecordImages(). */
+	imageFilenames?: string[];
 	benefits?: string[];
 	nutritionalInfo?: {
 		calories?: number;

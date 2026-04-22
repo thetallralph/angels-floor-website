@@ -115,10 +115,11 @@ function getCollection(type: string): string {
 function enrichRecordImages(p: PocketBase, record: Record<string, unknown>): Record<string, unknown> {
 	const files = record.images;
 	if (Array.isArray(files) && files.length > 0 && typeof files[0] === 'string') {
-		const urls = (files as string[]).map(f => p.files.getURL(record as never, f));
-		return { ...record, image: urls[0], images: urls };
+		const filenames = files as string[];
+		const urls = filenames.map(f => p.files.getURL(record as never, f));
+		return { ...record, image: urls[0], images: urls, imageFilenames: filenames };
 	}
-	return { ...record };
+	return { ...record, imageFilenames: [] };
 }
 
 export async function getContentList(type: string) {
@@ -184,6 +185,7 @@ export async function saveContent(type: string, id: string, data: Record<string,
 	delete cleanData.collectionName;
 	delete cleanData.image;
 	delete cleanData.images;
+	delete cleanData.imageFilenames;
 
 	// Try update via direct id or via slug lookup; fall back to create
 	try {
@@ -218,6 +220,24 @@ export async function deleteContent(type: string, id: string) {
 	const pbId = await resolvePBId(collection, id);
 	await p.collection(collection).delete(pbId);
 	return { success: true };
+}
+
+/**
+ * Attach new image files and/or remove existing ones on a product record.
+ * Uses PocketBase's `images+` (append) and `images-` (remove by filename) syntax.
+ */
+export async function saveProductImages(
+	id: string,
+	newFiles: File[],
+	removedFilenames: string[]
+): Promise<void> {
+	if (newFiles.length === 0 && removedFilenames.length === 0) return;
+	const p = await initPB();
+	const pbId = await resolvePBId('products', id);
+	const fd = new FormData();
+	for (const file of newFiles) fd.append('images+', file);
+	for (const name of removedFilenames) fd.append('images-', name);
+	await p.collection('products').update(pbId, fd);
 }
 
 // --- CMS Content (key-value overrides per page) ---
