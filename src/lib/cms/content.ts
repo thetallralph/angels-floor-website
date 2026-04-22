@@ -22,7 +22,6 @@ function mapProduct(record: RecordModel): Product {
 		packaging: record.packaging || '',
 		origin: record.origin || '',
 		certification: record.certification || '',
-		inStock: record.in_stock ?? true,
 		featured: record.featured ?? false
 	};
 }

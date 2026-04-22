@@ -40,7 +40,6 @@ export interface Product extends SEOFields {
 	packaging?: string;
 	origin?: string;
 	certification?: string;
-	inStock: boolean;
 	featured: boolean;
 }
 

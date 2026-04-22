@@ -32,12 +32,6 @@
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
       
-      <!-- Stock Badge -->
-      {#if !product.inStock}
-        <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-          Rupture
-        </div>
-      {/if}
     </div>
     
     <!-- Product Info -->

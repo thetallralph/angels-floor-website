@@ -32,7 +32,6 @@
 		packaging: '',
 		origin: 'Bénin',
 		certification: '',
-		inStock: true,
 		featured: false
 	});
 
@@ -534,15 +533,6 @@
 				<!-- Options -->
 				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
 					<h2 class="font-semibold text-neutral-obsidian">Options</h2>
-
-					<label class="flex items-center gap-3 cursor-pointer">
-						<input
-							type="checkbox"
-							bind:checked={product.inStock}
-							class="w-4 h-4 rounded border-neutral-light text-primary-green focus:ring-primary-green"
-						/>
-						<span class="text-sm text-neutral-charcoal">En stock</span>
-					</label>
 
 					<label class="flex items-center gap-3 cursor-pointer">
 						<input

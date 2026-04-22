@@ -30,7 +30,6 @@ export interface Product {
   packaging?: string;
   origin?: string;
   certification?: string;
-  inStock: boolean;
   featured: boolean;
 }
 
@@ -98,7 +97,6 @@ export const appStore = {
           description: 'Fonio précuit de qualité supérieure, prêt en 10 minutes',
           image: '/images/products/fonio-precuit.jpg',
           benefits: ['Riche en fibres', 'Sans gluten', 'Facile à digérer'],
-          inStock: true,
           featured: true
         },
         {
@@ -110,7 +108,6 @@ export const appStore = {
           description: 'Pulpe de baobab 100% naturelle, riche en vitamine C',
           image: '/images/products/baobab-pulpe.jpg',
           benefits: ['Riche en vitamine C', 'Antioxydant naturel', 'Renforce l\'immunité'],
-          inStock: true,
           featured: true
         }
       ];

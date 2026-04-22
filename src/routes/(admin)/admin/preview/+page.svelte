@@ -109,16 +109,13 @@
 						{/if}
 					</div>
 
-					<div class="mt-6 flex gap-2">
-						<span class="px-3 py-1 rounded-full text-xs font-medium {product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-							{product.inStock ? 'En stock' : 'Rupture de stock'}
-						</span>
-						{#if product.featured}
+					{#if product.featured}
+						<div class="mt-6 flex gap-2">
 							<span class="px-3 py-1 rounded-full text-xs font-medium bg-accent-gold/20 text-accent-gold">
 								Produit vedette
 							</span>
-						{/if}
-					</div>
+						</div>
+					{/if}
 				</div>
 			</div>
 

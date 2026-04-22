@@ -214,13 +214,6 @@
             alt={product.name}
             class="w-full h-full object-cover"
           />
-          {#if !product.inStock}
-            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <span class="text-white text-2xl font-bold bg-red-500 px-6 py-3 rounded-full">
-                Rupture de stock
-              </span>
-            </div>
-          {/if}
         </div>
         
         <!-- Thumbnail Gallery -->
