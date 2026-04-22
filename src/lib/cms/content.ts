@@ -1,5 +1,6 @@
 import type { Product, BlogArticle, SalesPoint } from '$lib/stores/app';
 import { createPB } from '$lib/server/pocketbase';
+import { loadCategoriesFromPB } from '$lib/cms/categories';
 import type { RecordModel } from 'pocketbase';
 
 function mapProduct(record: RecordModel): Product {
@@ -162,34 +163,14 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 export async function getCategories() {
-	const products = await loadProducts();
+	const [products, categories] = await Promise.all([loadProducts(), loadCategoriesFromPB()]);
 
 	return [
 		{ id: 'all', name: 'Tous les produits', count: products.length },
-		{
-			id: 'fonio',
-			name: 'Gamme Fonio',
-			count: products.filter((p) => p.category === 'fonio').length
-		},
-		{
-			id: 'baobab',
-			name: 'Pulpe de Baobab',
-			count: products.filter((p) => p.category === 'baobab').length
-		},
-		{
-			id: 'nere-fagara',
-			name: 'Néré & Fagara',
-			count: products.filter((p) => p.category === 'nere-fagara').length
-		},
-		{
-			id: 'mangue',
-			name: 'Produits Mangue',
-			count: products.filter((p) => p.category === 'mangue').length
-		},
-		{
-			id: 'bisbab',
-			name: 'Biscuits Baobab',
-			count: products.filter((p) => p.category === 'bisbab').length
-		}
+		...categories.map((c) => ({
+			id: c.slug,
+			name: c.name,
+			count: products.filter((p) => p.category === c.slug).length
+		}))
 	];
 }

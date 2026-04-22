@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getProductBySlug } from '$lib/cms/content';
+import { getProductBySlug, loadProducts } from '$lib/cms/content';
 
 export const load: PageServerLoad = async ({ params }) => {
   const product = await getProductBySlug(params.slug);
@@ -9,7 +9,15 @@ export const load: PageServerLoad = async ({ params }) => {
     error(404, 'Produit non trouvé');
   }
 
+  const all = await loadProducts();
+  const crossSell: Record<string, string[]> = { baobab: ['bisbab'], bisbab: ['baobab'] };
+  const relatedSlugs = new Set([product.category, ...(crossSell[product.category] ?? [])]);
+  const similarProducts = all
+    .filter((p) => p.id !== product.id && relatedSlugs.has(p.category))
+    .slice(0, 3);
+
   return {
-    product
+    product,
+    similarProducts
   };
 };

@@ -3,18 +3,19 @@
   import { ArrowRight, Dumbbell, Briefcase, Sun, Heart, Store, TrendingUp, Package, Users } from 'lucide-svelte';
   import ScrollingBanner from '$lib/components/ui/ScrollingBanner.svelte';
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
+  import ProductCard from '$lib/components/ui/ProductCard.svelte';
   import { CmsText, CmsImage } from '$lib/components/cms';
   import { appStore } from '$lib/stores/app.js';
-  import { featuredProducts } from '$lib/data/products.js';
+  import type { PageData } from './$types';
+
+  let { data }: { data: PageData } = $props();
+  const displayProducts = $derived(data.featuredProducts);
 
   let heroVisible = $state(false);
   let currentImageIndex = $state(0);
   // let showAnniversaryBanner = false;
   let impactCounter = $state(0);
   let impactSectionVisible = $state(false);
-  
-  // Get first three featured products
-  const displayProducts = featuredProducts.slice(0, 3);
   
   // function dismissBanner() {
   //   showAnniversaryBanner = false;
@@ -96,14 +97,6 @@
     };
   });
   
-  function formatPrice(price: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  }
 </script>
 
 <svelte:head>
@@ -292,42 +285,23 @@
     </ScrollReveal>
     
     <!-- Three Featured Products -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-      {#each displayProducts as product, i}
-        <ScrollReveal animation="fade-up" delay={i * 100}>
-        <a href="/produits/{product.slug}" class="block group">
-          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full">
-            <!-- Product Image -->
-            <div class="relative aspect-square overflow-hidden">
-              <img 
-                src={product.image || `https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=600&fit=crop`}
-                alt={product.name}
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            
-            <!-- Product Info -->
-            <div class="p-6">
-              <h3 class="text-xl font-bold text-neutral-obsidian mb-2 group-hover:text-primary-green transition-colors">
-                {product.name}
-              </h3>
-              <p class="text-neutral-charcoal text-sm mb-4 line-clamp-2">
-                {product.description}
-              </p>
-              
-              <!-- Price and Link -->
-              <div class="flex items-center justify-between">
-                <span class="text-lg font-semibold text-primary-green">
-                  {formatPrice(product.price)}
-                </span>
-                <ArrowRight class="w-5 h-5 text-neutral-slate group-hover:text-primary-green group-hover:translate-x-1 transition-all" />
-              </div>
-            </div>
-          </div>
+    {#if displayProducts.length > 0}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        {#each displayProducts as product, i}
+          <ScrollReveal animation="fade-up" delay={i * 100}>
+            <ProductCard {product} />
+          </ScrollReveal>
+        {/each}
+      </div>
+    {:else}
+      <div class="text-center py-12 max-w-2xl mx-auto">
+        <Package class="w-12 h-12 text-neutral-light mx-auto mb-4" />
+        <p class="text-neutral-charcoal">Aucun produit vedette pour le moment.</p>
+        <a href="/produits" class="inline-block mt-4 text-primary-green font-semibold hover:underline">
+          Voir tous nos produits →
         </a>
-        </ScrollReveal>
-      {/each}
-    </div>
+      </div>
+    {/if}
     
     <!-- Call to Action -->
     <ScrollReveal animation="fade">
@@ -749,13 +723,5 @@
   .hero-image-wrap.loaded {
     opacity: 1;
     transform: scale(1) translateX(0);
-  }
-  
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 </style>

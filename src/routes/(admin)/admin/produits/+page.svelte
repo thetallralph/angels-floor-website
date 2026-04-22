@@ -8,7 +8,8 @@
 		publishContent,
 		unpublishContent
 	} from '$lib/admin/api';
-	import { PRODUCT_CATEGORIES } from '$lib/admin/types';
+	import { listCategories } from '$lib/admin/categories';
+	import { DEFAULT_CATEGORIES, type Category } from '$lib/admin/types';
 	import {
 		Plus,
 		Pencil,
@@ -23,6 +24,9 @@
 	type ProductItem = Record<string, unknown>;
 
 	let products = $state<ProductItem[]>([]);
+	let categories = $state<Array<{ slug: string; name: string }>>(
+		DEFAULT_CATEGORIES.map((c) => ({ slug: c.slug, name: c.name }))
+	);
 	let loading = $state(true);
 	let search = $state('');
 	let filterCategory = $state('');
@@ -41,13 +45,24 @@
 	);
 
 	onMount(async () => {
-		await loadProducts();
+		await Promise.all([loadProducts(), loadCategoryList()]);
 
 		// Ouvrir le formulaire si ?new=1
 		if ($page.url.searchParams.get('new') === '1') {
 			goto('/admin/produits/nouveau');
 		}
 	});
+
+	async function loadCategoryList() {
+		try {
+			const list = await listCategories();
+			if (list && list.length > 0) {
+				categories = list.map((c: Category) => ({ slug: c.slug, name: c.name }));
+			}
+		} catch {
+			// keep DEFAULT_CATEGORIES fallback
+		}
+	}
 
 	async function loadProducts() {
 		loading = true;
@@ -138,8 +153,8 @@
 			class="px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green outline-none text-sm bg-white"
 		>
 			<option value="">Toutes les catégories</option>
-			{#each PRODUCT_CATEGORIES as cat}
-				<option value={cat.value}>{cat.label}</option>
+			{#each categories as cat}
+				<option value={cat.slug}>{cat.name}</option>
 			{/each}
 		</select>
 	</div>

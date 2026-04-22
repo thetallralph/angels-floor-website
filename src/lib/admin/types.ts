@@ -90,13 +90,28 @@ export interface SiteSettings {
 	};
 }
 
-export const PRODUCT_CATEGORIES = [
-	{ value: 'fonio', label: 'Fonio' },
-	{ value: 'baobab', label: 'Baobab' },
-	{ value: 'nere-fagara', label: 'Néré & Fagara' },
-	{ value: 'mangue', label: 'Mangue' },
-	{ value: 'bisbab', label: 'Biscuits Baobab' }
-] as const;
+export interface Category {
+	id: string;
+	slug: string;
+	name: string;
+	description?: string;
+	order: number;
+}
+
+/** Fallback used when the PocketBase `categories` collection isn't provisioned yet. */
+export const DEFAULT_CATEGORIES: Array<Omit<Category, 'id'>> = [
+	{ slug: 'fonio', name: 'Gamme Fonio', order: 1 },
+	{ slug: 'baobab', name: 'Pulpe de Baobab', order: 2 },
+	{ slug: 'nere-fagara', name: 'Néré & Fagara', order: 3 },
+	{ slug: 'mangue', name: 'Produits Mangue', order: 4 },
+	{ slug: 'bisbab', name: 'Biscuits Baobab', order: 5 }
+];
+
+/** @deprecated use `loadCategoriesFromPB()` / `listCategories()`. Kept for legacy code paths. */
+export const PRODUCT_CATEGORIES = DEFAULT_CATEGORIES.map((c) => ({
+	value: c.slug,
+	label: c.name
+}));
 
 export const BLOG_CATEGORIES = [
 	{ value: 'Recettes', label: 'Recettes' },

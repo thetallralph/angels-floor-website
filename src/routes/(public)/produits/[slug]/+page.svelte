@@ -1,14 +1,13 @@
 <script lang="ts">
   import { ArrowLeft, Share2, ShoppingBag, Check, MapPin, Phone, Clock, X, ChevronDown, ChevronUp } from 'lucide-svelte';
   import type { PageData } from './$types';
-  import { products } from '$lib/data/products.js';
   import ProductCard from '$lib/components/ui/ProductCard.svelte';
   import { getNearestSalesPoints, defaultCoordinates, type SalesPoint } from '$lib/data/salesPoints';
   import { onMount, onDestroy } from 'svelte';
-  
+
   export let data: PageData;
-  
-  const { product } = data;
+
+  const { product, similarProducts } = data;
   
   let selectedImage = 0;
   let showShareMenu = false;
@@ -95,18 +94,8 @@
   
   const productImages = product.images?.length ? product.images : placeholderImages[product.category] || [product.image];
   
-  // Get similar products (same category or similar ingredients)
-  const similarProducts = products
-    .filter(p => {
-      // Same category
-      if (p.category === product.category && p.id !== product.id) return true;
-      // Or products with baobab if current product has baobab
-      if (product.category === 'baobab' && p.category === 'bisbab') return true;
-      if (product.category === 'bisbab' && p.category === 'baobab') return true;
-      return false;
-    })
-    .slice(0, 3);
-    
+
+
   async function shareProduct() {
     const url = window.location.href;
     const text = `Découvrez ${product.name} de Angel's Floor - ${product.description}`;

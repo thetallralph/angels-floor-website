@@ -6,6 +6,7 @@
 	import {
 		LayoutDashboard,
 		Package,
+		Tag,
 		FileText,
 		Type,
 		Image,
@@ -28,6 +29,7 @@
 	const navItems = [
 		{ href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
 		{ href: '/admin/produits', label: 'Produits', icon: Package },
+		{ href: '/admin/categories', label: 'Catégories', icon: Tag },
 		{ href: '/admin/blog', label: 'Blog', icon: FileText },
 		{ href: '/admin/pages', label: 'Contenu', icon: Type },
 		{ href: '/admin/medias', label: 'Médias', icon: Image },

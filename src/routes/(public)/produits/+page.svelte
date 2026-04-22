@@ -68,13 +68,8 @@
     };
   });
   
-  const categoryInfo: Record<string, string> = {
-    'fonio': 'Gamme Fonio',
-    'baobab': 'Pulpe de Baobab',
-    'nere-fagara': 'Néré & Fagara',
-    'mangue': 'Produits Mangue',
-    'bisbab': 'Biscuits Baobab'
-  };
+  $: categoryName = (slug: string) =>
+    categories.find((c) => c.id === slug)?.name ?? slug;
 </script>
 
 <svelte:head>
@@ -198,7 +193,7 @@
             <!-- Simple Category Header -->
             <ScrollReveal animation="fade-up">
               <div class="mb-8 pb-4 border-b border-neutral-light">
-                <h2 class="text-2xl font-semibold text-neutral-charcoal">{categoryInfo[category]}</h2>
+                <h2 class="text-2xl font-semibold text-neutral-charcoal">{categoryName(category)}</h2>
                 <p class="text-sm text-neutral-slate mt-1">{categoryProducts.length} produit{categoryProducts.length > 1 ? 's' : ''}</p>
               </div>
             </ScrollReveal>

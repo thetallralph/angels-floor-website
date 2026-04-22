@@ -3,11 +3,16 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { getContent, saveContent, publishContent, uploadFile } from '$lib/admin/api';
-	import { PRODUCT_CATEGORIES, type Product } from '$lib/admin/types';
+	import { listCategories } from '$lib/admin/categories';
+	import { DEFAULT_CATEGORIES, type Category, type Product } from '$lib/admin/types';
 	import { ArrowLeft, Save, Send, Upload, X, Plus, Eye } from 'lucide-svelte';
 
 	const id = $derived($page.params.id ?? '');
 	const isNew = $derived(id === 'nouveau');
+
+	let categories = $state<Array<{ slug: string; name: string }>>(
+		DEFAULT_CATEGORIES.map((c) => ({ slug: c.slug, name: c.name }))
+	);
 
 	let product = $state<Partial<Product>>({
 		id: '',
@@ -40,6 +45,7 @@
 	}
 
 	onMount(async () => {
+		loadCategoryList();
 		if (id !== 'nouveau') {
 			try {
 				const data = await getContent('products', id, 'draft');
@@ -55,6 +61,20 @@
 			loading = false;
 		}
 	});
+
+	async function loadCategoryList() {
+		try {
+			const list = await listCategories();
+			if (list && list.length > 0) {
+				categories = list.map((c: Category) => ({ slug: c.slug, name: c.name }));
+				if (isNew && !product.category) {
+					product.category = categories[0].slug;
+				}
+			}
+		} catch {
+			// keep DEFAULT_CATEGORIES fallback
+		}
+	}
 
 	function generateSlug(name: string): string {
 		return name
@@ -245,8 +265,8 @@
 								bind:value={product.category}
 								class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green outline-none text-sm bg-white"
 							>
-								{#each PRODUCT_CATEGORIES as cat}
-									<option value={cat.value}>{cat.label}</option>
+								{#each categories as cat}
+									<option value={cat.slug}>{cat.name}</option>
 								{/each}
 							</select>
 						</div>
