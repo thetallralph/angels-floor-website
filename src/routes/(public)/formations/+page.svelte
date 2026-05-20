@@ -92,8 +92,8 @@
         <div class="relative aspect-[4/5] max-w-sm mx-auto lg:ml-auto lg:mr-0 overflow-hidden rounded-3xl shadow-xl">
           <CmsImage
             key="trainings.hero.image"
-            src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&h=1000&fit=crop"
-            alt="Formation pratique Angel's Floor"
+            src="/images/formations/hero.jpg"
+            alt="Formatrices Angel's Floor en train de préparer une pâte lors d'une session"
             class="w-full h-full object-cover"
           />
         </div>
