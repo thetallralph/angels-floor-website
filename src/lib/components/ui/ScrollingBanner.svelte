@@ -82,10 +82,9 @@
     width: 100%;
     height: 60px;
     background: #FFD700;
-    transform: rotate(-2deg);
     overflow: hidden;
     margin: 2rem 0;
-    box-shadow: 
+    box-shadow:
       0 4px 20px rgba(0, 0, 0, 0.15),
       0 8px 40px rgba(255, 215, 0, 0.4),
       0 12px 60px rgba(255, 165, 0, 0.3);
