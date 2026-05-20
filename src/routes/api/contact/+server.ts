@@ -1,14 +1,9 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import nodemailer from 'nodemailer';
-import {
-	SMTP_HOST,
-	SMTP_PORT,
-	SMTP_USER,
-	SMTP_PASSWORD,
-	SMTP_FROM,
-	CONTACT_TO
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
+
+const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM, CONTACT_TO } = env;
 
 const SUBJECT_LABELS: Record<string, string> = {
 	general: 'Question générale',
