@@ -396,6 +396,58 @@
   </p>
 </section>
 
+<!-- Founder Section -->
+<section class="py-20 lg:py-24 bg-neutral-sand">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-12 gap-8 lg:gap-12 items-center">
+      <!-- Portrait -->
+      <div class="col-span-12 lg:col-span-5">
+        <ScrollReveal animation="fade-up">
+          <div class="relative aspect-[4/5] max-w-md mx-auto lg:mx-0 overflow-hidden rounded-3xl shadow-xl">
+            <CmsImage
+              key="about.founder.portrait"
+              src="/images/about/angele-tawari.jpg"
+              alt="Angèle Tawari, fondatrice d'Angel's Floor"
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </ScrollReveal>
+      </div>
+
+      <!-- Story -->
+      <div class="col-span-12 lg:col-span-7">
+        <ScrollReveal animation="fade-up" delay={150}>
+          <CmsText key="about.founder.kicker" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">La fondatrice</CmsText>
+          <CmsText key="about.founder.name" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-3 leading-tight">Angèle Tawari</CmsText>
+          <CmsText key="about.founder.role" tag="p" class="text-lg text-neutral-charcoal mb-8">Entrepreneure agroalimentaire, fondatrice d'Angel's Floor</CmsText>
+
+          <div class="space-y-5 text-base md:text-lg text-neutral-charcoal leading-relaxed">
+            <CmsText
+              key="about.founder.p1"
+              tag="p"
+            >Originaire de Boukombé et basée à Natitingou, Angèle Tawari allie action économique et engagement social.</CmsText>
+
+            <CmsText
+              key="about.founder.p2"
+              tag="p"
+            >Depuis 2012, elle dirige Angel's Floor, son entreprise dédiée à la valorisation des ressources locales : fonio, baobab, néré, mangue. Des produits longtemps sous-exploités, parfois en voie de disparition, mais à forte valeur nutritionnelle et socio-économique.</CmsText>
+
+            <CmsText
+              key="about.founder.p3"
+              tag="p"
+            >Elle a transformé cette initiative en levier de développement local, créant des emplois et ouvrant des opportunités économiques durables aux jeunes et aux femmes de sa région. Active dans plusieurs groupements et réseaux communautaires qu'elle coordonne ou préside, elle renforce l'impact économique et social de l'entrepreneuriat local.</CmsText>
+
+            <CmsText
+              key="about.founder.p4"
+              tag="p"
+            >Soutenue par de nombreux programmes et partenariats, elle incarne une nouvelle génération d'actrices économiques béninoises qui misent sur l'innovation, la tradition et l'engagement citoyen pour transformer leur territoire.</CmsText>
+          </div>
+        </ScrollReveal>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Mission & Values Section -->
 <section class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
