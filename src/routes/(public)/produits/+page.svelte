@@ -3,6 +3,7 @@
   import type { PageData } from './$types';
   import ProductCard from '$lib/components/ui/ProductCard.svelte';
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
+  import PageHeader from '$lib/components/ui/PageHeader.svelte';
   import { ChevronDown, Filter } from 'lucide-svelte';
   
   export let data: PageData;
@@ -77,22 +78,16 @@
   <meta name="description" content="Découvrez notre gamme complète de produits béninois naturels : fonio précuit, pulpe de baobab, biscuits enrichis et plus encore." />
 </svelte:head>
 
-<!-- Hero Section -->
-<section class="relative bg-gradient-to-br from-primary-green to-primary-green-vibrant py-12 overflow-hidden">
-  <div class="absolute inset-0">
-    <div class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-gold/10 rounded-full blur-3xl"></div>
-  </div>
-  
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-    <ScrollReveal animation="fade-down">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">Nos Produits</h1>
-      <p class="text-lg text-white/90 max-w-2xl mx-auto">
-        Une sélection de produits béninois naturels, transformés avec soin par nos productrices
-      </p>
-    </ScrollReveal>
-  </div>
-</section>
+<PageHeader
+  imageKey="products.hero.image"
+  defaultImage="https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=1920&h=1080&fit=crop&q=80"
+  overlineKey="products.hero.overline"
+  overline="Notre Catalogue"
+  titleKey="products.hero.title"
+  title="Nos Produits"
+  subtitleKey="products.hero.subtitle"
+  subtitle="Une sélection de produits béninois naturels, transformés avec soin par nos productrices"
+/>
 
 <!-- Products Section with Sidebar -->
 <section class="bg-white min-h-screen">

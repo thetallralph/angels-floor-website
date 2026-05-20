@@ -2,40 +2,56 @@
   import { onMount } from 'svelte';
   import { Phone, Mail, MapPin, Clock, Send, MessageSquare, Store } from 'lucide-svelte';
   import { CmsText } from '$lib/components/cms';
+  import PageHeader from '$lib/components/ui/PageHeader.svelte';
   
   let formData = {
     name: '',
     email: '',
     phone: '',
     subject: 'general',
-    message: ''
+    message: '',
+    website: ''
   };
-  
+
   let isSubmitting = false;
   let showSuccess = false;
-  
+  let errorMessage = '';
+
   async function handleSubmit(event: Event) {
     event.preventDefault();
     isSubmitting = true;
-    
-    // Simulate form submission
-    setTimeout(() => {
-      isSubmitting = false;
+    errorMessage = '';
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Erreur lors de l'envoi");
+      }
+
       showSuccess = true;
-      // Reset form
       formData = {
         name: '',
         email: '',
         phone: '',
         subject: 'general',
-        message: ''
+        message: '',
+        website: ''
       };
-      
-      // Hide success message after 5 seconds
+
       setTimeout(() => {
         showSuccess = false;
       }, 5000);
-    }, 1500);
+    } catch (err) {
+      errorMessage = err instanceof Error ? err.message : "Erreur lors de l'envoi";
+    } finally {
+      isSubmitting = false;
+    }
   }
   
   onMount(() => {
@@ -48,18 +64,16 @@
   <meta name="description" content="Contactez Angel's Floor pour vos commandes, questions ou partenariats. Nous sommes à votre écoute." />
 </svelte:head>
 
-<!-- Hero Section -->
-<section class="relative bg-primary-green py-16 lg:py-24 overflow-hidden">
-  <div class="absolute inset-0">
-    <div class="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-  </div>
-  
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <CmsText key="contact.hero.title" tag="h1" class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-6 leading-tight">Contactez-Nous</CmsText>
-    <CmsText key="contact.hero.subtitle" tag="p" class="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">Nous sommes à votre écoute pour répondre à toutes vos questions et vous accompagner dans vos projets</CmsText>
-  </div>
-</section>
+<PageHeader
+  imageKey="contact.hero.image"
+  defaultImage="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1920&h=1080&fit=crop&q=80"
+  overlineKey="contact.hero.overline"
+  overline="Restons en lien"
+  titleKey="contact.hero.title"
+  title="Contactez-Nous"
+  subtitleKey="contact.hero.subtitle"
+  subtitle="Nous sommes à votre écoute pour répondre à toutes vos questions et vous accompagner dans vos projets"
+/>
 
 <!-- Contact Information Cards -->
 <section class="py-20 bg-white">
@@ -81,8 +95,8 @@
           <Mail class="w-6 h-6 text-white" />
         </div>
         <CmsText key="contact.email.label" tag="h3" class="font-bold text-lg text-black mb-2">Email</CmsText>
-        <CmsText key="contact.email.line1" tag="p" class="text-neutral-charcoal text-sm mb-1">contact@angelsfloor.bj</CmsText>
-        <CmsText key="contact.email.line2" tag="p" class="text-neutral-charcoal text-sm">commandes@angelsfloor.bj</CmsText>
+        <CmsText key="contact.email.line1" tag="p" class="text-neutral-charcoal text-sm mb-1">contact@angelsfloor.com</CmsText>
+        <CmsText key="contact.email.line2" tag="p" class="text-neutral-charcoal text-sm">commandes@angelsfloor.com</CmsText>
       </div>
       
       <!-- Address Card -->
@@ -127,8 +141,27 @@
             </p>
           </div>
         {/if}
-        
+
+        {#if errorMessage}
+          <div class="bg-red-50 border-2 border-red-500 rounded-2xl p-6 mb-6">
+            <p class="text-red-700 font-semibold text-center">
+              {errorMessage}
+            </p>
+          </div>
+        {/if}
+
         <form on:submit={handleSubmit} class="space-y-6">
+          <div class="absolute left-[-9999px]" aria-hidden="true">
+            <label for="website">Ne pas remplir</label>
+            <input
+              type="text"
+              id="website"
+              name="website"
+              bind:value={formData.website}
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </div>
           <!-- Name & Email Row -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>

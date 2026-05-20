@@ -54,5 +54,4 @@ temp/
 # Claude / agent / playwright artifacts
 .claude/
 .playwright-mcp/
-admin-dashboard.png
-admin-produits.png
+admin-*.png

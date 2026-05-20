@@ -1,13 +1,21 @@
+import type PocketBase from 'pocketbase';
 import { initPB } from './api';
 import { DEFAULT_CATEGORIES, type Category } from './types';
 
-function map(record: Record<string, unknown>): Category {
+function map(pb: PocketBase, record: Record<string, unknown>): Category {
+	const filename = typeof record.image === 'string' ? record.image : '';
+	const imageUrl = filename
+		? pb.files.getURL(record as never, filename)
+		: '';
 	return {
 		id: String(record.id),
 		slug: String(record.slug || ''),
 		name: String(record.name || ''),
 		description: String(record.description || ''),
-		order: Number(record.order ?? 0)
+		order: Number(record.order ?? 0),
+		image: imageUrl,
+		imageFilename: filename,
+		published: Boolean(record.published)
 	};
 }
 
@@ -16,25 +24,37 @@ export async function listCategories(): Promise<Category[] | null> {
 	const pb = await initPB();
 	try {
 		const records = await pb.collection('categories').getFullList({ sort: 'order,name' });
-		return records.map((r) => map(r as Record<string, unknown>));
+		return records.map((r) => map(pb, r as Record<string, unknown>));
 	} catch (err: unknown) {
 		if (isMissingCollectionError(err)) return null;
 		throw err;
 	}
 }
 
-export async function createCategory(data: Omit<Category, 'id'>): Promise<Category> {
+export type CategoryWritable = Partial<Omit<Category, 'id' | 'image' | 'imageFilename'>>;
+
+export async function createCategory(data: Omit<Category, 'id' | 'image' | 'imageFilename'>): Promise<Category> {
 	const pb = await initPB();
 	const record = await pb.collection('categories').create(data);
 	await ensureCategoryInProductsSchema(data.slug);
-	return map(record as Record<string, unknown>);
+	return map(pb, record as Record<string, unknown>);
 }
 
-export async function updateCategory(id: string, data: Partial<Omit<Category, 'id'>>): Promise<Category> {
+export async function updateCategory(id: string, data: CategoryWritable): Promise<Category> {
 	const pb = await initPB();
 	const record = await pb.collection('categories').update(id, data);
 	if (data.slug) await ensureCategoryInProductsSchema(data.slug);
-	return map(record as Record<string, unknown>);
+	return map(pb, record as Record<string, unknown>);
+}
+
+/** Replace the category image. Pass null to clear. */
+export async function saveCategoryImage(id: string, file: File | null): Promise<Category> {
+	const pb = await initPB();
+	const fd = new FormData();
+	if (file) fd.append('image', file);
+	else fd.append('image', '');
+	const record = await pb.collection('categories').update(id, fd);
+	return map(pb, record as Record<string, unknown>);
 }
 
 export async function deleteCategory(id: string): Promise<void> {
@@ -67,7 +87,7 @@ async function ensureCategoryInProductsSchema(slug: string): Promise<void> {
 
 /**
  * One-shot: create the PocketBase `categories` collection with public read rules
- * and seed the 5 default categories. Requires the current user to be a superuser.
+ * and seed the default categories. Requires the current user to be a superuser.
  */
 export async function bootstrapCategoriesCollection(): Promise<void> {
 	const pb = await initPB();
@@ -87,7 +107,15 @@ export async function bootstrapCategoriesCollection(): Promise<void> {
 				{ name: 'slug', type: 'text', required: true },
 				{ name: 'name', type: 'text', required: true },
 				{ name: 'description', type: 'text', required: false },
-				{ name: 'order', type: 'number', required: false }
+				{ name: 'order', type: 'number', required: false },
+				{
+					name: 'image',
+					type: 'file',
+					maxSelect: 1,
+					maxSize: 5_242_880,
+					mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
+				},
+				{ name: 'published', type: 'bool' }
 			],
 			indexes: ['CREATE UNIQUE INDEX idx_categories_slug ON categories (slug)']
 		});

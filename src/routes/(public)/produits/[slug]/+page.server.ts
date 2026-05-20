@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ params }) => {
   }
 
   const all = await loadProducts();
-  const crossSell: Record<string, string[]> = { baobab: ['bisbab'], bisbab: ['baobab'] };
+  const crossSell: Record<string, string[]> = { baobab: ['nere'], nere: ['baobab'] };
   const relatedSlugs = new Set([product.category, ...(crossSell[product.category] ?? [])]);
   const similarProducts = all
     .filter((p) => p.id !== product.id && relatedSlugs.has(p.category))

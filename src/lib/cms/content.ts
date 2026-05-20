@@ -4,25 +4,33 @@ import { loadCategoriesFromPB } from '$lib/cms/categories';
 import type { RecordModel } from 'pocketbase';
 
 function mapProduct(record: RecordModel): Product {
+	const pb = createPB();
 	return {
 		id: record.id,
 		slug: record.slug,
 		name: record.name,
+		subtitle: record.subtitle || '',
+		tagline: record.tagline || '',
+		specialMention: record.special_mention || '',
+		qualityClaims: Array.isArray(record.quality_claims) ? record.quality_claims : [],
 		category: record.category,
 		price: record.price,
 		description: record.description || '',
 		detailedDescription: record.detailed_description || '',
-		image: record.images?.length
-			? createPB().files.getURL(record, record.images[0])
-			: '',
-		images: record.images?.map((img: string) => createPB().files.getURL(record, img)) || [],
+		image: record.images?.length ? pb.files.getURL(record, record.images[0]) : '',
+		images: record.images?.map((img: string) => pb.files.getURL(record, img)) || [],
 		benefits: record.benefits || [],
-		nutritionalInfo: record.nutritional_info || {},
+		variants: Array.isArray(record.variants) ? record.variants : [],
+		tags: Array.isArray(record.tags) ? record.tags : [],
+		preparation: record.preparation || undefined,
+		nutritionalInfo: record.nutritional_info || undefined,
+		conservation: record.conservation || '',
 		usage: record.usage || '',
 		packaging: record.packaging || '',
 		origin: record.origin || '',
 		certification: record.certification || '',
-		featured: record.featured ?? false
+		featured: record.featured ?? false,
+		published: record.published ?? true
 	};
 }
 

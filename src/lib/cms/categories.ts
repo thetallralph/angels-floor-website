@@ -2,13 +2,17 @@ import type { RecordModel } from 'pocketbase';
 import { createPB } from '$lib/server/pocketbase';
 import { DEFAULT_CATEGORIES, type Category } from '$lib/admin/types';
 
-function mapCategory(record: RecordModel): Category {
+function mapCategory(pb: ReturnType<typeof createPB>, record: RecordModel): Category {
+	const filename = typeof record.image === 'string' ? record.image : '';
 	return {
 		id: record.id,
 		slug: record.slug,
 		name: record.name,
 		description: record.description || '',
-		order: record.order ?? 0
+		order: record.order ?? 0,
+		image: filename ? pb.files.getURL(record, filename) : '',
+		imageFilename: filename,
+		published: Boolean(record.published)
 	};
 }
 
@@ -24,7 +28,7 @@ export async function loadCategoriesFromPB(): Promise<Category[]> {
 		if (records.length === 0) {
 			return DEFAULT_CATEGORIES.map((c, i) => ({ id: `default-${i}`, ...c }));
 		}
-		return records.map(mapCategory);
+		return records.map((r) => mapCategory(pb, r));
 	} catch {
 		return DEFAULT_CATEGORIES.map((c, i) => ({ id: `default-${i}`, ...c }));
 	}

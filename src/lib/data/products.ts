@@ -1,7 +1,9 @@
 import type { Product } from '$lib/stores/app.js';
 import productsData from './products.json';
 
-export const products: Product[] = productsData as Product[];
+// Legacy mock data — superseded by the PocketBase-backed loaders in $lib/cms/content.ts.
+// Kept temporarily as a typed fallback; the JSON shape predates the BPV-driven schema.
+export const products: Product[] = productsData as unknown as Product[];
 
 export const categories = [
   { id: 'all', name: 'Tous les produits', count: products.length },

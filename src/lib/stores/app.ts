@@ -1,36 +1,61 @@
 import { writable } from 'svelte/store';
 
+export interface Recipe {
+  name: string;
+  steps: string[];
+}
+
+export interface Preparation {
+  ratio?: string;
+  recipes: Recipe[];
+}
+
+export interface Nutrition {
+  per?: string;
+  energy?: string;
+  carbs?: string;
+  protein?: string;
+  fiber?: string;
+  fat?: string;
+  minerals?: string[];
+  vitamins?: string[];
+}
+
+export interface ProductVariant {
+  size?: string;
+  flavor?: string;
+  label?: string;
+  sku?: string;
+  price?: number;
+}
+
 // Product interface
 export interface Product {
   id: string;
   slug: string;
   name: string;
-  category: 'fonio' | 'baobab' | 'nere-fagara' | 'mangue' | 'bisbab';
+  subtitle?: string;
+  tagline?: string;
+  specialMention?: string;
+  qualityClaims?: string[];
+  category: 'fonio' | 'baobab' | 'nere' | 'mangue' | 'papaye' | 'autres' | string;
   price: number;
   description: string;
   detailedDescription?: string;
   image: string;
   images?: string[];
   benefits: string[];
-  nutritionalInfo?: {
-    calories?: number;
-    protein?: number;
-    carbs?: number;
-    fiber?: number;
-    fat?: number;
-    vitamins?: string[];
-    minerals?: string[];
-    vitaminC?: number;
-    calcium?: number;
-    potassium?: number;
-    iron?: number;
-    antioxidants?: string;
-  };
+  variants?: ProductVariant[];
+  tags?: string[];
+  preparation?: Preparation;
+  nutritionalInfo?: Nutrition;
+  conservation?: string;
   usage?: string;
   packaging?: string;
   origin?: string;
   certification?: string;
   featured: boolean;
+  published?: boolean;
 }
 
 // Blog article interface

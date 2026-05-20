@@ -6,7 +6,7 @@
 	import { listCategories } from '$lib/admin/categories';
 	import { DEFAULT_CATEGORIES, type Category, type Product } from '$lib/admin/types';
 	import MediaPickerModal from '$lib/admin/MediaPickerModal.svelte';
-	import { ArrowLeft, Save, Send, X, Plus, Eye, ImagePlus, FolderOpen } from 'lucide-svelte';
+	import { ArrowLeft, Save, Send, X, Plus, Eye, ImagePlus, FolderOpen, Tag } from 'lucide-svelte';
 
 	const MAX_IMAGES = 10;
 
@@ -21,6 +21,10 @@
 		id: '',
 		slug: '',
 		name: '',
+		subtitle: '',
+		tagline: '',
+		specialMention: '',
+		qualityClaims: [],
 		category: 'fonio',
 		price: 0,
 		description: '',
@@ -28,11 +32,17 @@
 		image: '',
 		images: [],
 		benefits: [],
+		variants: [],
+		tags: [],
+		preparation: { ratio: '', recipes: [] },
+		nutritionalInfo: { per: '100g' },
+		conservation: '',
 		usage: '',
 		packaging: '',
 		origin: 'Bénin',
 		certification: '',
-		featured: false
+		featured: false,
+		published: false
 	});
 
 	let loading = $state(id !== 'nouveau');
@@ -40,6 +50,16 @@
 	let publishing = $state(false);
 	let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
 	let newBenefit = $state('');
+	let newTag = $state('');
+	let newClaim = $state('');
+	let newMineral = $state('');
+	let newVitamin = $state('');
+	let newVariant = $state<{ size: string; flavor: string; label: string; price: string }>({
+		size: '',
+		flavor: '',
+		label: '',
+		price: ''
+	});
 
 	type PendingFile = { file: File; previewUrl: string };
 	let existingImages = $state<Array<{ filename: string; url: string }>>([]);
@@ -216,6 +236,130 @@
 	function removeBenefit(index: number) {
 		product.benefits = (product.benefits || []).filter((_, i) => i !== index);
 	}
+
+	function addTag() {
+		const t = newTag.trim().toLowerCase();
+		if (!t) return;
+		const existing = product.tags || [];
+		if (existing.includes(t)) {
+			newTag = '';
+			return;
+		}
+		product.tags = [...existing, t];
+		newTag = '';
+	}
+
+	function removeTag(index: number) {
+		product.tags = (product.tags || []).filter((_, i) => i !== index);
+	}
+
+	function addVariant() {
+		const size = newVariant.size.trim();
+		const flavor = newVariant.flavor.trim();
+		const label = newVariant.label.trim();
+		const price = newVariant.price.trim() ? Number(newVariant.price) : NaN;
+		if (!size && !flavor && !label) return;
+		product.variants = [
+			...(product.variants || []),
+			{
+				...(size ? { size } : {}),
+				...(flavor ? { flavor } : {}),
+				...(label ? { label } : {}),
+				...(Number.isFinite(price) && price >= 0 ? { price } : {})
+			}
+		];
+		newVariant = { size: '', flavor: '', label: '', price: '' };
+	}
+
+	function removeVariant(index: number) {
+		product.variants = (product.variants || []).filter((_, i) => i !== index);
+	}
+
+	function formatVariant(v: { size?: string; flavor?: string; label?: string; price?: number }): string {
+		const base = [v.size, v.flavor, v.label].filter(Boolean).join(' · ');
+		if (typeof v.price === 'number' && v.price > 0) {
+			return `${base || '—'} — ${v.price.toLocaleString('fr-FR')} FCFA`;
+		}
+		return base;
+	}
+
+	function addClaim() {
+		const t = newClaim.trim();
+		if (!t) return;
+		const existing = product.qualityClaims || [];
+		if (existing.includes(t)) {
+			newClaim = '';
+			return;
+		}
+		product.qualityClaims = [...existing, t];
+		newClaim = '';
+	}
+
+	function removeClaim(index: number) {
+		product.qualityClaims = (product.qualityClaims || []).filter((_, i) => i !== index);
+	}
+
+	function addRecipe() {
+		const prep = product.preparation ?? { ratio: '', recipes: [] };
+		product.preparation = { ...prep, recipes: [...prep.recipes, { name: '', steps: [] }] };
+	}
+
+	function removeRecipe(index: number) {
+		const prep = product.preparation ?? { ratio: '', recipes: [] };
+		product.preparation = { ...prep, recipes: prep.recipes.filter((_, i) => i !== index) };
+	}
+
+	function addStep(recipeIndex: number) {
+		const prep = product.preparation ?? { ratio: '', recipes: [] };
+		const recipes = prep.recipes.map((r, i) => (i === recipeIndex ? { ...r, steps: [...r.steps, ''] } : r));
+		product.preparation = { ...prep, recipes };
+	}
+
+	function removeStep(recipeIndex: number, stepIndex: number) {
+		const prep = product.preparation ?? { ratio: '', recipes: [] };
+		const recipes = prep.recipes.map((r, i) =>
+			i === recipeIndex ? { ...r, steps: r.steps.filter((_, j) => j !== stepIndex) } : r
+		);
+		product.preparation = { ...prep, recipes };
+	}
+
+	function addMineral() {
+		const t = newMineral.trim();
+		if (!t) return;
+		const nutrition = product.nutritionalInfo ?? {};
+		const minerals = nutrition.minerals ?? [];
+		if (minerals.includes(t)) {
+			newMineral = '';
+			return;
+		}
+		product.nutritionalInfo = { ...nutrition, minerals: [...minerals, t] };
+		newMineral = '';
+	}
+
+	function removeMineral(index: number) {
+		const nutrition = product.nutritionalInfo ?? {};
+		const minerals = (nutrition.minerals ?? []).filter((_, i) => i !== index);
+		product.nutritionalInfo = { ...nutrition, minerals };
+	}
+
+	function addVitamin() {
+		const t = newVitamin.trim();
+		if (!t) return;
+		const nutrition = product.nutritionalInfo ?? {};
+		const vitamins = nutrition.vitamins ?? [];
+		if (vitamins.includes(t)) {
+			newVitamin = '';
+			return;
+		}
+		product.nutritionalInfo = { ...nutrition, vitamins: [...vitamins, t] };
+		newVitamin = '';
+	}
+
+	function removeVitamin(index: number) {
+		const nutrition = product.nutritionalInfo ?? {};
+		const vitamins = (nutrition.vitamins ?? []).filter((_, i) => i !== index);
+		product.nutritionalInfo = { ...nutrition, vitamins };
+	}
 </script>
 
 <div>
@@ -362,6 +506,85 @@
 					</div>
 				</div>
 
+				<!-- Identité commerciale (BPV) -->
+				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+					<div>
+						<h2 class="font-semibold text-neutral-obsidian">Identité commerciale</h2>
+						<p class="text-xs text-neutral-slate mt-0.5">
+							Reprise du BPV : ligne secondaire, slogan, mention badge et claims qualité.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<label for="subtitle" class="block text-sm font-medium text-neutral-charcoal mb-1">Sous-titre / ligne produit</label>
+							<input
+								id="subtitle"
+								type="text"
+								bind:value={product.subtitle}
+								class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+								placeholder="PURS GRAINS DE FONIO"
+							/>
+						</div>
+						<div>
+							<label for="specialMention" class="block text-sm font-medium text-neutral-charcoal mb-1">Mention spéciale (badge)</label>
+							<input
+								id="specialMention"
+								type="text"
+								bind:value={product.specialMention}
+								class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+								placeholder="SANS GLUTEN"
+							/>
+						</div>
+					</div>
+
+					<div>
+						<label for="tagline" class="block text-sm font-medium text-neutral-charcoal mb-1">Slogan / accroche</label>
+						<input
+							id="tagline"
+							type="text"
+							bind:value={product.tagline}
+							class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+							placeholder="Optez pour votre bien-être !"
+						/>
+					</div>
+
+					<div>
+						<div class="block text-sm font-medium text-neutral-charcoal mb-1">Claims qualité</div>
+						<div class="flex gap-2">
+							<input
+								type="text"
+								bind:value={newClaim}
+								onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addClaim())}
+								class="flex-1 px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+								placeholder="100% Naturel, Sans conservateur, HACCP…"
+							/>
+							<button
+								onclick={addClaim}
+								class="p-2.5 bg-primary-green text-white rounded-xl hover:bg-primary-green-vibrant transition-all"
+							>
+								<Plus class="w-4 h-4" />
+							</button>
+						</div>
+						{#if product.qualityClaims && product.qualityClaims.length > 0}
+							<div class="flex flex-wrap gap-2 mt-3">
+								{#each product.qualityClaims as claim, i}
+									<span class="inline-flex items-center gap-1 bg-primary-green/10 text-primary-green-vibrant px-3 py-1 rounded-full text-xs font-medium">
+										{claim}
+										<button
+											onclick={() => removeClaim(i)}
+											class="ml-1 hover:text-red-500 transition-colors"
+											title="Retirer"
+										>
+											<X class="w-3 h-3" />
+										</button>
+									</span>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				</div>
+
 				<!-- Bénéfices -->
 				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
 					<h2 class="font-semibold text-neutral-obsidian">Bénéfices</h2>
@@ -397,6 +620,369 @@
 							{/each}
 						</ul>
 					{/if}
+				</div>
+
+				<!-- Variantes -->
+				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+					<div>
+						<h2 class="font-semibold text-neutral-obsidian">Variantes</h2>
+						<p class="text-xs text-neutral-slate mt-0.5">
+							Déclinaisons de taille et/ou parfum. Laisser vide si le produit n'a qu'un seul format.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
+						<input
+							type="text"
+							bind:value={newVariant.size}
+							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addVariant())}
+							class="px-3 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+							placeholder="Taille (50G, 1KG, 90ML…)"
+						/>
+						<input
+							type="text"
+							bind:value={newVariant.flavor}
+							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addVariant())}
+							class="px-3 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+							placeholder="Parfum (Nature…)"
+						/>
+						<input
+							type="text"
+							bind:value={newVariant.label}
+							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addVariant())}
+							class="px-3 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+							placeholder="Mention (Dragée…)"
+						/>
+						<input
+							type="number"
+							bind:value={newVariant.price}
+							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addVariant())}
+							min="0"
+							step="1"
+							class="px-3 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+							placeholder="Prix (FCFA)"
+						/>
+						<button
+							onclick={addVariant}
+							class="p-2.5 bg-primary-green text-white rounded-xl hover:bg-primary-green-vibrant transition-all"
+							title="Ajouter la variante"
+						>
+							<Plus class="w-4 h-4" />
+						</button>
+					</div>
+
+					{#if product.variants && product.variants.length > 0}
+						<ul class="space-y-2">
+							{#each product.variants as variant, i}
+								<li class="flex items-center justify-between bg-neutral-pearl px-4 py-2.5 rounded-xl text-sm">
+									<span class="font-medium">{formatVariant(variant) || '—'}</span>
+									<button
+										onclick={() => removeVariant(i)}
+										class="text-neutral-slate hover:text-red-500 transition-colors"
+										title="Retirer"
+									>
+										<X class="w-4 h-4" />
+									</button>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+
+				<!-- Tags -->
+				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+					<div>
+						<h2 class="font-semibold text-neutral-obsidian">Tags</h2>
+						<p class="text-xs text-neutral-slate mt-0.5">
+							Mots-clés pour grouper les produits de la catégorie « Autres » (igname, tomate, condiment…).
+						</p>
+					</div>
+
+					<div class="flex gap-2">
+						<input
+							type="text"
+							bind:value={newTag}
+							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+							class="flex-1 px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+							placeholder="Ajouter un tag…"
+						/>
+						<button
+							onclick={addTag}
+							class="p-2.5 bg-primary-green text-white rounded-xl hover:bg-primary-green-vibrant transition-all"
+						>
+							<Plus class="w-4 h-4" />
+						</button>
+					</div>
+
+					{#if product.tags && product.tags.length > 0}
+						<div class="flex flex-wrap gap-2">
+							{#each product.tags as tag, i}
+								<span class="inline-flex items-center gap-1 bg-accent-gold/10 text-neutral-obsidian px-3 py-1 rounded-full text-xs font-medium">
+									<Tag class="w-3 h-3" />
+									{tag}
+									<button
+										onclick={() => removeTag(i)}
+										class="ml-1 text-neutral-slate hover:text-red-500 transition-colors"
+										title="Retirer"
+									>
+										<X class="w-3 h-3" />
+									</button>
+								</span>
+							{/each}
+						</div>
+					{/if}
+				</div>
+
+				<!-- Préparation -->
+				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+					<div>
+						<h2 class="font-semibold text-neutral-obsidian">Préparation</h2>
+						<p class="text-xs text-neutral-slate mt-0.5">
+							Recettes du BPV. Une recette = un titre + une suite d'étapes.
+						</p>
+					</div>
+
+					<div>
+						<label for="ratio" class="block text-sm font-medium text-neutral-charcoal mb-1">Ratio universel</label>
+						<input
+							id="ratio"
+							type="text"
+							value={product.preparation?.ratio ?? ''}
+							oninput={(e) =>
+								(product.preparation = {
+									...(product.preparation ?? { recipes: [] }),
+									ratio: (e.target as HTMLInputElement).value
+								})}
+							class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
+							placeholder="1 mesure de fonio = 8 mesures d'eau"
+						/>
+					</div>
+
+					{#if product.preparation?.recipes}
+						{#each product.preparation.recipes as recipe, ri}
+							<div class="rounded-xl border border-neutral-light p-4 space-y-3">
+								<div class="flex items-start gap-2">
+									<input
+										type="text"
+										value={recipe.name}
+										oninput={(e) => {
+											const prep = product.preparation ?? { ratio: '', recipes: [] };
+											prep.recipes[ri].name = (e.target as HTMLInputElement).value;
+											product.preparation = { ...prep };
+										}}
+										class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm font-medium"
+										placeholder="Bouillie de grains de fonio"
+									/>
+									<button
+										onclick={() => removeRecipe(ri)}
+										class="p-2 text-neutral-slate hover:text-red-500 transition-colors"
+										title="Supprimer la recette"
+									>
+										<X class="w-4 h-4" />
+									</button>
+								</div>
+
+								<ol class="space-y-2 list-decimal pl-5">
+									{#each recipe.steps as step, si}
+										<li class="flex items-start gap-2">
+											<textarea
+												value={step}
+												oninput={(e) => {
+													const prep = product.preparation ?? { ratio: '', recipes: [] };
+													prep.recipes[ri].steps[si] = (e.target as HTMLTextAreaElement).value;
+													product.preparation = { ...prep };
+												}}
+												rows="2"
+												class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm resize-y"
+												placeholder="Décrivez l'étape…"
+											></textarea>
+											<button
+												onclick={() => removeStep(ri, si)}
+												class="mt-1 p-1.5 text-neutral-slate hover:text-red-500 transition-colors"
+												title="Retirer l'étape"
+											>
+												<X class="w-3.5 h-3.5" />
+											</button>
+										</li>
+									{/each}
+								</ol>
+
+								<button
+									onclick={() => addStep(ri)}
+									class="flex items-center gap-1.5 text-sm text-primary-green hover:text-primary-green-vibrant transition-colors"
+								>
+									<Plus class="w-4 h-4" />
+									Ajouter une étape
+								</button>
+							</div>
+						{/each}
+					{/if}
+
+					<button
+						onclick={addRecipe}
+						class="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-neutral-light text-neutral-slate text-sm hover:border-primary-green hover:text-primary-green transition-all w-full justify-center"
+					>
+						<Plus class="w-4 h-4" />
+						Ajouter une recette
+					</button>
+				</div>
+
+				<!-- Composition nutritionnelle -->
+				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+					<div>
+						<h2 class="font-semibold text-neutral-obsidian">Composition nutritionnelle</h2>
+						<p class="text-xs text-neutral-slate mt-0.5">
+							Valeurs telles qu'écrites sur l'étiquette ("80g", "352 kCal").
+						</p>
+					</div>
+
+					<div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+						<div>
+							<label for="per" class="block text-xs font-medium text-neutral-charcoal mb-1">Pour</label>
+							<input
+								id="per"
+								type="text"
+								value={product.nutritionalInfo?.per ?? ''}
+								oninput={(e) =>
+									(product.nutritionalInfo = { ...(product.nutritionalInfo ?? {}), per: (e.target as HTMLInputElement).value })}
+								class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+								placeholder="100g"
+							/>
+						</div>
+						<div>
+							<label for="energy" class="block text-xs font-medium text-neutral-charcoal mb-1">Énergie</label>
+							<input
+								id="energy"
+								type="text"
+								value={product.nutritionalInfo?.energy ?? ''}
+								oninput={(e) =>
+									(product.nutritionalInfo = { ...(product.nutritionalInfo ?? {}), energy: (e.target as HTMLInputElement).value })}
+								class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+								placeholder="352 kCal"
+							/>
+						</div>
+						<div>
+							<label for="carbs" class="block text-xs font-medium text-neutral-charcoal mb-1">Glucides</label>
+							<input
+								id="carbs"
+								type="text"
+								value={product.nutritionalInfo?.carbs ?? ''}
+								oninput={(e) =>
+									(product.nutritionalInfo = { ...(product.nutritionalInfo ?? {}), carbs: (e.target as HTMLInputElement).value })}
+								class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+								placeholder="80g"
+							/>
+						</div>
+						<div>
+							<label for="protein" class="block text-xs font-medium text-neutral-charcoal mb-1">Protéines</label>
+							<input
+								id="protein"
+								type="text"
+								value={product.nutritionalInfo?.protein ?? ''}
+								oninput={(e) =>
+									(product.nutritionalInfo = { ...(product.nutritionalInfo ?? {}), protein: (e.target as HTMLInputElement).value })}
+								class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+								placeholder="8g"
+							/>
+						</div>
+						<div>
+							<label for="fiber" class="block text-xs font-medium text-neutral-charcoal mb-1">Fibres</label>
+							<input
+								id="fiber"
+								type="text"
+								value={product.nutritionalInfo?.fiber ?? ''}
+								oninput={(e) =>
+									(product.nutritionalInfo = { ...(product.nutritionalInfo ?? {}), fiber: (e.target as HTMLInputElement).value })}
+								class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+								placeholder="2,4g"
+							/>
+						</div>
+						<div>
+							<label for="fat" class="block text-xs font-medium text-neutral-charcoal mb-1">Lipides</label>
+							<input
+								id="fat"
+								type="text"
+								value={product.nutritionalInfo?.fat ?? ''}
+								oninput={(e) =>
+									(product.nutritionalInfo = { ...(product.nutritionalInfo ?? {}), fat: (e.target as HTMLInputElement).value })}
+								class="w-full px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+								placeholder="—"
+							/>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<div class="block text-sm font-medium text-neutral-charcoal mb-1">Minéraux</div>
+							<div class="flex gap-2">
+								<input
+									type="text"
+									bind:value={newMineral}
+									onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addMineral())}
+									class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+									placeholder="Fer, Magnésium…"
+								/>
+								<button onclick={addMineral} class="p-2 bg-primary-green text-white rounded-lg hover:bg-primary-green-vibrant transition-all">
+									<Plus class="w-4 h-4" />
+								</button>
+							</div>
+							{#if product.nutritionalInfo?.minerals && product.nutritionalInfo.minerals.length > 0}
+								<div class="flex flex-wrap gap-1.5 mt-2">
+									{#each product.nutritionalInfo.minerals as min, i}
+										<span class="inline-flex items-center gap-1 bg-neutral-pearl px-2 py-1 rounded-md text-xs">
+											{min}
+											<button onclick={() => removeMineral(i)} class="text-neutral-slate hover:text-red-500 transition-colors">
+												<X class="w-3 h-3" />
+											</button>
+										</span>
+									{/each}
+								</div>
+							{/if}
+						</div>
+						<div>
+							<div class="block text-sm font-medium text-neutral-charcoal mb-1">Vitamines</div>
+							<div class="flex gap-2">
+								<input
+									type="text"
+									bind:value={newVitamin}
+									onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addVitamin())}
+									class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+									placeholder="B, C…"
+								/>
+								<button onclick={addVitamin} class="p-2 bg-primary-green text-white rounded-lg hover:bg-primary-green-vibrant transition-all">
+									<Plus class="w-4 h-4" />
+								</button>
+							</div>
+							{#if product.nutritionalInfo?.vitamins && product.nutritionalInfo.vitamins.length > 0}
+								<div class="flex flex-wrap gap-1.5 mt-2">
+									{#each product.nutritionalInfo.vitamins as vit, i}
+										<span class="inline-flex items-center gap-1 bg-neutral-pearl px-2 py-1 rounded-md text-xs">
+											{vit}
+											<button onclick={() => removeVitamin(i)} class="text-neutral-slate hover:text-red-500 transition-colors">
+												<X class="w-3 h-3" />
+											</button>
+										</span>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					</div>
+				</div>
+
+				<!-- Conservation -->
+				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+					<div>
+						<h2 class="font-semibold text-neutral-obsidian">Conservation</h2>
+						<p class="text-xs text-neutral-slate mt-0.5">
+							Instructions de stockage et durabilité.
+						</p>
+					</div>
+					<textarea
+						bind:value={product.conservation}
+						rows="3"
+						class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm resize-y"
+						placeholder="Refermer hermétiquement l'emballage après utilisation. Conserver dans un endroit sec, frais et à l'abri de l'humidité. À consommer de préférence avant la Date de Durabilité Minimale."
+					></textarea>
 				</div>
 
 				<!-- Détails -->
@@ -533,6 +1119,15 @@
 				<!-- Options -->
 				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
 					<h2 class="font-semibold text-neutral-obsidian">Options</h2>
+
+					<label class="flex items-center gap-3 cursor-pointer">
+						<input
+							type="checkbox"
+							bind:checked={product.published}
+							class="w-4 h-4 rounded border-neutral-light text-primary-green focus:ring-primary-green"
+						/>
+						<span class="text-sm text-neutral-charcoal">Publié (visible sur le site)</span>
+					</label>
 
 					<label class="flex items-center gap-3 cursor-pointer">
 						<input

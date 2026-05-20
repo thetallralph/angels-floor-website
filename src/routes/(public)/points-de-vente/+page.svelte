@@ -1,36 +1,42 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { MapPin, Phone, Clock, Search, Filter } from 'lucide-svelte';
-	import { salesPoints, getSalesPointsByDepartment, type SalesPoint } from '$lib/data/salesPoints';
-	import { CmsText } from '$lib/components/cms';
-	
+	import type { PublicSalesPoint } from '$lib/cms/salesPoints';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
+
+	export let data: { salesPoints: PublicSalesPoint[] };
+	$: salesPoints = data.salesPoints;
+
 	let selectedDepartment = 'Tous';
 	let selectedType = 'Tous';
 	let searchQuery = '';
 	let map: any;
 	let markers: any[] = [];
 	let L: any;
-	
-	$: departments = ['Tous', ...Object.keys(getSalesPointsByDepartment())];
+
+	$: departments = [
+		'Tous',
+		...Array.from(new Set(salesPoints.map((p) => p.department))).sort()
+	];
 	$: types = ['Tous', 'boutique', 'supermarché', 'marché', 'pharmacie'];
-	
+
 	$: filteredSalesPoints = salesPoints.filter(point => {
 		const matchesDepartment = selectedDepartment === 'Tous' || point.department === selectedDepartment;
 		const matchesType = selectedType === 'Tous' || point.type === selectedType;
-		const matchesSearch = searchQuery === '' || 
+		const matchesSearch = searchQuery === '' ||
 			point.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			point.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			point.city.toLowerCase().includes(searchQuery.toLowerCase());
 		return matchesDepartment && matchesType && matchesSearch;
 	});
-	
+
 	$: salesPointsByDepartment = filteredSalesPoints.reduce((acc, point) => {
 		if (!acc[point.department]) {
 			acc[point.department] = [];
 		}
 		acc[point.department].push(point);
 		return acc;
-	}, {} as Record<string, SalesPoint[]>);
+	}, {} as Record<string, PublicSalesPoint[]>);
 	
 	onMount(async () => {
 		if (typeof window !== 'undefined') {
@@ -115,7 +121,7 @@
 		}
 	}
 	
-	function focusOnPoint(point: SalesPoint) {
+	function focusOnPoint(point: PublicSalesPoint) {
 		if (!map || !L) return;
 		map.setView([point.coordinates.lat, point.coordinates.lng], 15);
 		
@@ -135,22 +141,16 @@
 </script>
 
 <div class="min-h-screen bg-neutral-sand">
-	<!-- Hero Section -->
-	<section class="relative bg-primary-green py-16 lg:py-24 overflow-hidden">
-		<div class="absolute inset-0">
-			<div class="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-			<div class="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-		</div>
-		
-		<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-			<div class="text-center">
-				<CmsText key="sales-points.hero.title" tag="h1" class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-6 leading-tight">Nos Points de Vente</CmsText>
-				<p class="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-					<CmsText key="sales-points.hero.subtitle">Trouvez nos produits dans plus de {salesPoints.length} points de vente à travers le Bénin</CmsText>
-				</p>
-			</div>
-		</div>
-	</section>
+	<PageHeader
+		imageKey="sales-points.hero.image"
+		defaultImage="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=1920&h=1080&fit=crop&q=80"
+		overlineKey="sales-points.hero.overline"
+		overline="Trouvez-nous"
+		titleKey="sales-points.hero.title"
+		title="Nos Points de Vente"
+		subtitleKey="sales-points.hero.subtitle"
+		subtitle="Trouvez nos produits dans plus de {salesPoints.length} points de vente à travers le Bénin"
+	/>
 	
 	<!-- Filtres -->
 	<section class="bg-white border-b sticky top-0 z-40 shadow-sm">
