@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { Menu, X, Phone, ArrowRight, Home, ShoppingBag, MapPin, Users, Mail } from 'lucide-svelte';
+  import { Menu, X, Phone, ArrowRight, Home, ShoppingBag, MapPin, Users, Mail, GraduationCap } from 'lucide-svelte';
   import { fade, fly } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   
@@ -13,14 +13,20 @@
       icon: Home,
       description: 'Retour à la page d\'accueil'
     },
-    { 
-      href: '/produits', 
+    {
+      href: '/produits',
       label: 'Produits',
       icon: ShoppingBag,
       description: 'Découvrez nos produits naturels'
     },
-    { 
-      href: '/points-de-vente', 
+    {
+      href: '/formations',
+      label: 'Formations',
+      icon: GraduationCap,
+      description: 'Cosmétique & transformation alimentaire'
+    },
+    {
+      href: '/points-de-vente',
       label: 'Points de vente',
       icon: MapPin,
       description: 'Trouvez où acheter nos produits'

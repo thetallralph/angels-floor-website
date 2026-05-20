@@ -98,6 +98,7 @@ const TYPE_MAP: Record<string, string> = {
 	'products': 'products',
 	'blog': 'blog',
 	'sales-points': 'sales_points',
+	'trainings': 'trainings',
 	'pages': 'pages',
 	'settings': 'settings',
 	'cms_content': 'cms_content'
@@ -105,6 +106,38 @@ const TYPE_MAP: Record<string, string> = {
 
 function getCollection(type: string): string {
 	return TYPE_MAP[type] || type;
+}
+
+/**
+ * Product-specific PB snake_case ↔ TS camelCase aliases.
+ * PB columns are snake_case; the admin UI binds to camelCase. Without this map,
+ * fields like `detailed_description` silently drop on save because the UI sends
+ * the camelCase variant, which PB ignores.
+ */
+const PRODUCT_FIELD_ALIASES: Record<string, string> = {
+	detailed_description: 'detailedDescription',
+	nutritional_info: 'nutritionalInfo',
+	special_mention: 'specialMention',
+	quality_claims: 'qualityClaims'
+};
+
+function aliasProductFieldsFromPB(record: Record<string, unknown>): Record<string, unknown> {
+	const out = { ...record };
+	for (const [snake, camel] of Object.entries(PRODUCT_FIELD_ALIASES)) {
+		if (snake in out) out[camel] = out[snake];
+	}
+	return out;
+}
+
+function aliasProductFieldsToPB(data: Record<string, unknown>): Record<string, unknown> {
+	const out = { ...data };
+	for (const [snake, camel] of Object.entries(PRODUCT_FIELD_ALIASES)) {
+		if (camel in out) {
+			out[snake] = out[camel];
+			delete out[camel];
+		}
+	}
+	return out;
 }
 
 /**
@@ -119,14 +152,30 @@ function enrichRecordImages(p: PocketBase, record: Record<string, unknown>): Rec
 		const urls = filenames.map(f => p.files.getURL(record as never, f));
 		return { ...record, image: urls[0], images: urls, imageFilenames: filenames };
 	}
+	// Single-image field (e.g. trainings, categories): convert filename → URL while
+	// keeping the raw filename available as `imageFilename` for upload diffing.
+	const single = record.image;
+	if (typeof single === 'string' && single.length > 0) {
+		return {
+			...record,
+			image: p.files.getURL(record as never, single),
+			imageFilename: single,
+			imageFilenames: []
+		};
+	}
 	return { ...record, imageFilenames: [] };
+}
+
+function postProcessRecord(p: PocketBase, collection: string, record: Record<string, unknown>): Record<string, unknown> {
+	const withImages = enrichRecordImages(p, record);
+	return collection === 'products' ? aliasProductFieldsFromPB(withImages) : withImages;
 }
 
 export async function getContentList(type: string) {
 	const p = await initPB();
 	const collection = getCollection(type);
 	const records = await p.collection(collection).getFullList();
-	return records.map(r => enrichRecordImages(p, r));
+	return records.map((r) => postProcessRecord(p, collection, r));
 }
 
 /**
@@ -149,10 +198,10 @@ export async function getContent(type: string, id: string, _status: 'draft' | 'l
 	const collection = getCollection(type);
 	try {
 		const record = await p.collection(collection).getOne(id);
-		return enrichRecordImages(p, record);
+		return postProcessRecord(p, collection, record);
 	} catch {
 		const record = await p.collection(collection).getFirstListItem(`slug = "${id}"`);
-		return enrichRecordImages(p, record);
+		return postProcessRecord(p, collection, record);
 	}
 }
 
@@ -162,14 +211,14 @@ export async function getLiveContent(type: string, id?: string) {
 	if (id) {
 		try {
 			const record = await p.collection(collection).getOne(id);
-			return enrichRecordImages(p, record);
+			return postProcessRecord(p, collection, record);
 		} catch {
 			const record = await p.collection(collection).getFirstListItem(`slug = "${id}"`);
-			return enrichRecordImages(p, record);
+			return postProcessRecord(p, collection, record);
 		}
 	}
 	const records = await p.collection(collection).getFullList({ sort: '-created' });
-	return records.map(r => enrichRecordImages(p, r));
+	return records.map((r) => postProcessRecord(p, collection, r));
 }
 
 export async function saveContent(type: string, id: string, data: Record<string, unknown>) {
@@ -177,7 +226,7 @@ export async function saveContent(type: string, id: string, data: Record<string,
 	const collection = getCollection(type);
 
 	// Remove PocketBase system fields + virtual image URL fields added by enrichRecordImages
-	const cleanData = { ...data };
+	let cleanData: Record<string, unknown> = { ...data };
 	delete cleanData.id;
 	delete cleanData.created;
 	delete cleanData.updated;
@@ -185,7 +234,9 @@ export async function saveContent(type: string, id: string, data: Record<string,
 	delete cleanData.collectionName;
 	delete cleanData.image;
 	delete cleanData.images;
+	delete cleanData.imageFilename;
 	delete cleanData.imageFilenames;
+	if (collection === 'products') cleanData = aliasProductFieldsToPB(cleanData);
 
 	// Try update via direct id or via slug lookup; fall back to create
 	try {
@@ -238,6 +289,16 @@ export async function saveProductImages(
 	for (const file of newFiles) fd.append('images+', file);
 	for (const name of removedFilenames) fd.append('images-', name);
 	await p.collection('products').update(pbId, fd);
+}
+
+/** Replace or clear the single `image` field on a training record. */
+export async function saveTrainingImage(id: string, file: File | null): Promise<void> {
+	const p = await initPB();
+	const pbId = await resolvePBId('trainings', id);
+	const fd = new FormData();
+	if (file) fd.append('image', file);
+	else fd.append('image', '');
+	await p.collection('trainings').update(pbId, fd);
 }
 
 // --- CMS Content (key-value overrides per page) ---

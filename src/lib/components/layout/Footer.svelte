@@ -1,8 +1,15 @@
 <script lang="ts">
   import { Mail, Phone, MapPin, ArrowRight, MessageCircle } from 'lucide-svelte';
-  
+
+  type FooterCategory = { slug: string; name: string };
+  export let categories: FooterCategory[] = [];
+
+  const MAX_FOOTER_CATEGORIES = 5;
+  $: visibleCategories = categories.slice(0, MAX_FOOTER_CATEGORIES);
+  $: hasMoreCategories = categories.length > MAX_FOOTER_CATEGORIES;
+
   let whatsappNumber = '';
-  
+
   function handleWhatsAppSubmit(event: Event) {
     event.preventDefault();
     // WhatsApp logic will be implemented later
@@ -10,7 +17,7 @@
     whatsappNumber = '';
     // Show success message
   }
-  
+
   const currentYear = new Date().getFullYear();
 </script>
 
@@ -106,6 +113,10 @@
             <span class="group-hover:translate-x-1 transition-transform duration-300">Notre Histoire</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
+          <a href="/formations" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">Formations</span>
+            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </a>
           <!-- Impact link hidden for now -->
           <!-- <a href="/impact" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm">
             <span class="group-hover:translate-x-1 transition-transform duration-300">Impact Communautaire</span>
@@ -117,34 +128,28 @@
       <!-- Produits Column -->
       <div class="space-y-4 flex flex-col items-center md:items-start">
         <h3 class="text-xl font-bold mb-6 relative">
-          Nos Produits
+          Nos Gammes
           <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 w-12 h-1 bg-accent-gold rounded-full"></span>
         </h3>
         <div class="space-y-3 w-full">
-          <a href="/produits?category=fonio" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Gamme Fonio</span>
-            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </a>
-          <a href="/produits?category=baobab" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Pulpe de Baobab</span>
-            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </a>
-          <a href="/produits?category=nere-fagara" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Néré & Fagara</span>
-            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </a>
-          <a href="/produits?category=mangue" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Produits Mangue</span>
-            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </a>
-          <a href="/produits?category=bisbab" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Biscuits Baobab</span>
-            <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </a>
-          <a href="/produits" class="inline-flex items-center text-accent-gold hover:text-accent-gold-bright transition-colors text-sm font-medium mt-2 justify-center md:justify-start">
-            Voir tous les produits
-            <ArrowRight class="w-3 h-3 ml-1" />
-          </a>
+          {#each visibleCategories as category (category.slug)}
+            <a
+              href="/produits?category={category.slug}"
+              class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start"
+            >
+              <span class="group-hover:translate-x-1 transition-transform duration-300">{category.name}</span>
+              <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </a>
+          {/each}
+          {#if hasMoreCategories}
+            <a
+              href="/produits"
+              class="inline-flex items-center text-accent-gold hover:text-accent-gold-bright transition-colors text-sm font-medium mt-2 justify-center md:justify-start"
+            >
+              Voir toutes les gammes
+              <ArrowRight class="w-3 h-3 ml-1" />
+            </a>
+          {/if}
         </div>
       </div>
       

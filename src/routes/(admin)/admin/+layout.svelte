@@ -10,6 +10,8 @@
 		FileText,
 		Type,
 		Image,
+		MapPin,
+		GraduationCap,
 		Settings,
 		LogOut,
 		ChevronLeft,
@@ -30,9 +32,11 @@
 		{ href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
 		{ href: '/admin/produits', label: 'Produits', icon: Package },
 		{ href: '/admin/categories', label: 'Catégories', icon: Tag },
+		{ href: '/admin/formations', label: 'Formations', icon: GraduationCap },
 		{ href: '/admin/blog', label: 'Blog', icon: FileText },
 		{ href: '/admin/pages', label: 'Contenu', icon: Type },
 		{ href: '/admin/medias', label: 'Médias', icon: Image },
+		{ href: '/admin/points-de-vente', label: 'Points de vente', icon: MapPin },
 		{ href: '/admin/settings', label: 'Paramètres', icon: Settings }
 	];
 
