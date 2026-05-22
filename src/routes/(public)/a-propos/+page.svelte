@@ -1,45 +1,68 @@
 <script lang="ts">
+  import { onMount, tick } from 'svelte';
   import { Heart, Users, Target, Leaf, TrendingUp } from 'lucide-svelte';
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import { CmsText, CmsImage } from '$lib/components/cms';
 
+  // Scroll-jacked horizontal timeline (desktop only).
+  let pinnedSection: HTMLElement;
   let timelineTrack: HTMLElement;
-  let isDragging = false;
-  let dragStartX = 0;
-  let dragStartScrollLeft = 0;
-  let hasDragged = false;
+  let translateX = 0;
+  let progress = 0;
+  let sectionHeight = '400vh';
+  let rafScheduled = false;
 
-  function handleTrackMouseDown(event: MouseEvent) {
+  function measure() {
     if (!timelineTrack) return;
-    isDragging = true;
-    hasDragged = false;
-    dragStartX = event.pageX;
-    dragStartScrollLeft = timelineTrack.scrollLeft;
-    timelineTrack.style.scrollBehavior = 'auto';
+    const trackWidth = timelineTrack.scrollWidth;
+    const viewportWidth = window.innerWidth;
+    const maxX = Math.max(0, trackWidth - viewportWidth);
+    sectionHeight = `${maxX + window.innerHeight}px`;
   }
 
-  function handleTrackMouseMove(event: MouseEvent) {
-    if (!isDragging || !timelineTrack) return;
-    const delta = event.pageX - dragStartX;
-    if (Math.abs(delta) > 3) hasDragged = true;
-    event.preventDefault();
-    timelineTrack.scrollLeft = dragStartScrollLeft - delta * 1.4;
-  }
-
-  function endDrag() {
-    if (!isDragging || !timelineTrack) return;
-    isDragging = false;
-    timelineTrack.style.scrollBehavior = '';
-  }
-
-  // Swallow click events that were actually drags so e.g. links inside don't fire.
-  function suppressClickIfDragged(event: MouseEvent) {
-    if (hasDragged) {
-      event.preventDefault();
-      event.stopPropagation();
-      hasDragged = false;
+  function update() {
+    if (!pinnedSection || !timelineTrack) return;
+    const rect = pinnedSection.getBoundingClientRect();
+    const sectionH = pinnedSection.offsetHeight;
+    const viewportH = window.innerHeight;
+    const scrollDist = sectionH - viewportH;
+    if (scrollDist <= 0) {
+      translateX = 0;
+      progress = 0;
+      return;
     }
+    const scrolled = Math.max(0, Math.min(scrollDist, -rect.top));
+    progress = scrolled / scrollDist;
+    const maxX = Math.max(0, timelineTrack.scrollWidth - window.innerWidth);
+    translateX = progress * maxX;
   }
+
+  function onScroll() {
+    if (rafScheduled) return;
+    rafScheduled = true;
+    requestAnimationFrame(() => {
+      update();
+      rafScheduled = false;
+    });
+  }
+
+  function onResize() {
+    measure();
+    update();
+  }
+
+  onMount(() => {
+    tick().then(() => {
+      measure();
+      update();
+    });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  });
 
   const timelineEvents = [
     {
@@ -216,24 +239,26 @@
   </div>
 </section>
 
-<!-- Native horizontal timeline (desktop) — wall of polaroids -->
+<!-- Scroll-jacked horizontal timeline (desktop) — wall of polaroids -->
 <section
-  class="hidden md:block relative bg-[#071810] text-white py-20 lg:py-28 overflow-hidden"
+  bind:this={pinnedSection}
+  class="hidden md:block relative bg-[#071810] text-white"
+  style="height: {sectionHeight};"
   aria-label="Chronologie Angel's Floor"
 >
-  <!-- Wall background -->
-  <div class="absolute inset-0 -z-10">
-    <div class="absolute inset-0 bg-gradient-to-b from-footer-green/60 via-[#071810] to-[#05140C]"></div>
-    <div class="absolute inset-0 opacity-[0.07] mix-blend-overlay"
-         style="background-image: radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1.4px); background-size: 4px 4px;"></div>
-    <div class="absolute -top-32 left-1/4 w-[28rem] h-[28rem] bg-accent-gold/[0.06] rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-32 right-1/4 w-[28rem] h-[28rem] bg-primary-green-vibrant/10 rounded-full blur-3xl"></div>
-  </div>
+  <div class="sticky top-0 h-screen w-full overflow-hidden flex flex-col">
+    <!-- Wall background -->
+    <div class="absolute inset-0 -z-10 pointer-events-none">
+      <div class="absolute inset-0 bg-gradient-to-b from-footer-green/60 via-[#071810] to-[#05140C]"></div>
+      <div class="absolute inset-0 opacity-[0.07] mix-blend-overlay"
+           style="background-image: radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1.4px); background-size: 4px 4px;"></div>
+      <div class="absolute -top-32 left-1/4 w-[28rem] h-[28rem] bg-accent-gold/[0.06] rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-32 right-1/4 w-[28rem] h-[28rem] bg-primary-green-vibrant/10 rounded-full blur-3xl"></div>
+    </div>
 
-  <!-- Header -->
-  <div class="max-w-7xl mx-auto px-8 lg:px-16 mb-14 lg:mb-20">
-    <ScrollReveal animation="fade-up">
-      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+    <!-- Header (stays fixed while track pans) -->
+    <div class="pt-14 lg:pt-20 pb-6 lg:pb-10 px-8 lg:px-16 shrink-0 relative z-10">
+      <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div class="max-w-2xl">
           <CmsText
             key="about.timeline.overline"
@@ -251,33 +276,29 @@
             class="text-white/60 text-base lg:text-lg leading-relaxed"
           >De 5 femmes pionnières dans l'Atacora à plus de 500 productrices autonomisées à travers le Bénin.</CmsText>
         </div>
-        <div class="hidden lg:flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.3em] text-white/40 shrink-0">
-          <span>Faire défiler</span>
-          <span class="text-accent-gold">→</span>
+        <div class="hidden lg:flex flex-col gap-3 shrink-0 w-64">
+          <div class="text-[10px] font-mono uppercase tracking-[0.3em] text-white/40 flex justify-between">
+            <span>Défilez ↓</span>
+            <span class="text-accent-gold/80">{Math.round(progress * 100)}%</span>
+          </div>
+          <div class="h-1 bg-white/10 rounded-full overflow-hidden">
+            <div class="h-full bg-accent-gold" style="width: {progress * 100}%;"></div>
+          </div>
         </div>
       </div>
-    </ScrollReveal>
-  </div>
+    </div>
 
-  <!-- Native horizontal scroll track (with grab cursor + drag-to-slide) -->
-  <div class="relative">
-    <div
-      bind:this={timelineTrack}
-      class="timeline-track overflow-x-auto overflow-y-hidden pb-6 snap-x snap-proximity select-none cursor-grab"
-      class:is-dragging={isDragging}
-      role="region"
-      aria-label="Faire glisser pour parcourir la chronologie"
-      on:mousedown={handleTrackMouseDown}
-      on:mousemove={handleTrackMouseMove}
-      on:mouseup={endDrag}
-      on:mouseleave={endDrag}
-      on:clickcapture={suppressClickIfDragged}
-    >
-      <div class="relative inline-flex items-end gap-16 lg:gap-24 px-[10vw] lg:px-[14vw]">
+    <!-- Horizontal track (translates with vertical scroll) -->
+    <div class="flex-1 flex items-center relative">
+      <div
+        bind:this={timelineTrack}
+        class="relative inline-flex items-end gap-16 lg:gap-24 px-[10vw] lg:px-[14vw] will-change-transform"
+        style="transform: translate3d(-{translateX}px, 0, 0);"
+      >
         <!-- Continuous baseline timeline line spanning all lanes -->
         <div class="absolute bottom-[100px] left-0 right-0 h-px bg-white/15"></div>
 
-        <!-- Graduation tick marks along the line (small evenly spaced verticals) -->
+        <!-- Graduation tick marks along the line -->
         <div
           class="timeline-graduations pointer-events-none absolute bottom-[97px] left-0 right-0 h-[7px]"
           aria-hidden="true"
@@ -285,10 +306,11 @@
 
         {#each timelineEvents as event, index (event.year)}
           {@const style = laneStyles[index]}
-          <div class="shrink-0 w-[32rem] lg:w-[36rem] relative pb-0 snap-start">
+          {@const isLast = index === timelineEvents.length - 1}
+          <div class="shrink-0 w-[32rem] lg:w-[36rem] relative pb-0">
             <!-- Event group: polaroid + text side-by-side -->
             <div class="flex flex-row items-start gap-6 lg:gap-8 mb-10">
-              <!-- Polaroid (larger) -->
+              <!-- Polaroid -->
               <div
                 class="polaroid relative w-[19rem] lg:w-[21rem] shrink-0 bg-[#f5efe4] p-3 lg:p-4 pb-12 lg:pb-14 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)]"
                 style="transform: rotate({style.rotate}deg);"
@@ -296,14 +318,23 @@
                 {#if style.tape === 'tl'}<span class="tape tape-tl"></span>{/if}
                 {#if style.tape === 'tr'}<span class="tape tape-tr"></span>{/if}
                 <div class="aspect-[4/3] overflow-hidden bg-neutral-charcoal">
-                  <img src={event.image} alt="{event.title} — {event.year}" loading="lazy" draggable="false" class="w-full h-full object-cover pointer-events-none" />
+                  {#if isLast}
+                    <CmsImage
+                      key="about.timeline.celebration.image"
+                      src={event.image}
+                      alt="{event.title} — {event.year}"
+                      class="w-full h-full object-cover pointer-events-none"
+                    />
+                  {:else}
+                    <img src={event.image} alt="{event.title} — {event.year}" loading="lazy" draggable="false" class="w-full h-full object-cover pointer-events-none" />
+                  {/if}
                 </div>
                 <span class="absolute bottom-3 lg:bottom-4 left-0 right-0 text-center font-handwritten text-neutral-charcoal text-lg lg:text-xl">
                   {event.year}
                 </span>
               </div>
 
-              <!-- Text block (always left aligned) -->
+              <!-- Text block -->
               <div class="flex-1 text-left pt-2">
                 <h3 class="text-xl lg:text-2xl font-bold leading-tight mb-3 text-white">{event.title}</h3>
                 <p class="text-sm lg:text-base text-white/65 leading-relaxed mb-4">{event.description}</p>
@@ -314,7 +345,7 @@
               </div>
             </div>
 
-            <!-- Connector + dot + year anchored on baseline (year enlarged) -->
+            <!-- Connector + dot + year anchored on baseline -->
             <div class="relative h-[100px] flex flex-col items-center">
               <div class="w-px h-7 bg-gradient-to-b from-accent-gold/0 via-accent-gold/40 to-accent-gold/70 mx-auto"></div>
               <div class="relative">
@@ -326,11 +357,11 @@
           </div>
         {/each}
       </div>
-    </div>
 
-    <!-- Edge fades for visual scroll hint -->
-    <div class="absolute top-0 bottom-6 left-0 w-12 lg:w-24 bg-gradient-to-r from-[#071810] to-transparent pointer-events-none"></div>
-    <div class="absolute top-0 bottom-6 right-0 w-12 lg:w-24 bg-gradient-to-l from-[#071810] to-transparent pointer-events-none"></div>
+      <!-- Edge fades -->
+      <div class="absolute top-0 bottom-0 left-0 w-12 lg:w-24 bg-gradient-to-r from-[#071810] to-transparent pointer-events-none z-10"></div>
+      <div class="absolute top-0 bottom-0 right-0 w-12 lg:w-24 bg-gradient-to-l from-[#071810] to-transparent pointer-events-none z-10"></div>
+    </div>
   </div>
 </section>
 
@@ -752,37 +783,6 @@
 </section>
 
 <style>
-  /* Desktop horizontal scrollbar — visible & elegant + smooth slide */
-  .timeline-track {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(234, 207, 15, 0.35) transparent;
-    scroll-padding-inline: 10vw;
-    scroll-behavior: smooth;
-    overscroll-behavior-x: contain;
-  }
-  .timeline-track::-webkit-scrollbar {
-    height: 8px;
-  }
-  .timeline-track::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 4px;
-    margin: 0 10vw;
-  }
-  .timeline-track::-webkit-scrollbar-thumb {
-    background: rgba(234, 207, 15, 0.4);
-    border-radius: 4px;
-  }
-  .timeline-track::-webkit-scrollbar-thumb:hover {
-    background: rgba(234, 207, 15, 0.7);
-  }
-  .timeline-track.is-dragging {
-    cursor: grabbing;
-    scroll-behavior: auto;
-  }
-  .timeline-track.is-dragging * {
-    cursor: grabbing !important;
-  }
-
   /* Graduation tick marks along the baseline — short verticals every 24px */
   .timeline-graduations {
     background-image: repeating-linear-gradient(

@@ -12,6 +12,7 @@
 		subtitle?: string;
 		subtitleKey?: string;
 		align?: 'center' | 'left';
+		compact?: boolean;
 	};
 
 	let {
@@ -23,13 +24,15 @@
 		titleKey,
 		subtitle,
 		subtitleKey,
-		align = 'center'
+		align = 'center',
+		compact = false
 	}: Props = $props();
 
 	const alignClass = $derived(align === 'left' ? 'text-left' : 'text-center mx-auto');
+	const sectionPadding = $derived(compact ? 'py-16 lg:py-24' : 'py-24 lg:py-32');
 </script>
 
-<section class="relative isolate overflow-hidden py-24 lg:py-32">
+<section class="relative isolate overflow-hidden {sectionPadding}">
 	<!-- Background image -->
 	<div class="absolute inset-0 -z-10">
 		<CmsImage

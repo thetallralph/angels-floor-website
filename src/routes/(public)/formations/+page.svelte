@@ -1,14 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ArrowRight, BookOpen, Users, Award, Image as ImageIcon } from 'lucide-svelte';
+  import { ArrowRight, BookOpen, Users, Award, Image as ImageIcon, ChevronDown, Filter } from 'lucide-svelte';
   import { CmsText, CmsImage } from '$lib/components/cms';
+  import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import type { PageData } from './$types';
   import type { TrainingCategory } from '$lib/admin/types';
 
   let { data }: { data: PageData } = $props();
 
   let heroVisible = $state(false);
-  let categoryFilter = $state<'all' | TrainingCategory>('all');
+  let activeCategory = $state<TrainingCategory>('agroalimentaire');
+  let mobileMenuOpen = $state(false);
 
   const benefits = [
     {
@@ -28,24 +30,73 @@
     }
   ];
 
-  const filtered = $derived(
-    categoryFilter === 'all'
-      ? data.trainings
-      : data.trainings.filter((t) => t.category === categoryFilter)
-  );
+  const categories: { id: TrainingCategory; name: string }[] = [
+    { id: 'agroalimentaire', name: 'Agroalimentaire' },
+    { id: 'cosmetique', name: 'Cosmétique' }
+  ];
 
-  const counts = $derived.by(() => {
-    const agro = data.trainings.filter((t) => t.category === 'agroalimentaire').length;
-    const cosm = data.trainings.filter((t) => t.category === 'cosmetique').length;
-    return { all: data.trainings.length, agroalimentaire: agro, cosmetique: cosm };
+  const trainingsByCategory = $derived.by(() => {
+    const result: Record<TrainingCategory, typeof data.trainings> = {
+      agroalimentaire: [],
+      cosmetique: []
+    };
+    for (const t of data.trainings) {
+      result[t.category].push(t);
+    }
+    return result;
   });
+
+  const categoriesWithCount = $derived(
+    categories.map((c) => ({ ...c, count: trainingsByCategory[c.id].length }))
+  );
 
   function formatPrice(n: number): string {
     return n.toLocaleString('fr-FR');
   }
 
+  function scrollToCategory(id: string) {
+    const el = document.getElementById(`category-${id}`);
+    if (el) {
+      const offset = window.innerWidth < 1024 ? 140 : 100;
+      window.scrollTo({ top: el.offsetTop - offset, behavior: 'smooth' });
+    }
+  }
+
+  function handleClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (mobileMenuOpen && !target.closest('.lg\\:hidden')) {
+      mobileMenuOpen = false;
+    }
+  }
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    if (mobileMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  });
+
   onMount(() => {
     heroVisible = true;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            activeCategory = entry.target.id.replace('category-', '') as TrainingCategory;
+          }
+        });
+      },
+      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
+    );
+
+    categories.forEach((c) => {
+      const el = document.getElementById(`category-${c.id}`);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   });
 </script>
 
@@ -125,16 +176,11 @@
   </div>
 </section>
 
-<!-- CATALOGUE avec sidebar filtre -->
-<section id="formations" class="bg-neutral-sand py-20">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="max-w-3xl mb-10">
-      <CmsText key="trainings.catalog.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4 leading-tight">Le catalogue</CmsText>
-      <CmsText key="trainings.catalog.description" tag="p" class="text-lg text-neutral-charcoal leading-relaxed">Parcourez nos formations et cliquez sur "En savoir plus" pour découvrir les détails.</CmsText>
-    </div>
-
+<!-- CATALOGUE — anchored sections + left sidebar (structure produits) -->
+<section id="formations" class="bg-white min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     {#if data.trainings.length === 0}
-      <div class="bg-white rounded-3xl px-8 py-16 lg:px-12 lg:py-20">
+      <div class="bg-neutral-sand rounded-3xl px-8 py-16 lg:px-12 lg:py-20">
         <div class="max-w-2xl">
           <h3 class="text-2xl md:text-3xl font-bold text-neutral-obsidian mb-4 leading-tight">Catalogue en cours de mise à jour.</h3>
           <p class="text-base text-neutral-charcoal leading-relaxed">
@@ -143,81 +189,142 @@
         </div>
       </div>
     {:else}
-      <div class="grid grid-cols-12 gap-6 lg:gap-8">
-        <!-- SIDEBAR -->
-        <aside class="col-span-12 lg:col-span-3">
-          <div class="lg:sticky lg:top-24 bg-white rounded-2xl p-5 lg:p-6">
-            <div class="text-xs font-semibold text-neutral-slate uppercase tracking-wider mb-4">Catégories</div>
-            <nav class="space-y-1">
-              <button
-                onclick={() => (categoryFilter = 'all')}
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {categoryFilter === 'all' ? 'bg-primary-green text-white' : 'text-neutral-charcoal hover:bg-neutral-sand'}"
-              >
-                <span>Toutes</span>
-                <span class="text-xs {categoryFilter === 'all' ? 'opacity-80' : 'text-neutral-slate'}">{counts.all}</span>
-              </button>
-              <button
-                onclick={() => (categoryFilter = 'agroalimentaire')}
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {categoryFilter === 'agroalimentaire' ? 'bg-primary-green text-white' : 'text-neutral-charcoal hover:bg-neutral-sand'}"
-              >
-                <span>Agroalimentaire</span>
-                <span class="text-xs {categoryFilter === 'agroalimentaire' ? 'opacity-80' : 'text-neutral-slate'}">{counts.agroalimentaire}</span>
-              </button>
-              <button
-                onclick={() => (categoryFilter = 'cosmetique')}
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {categoryFilter === 'cosmetique' ? 'bg-primary-green text-white' : 'text-neutral-charcoal hover:bg-neutral-sand'}"
-              >
-                <span>Cosmétique</span>
-                <span class="text-xs {categoryFilter === 'cosmetique' ? 'opacity-80' : 'text-neutral-slate'}">{counts.cosmetique}</span>
-              </button>
-            </nav>
+      <div class="flex flex-col lg:flex-row gap-12">
+        <!-- Mobile Category Navigation - Fixed/Sticky -->
+        <div class="lg:hidden">
+          <div class="fixed top-0 left-0 right-0 z-30 bg-white border-b border-neutral-light shadow-md">
+            <button
+              onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
+              class="w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-sand transition-colors"
+            >
+              <div class="flex items-center gap-2">
+                <Filter class="w-5 h-5 text-primary-green" />
+                <span class="font-semibold text-neutral-charcoal">
+                  {categoriesWithCount.find((c) => c.id === activeCategory)?.name || 'Catégories'}
+                </span>
+              </div>
+              <ChevronDown class="w-5 h-5 text-neutral-charcoal transition-transform duration-200 {mobileMenuOpen ? 'rotate-180' : ''}" />
+            </button>
+
+            {#if mobileMenuOpen}
+              <div class="absolute top-full left-0 right-0 bg-white border-b border-neutral-light shadow-xl max-h-[70vh] overflow-y-auto">
+                <nav class="py-2">
+                  {#each categoriesWithCount as category}
+                    <button
+                      onclick={() => {
+                        scrollToCategory(category.id);
+                        mobileMenuOpen = false;
+                      }}
+                      class="w-full text-left px-4 py-3 flex items-center justify-between transition-colors
+                        {activeCategory === category.id
+                          ? 'bg-primary-green text-white'
+                          : 'hover:bg-neutral-sand text-neutral-charcoal'}"
+                    >
+                      <span class="font-medium">{category.name}</span>
+                      <span class="text-sm {activeCategory === category.id ? 'text-white/80' : 'text-neutral-slate'}">
+                        {category.count}
+                      </span>
+                    </button>
+                  {/each}
+                </nav>
+              </div>
+            {/if}
           </div>
+        </div>
+
+        <!-- Desktop Left Navigation Panel -->
+        <aside class="hidden lg:block lg:w-64 lg:sticky lg:top-24 lg:h-fit">
+          <ScrollReveal animation="fade-right">
+            <div>
+              <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-slate mb-4">Catégories</h2>
+              <nav class="space-y-1">
+                {#each categoriesWithCount as category}
+                  <button
+                    onclick={() => scrollToCategory(category.id)}
+                    class="w-full text-left px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-between
+                      {activeCategory === category.id
+                        ? 'bg-neutral-sand text-primary-green font-medium'
+                        : 'hover:bg-neutral-sand text-neutral-charcoal'}"
+                  >
+                    <span>{category.name}</span>
+                    <span class="text-sm text-neutral-slate">{category.count}</span>
+                  </button>
+                {/each}
+              </nav>
+
+              <!-- Contact Info -->
+              <div class="mt-12">
+                <h3 class="text-sm font-semibold uppercase tracking-wider text-neutral-slate mb-4">Pour s'inscrire</h3>
+                <div class="space-y-3 text-sm">
+                  <a href="tel:+22901961219771" class="flex items-center gap-2 text-neutral-charcoal hover:text-primary-green transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    +229 01 96 12 19 71
+                  </a>
+                  <a href="mailto:contact@angelsfloor.bj" class="flex items-center gap-2 text-neutral-charcoal hover:text-primary-green transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    contact@angelsfloor.bj
+                  </a>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
         </aside>
 
-        <!-- GRID -->
-        <div class="col-span-12 lg:col-span-9">
-          {#if filtered.length === 0}
-            <div class="text-center py-16 text-neutral-slate">
-              Aucune formation dans cette catégorie pour l'instant.
-            </div>
-          {:else}
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              {#each filtered as t (t.id)}
-                <a href="/formations/{t.slug}" class="block bg-white rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 group">
-                  <div class="aspect-[4/3] bg-neutral-sand overflow-hidden">
-                    {#if t.image}
-                      <img src={t.image} alt={t.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    {:else}
-                      <div class="w-full h-full flex items-center justify-center text-neutral-slate">
-                        <ImageIcon class="w-10 h-10" />
-                      </div>
-                    {/if}
+        <!-- Trainings Content (anchored sections) -->
+        <div class="flex-1 pt-14 lg:pt-0">
+          {#each categoriesWithCount as category}
+            {@const list = trainingsByCategory[category.id]}
+            {#if list.length > 0}
+              <div id="category-{category.id}" class="mb-16 scroll-mt-36 lg:scroll-mt-24">
+                <ScrollReveal animation="fade-up">
+                  <div class="mb-8 pb-4 border-b border-neutral-light">
+                    <h2 class="text-2xl font-semibold text-neutral-charcoal">{category.name}</h2>
+                    <p class="text-sm text-neutral-slate mt-1">{list.length} formation{list.length > 1 ? 's' : ''}</p>
                   </div>
+                </ScrollReveal>
 
-                  <div class="p-5 flex flex-col flex-1">
-                    <div class="text-xs font-semibold text-primary-green uppercase tracking-wider mb-2">
-                      {t.category === 'cosmetique' ? 'Cosmétique' : 'Agroalimentaire'}
-                    </div>
-                    <h3 class="text-base font-bold text-neutral-obsidian mb-3 leading-snug">{t.title}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {#each list as t, i (t.id)}
+                    <ScrollReveal animation="fade-up" delay={i * 100}>
+                      <a href="/formations/{t.slug}" class="block bg-white border border-neutral-light rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 group h-full">
+                        <div class="aspect-[4/3] bg-neutral-sand overflow-hidden">
+                          {#if t.image}
+                            <img src={t.image} alt={t.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          {:else}
+                            <div class="w-full h-full flex items-center justify-center text-neutral-slate">
+                              <ImageIcon class="w-10 h-10" />
+                            </div>
+                          {/if}
+                        </div>
 
-                    {#if t.description}
-                      <p class="text-sm text-neutral-charcoal leading-relaxed mb-4 line-clamp-3">{t.description}</p>
-                    {/if}
+                        <div class="p-5 flex flex-col flex-1">
+                          <h3 class="text-base font-bold text-neutral-obsidian mb-3 leading-snug">{t.title}</h3>
 
-                    <div class="flex items-baseline justify-between mt-auto mb-4 pt-3 border-t border-neutral-light">
-                      <div class="text-sm text-neutral-charcoal">{t.duration_days} jours</div>
-                      <div class="text-base font-bold text-primary-green">{formatPrice(t.price)} <span class="text-xs font-medium">FCFA</span></div>
-                    </div>
+                          {#if t.description}
+                            <p class="text-sm text-neutral-charcoal leading-relaxed mb-4 line-clamp-3">{t.description}</p>
+                          {/if}
 
-                    <span class="inline-flex items-center justify-center gap-2 bg-neutral-sand text-neutral-charcoal group-hover:bg-primary-green group-hover:text-white px-4 py-2.5 rounded-full text-sm font-semibold transition-all">
-                      En savoir plus
-                      <ArrowRight class="w-4 h-4" />
-                    </span>
-                  </div>
-                </a>
-              {/each}
-            </div>
-          {/if}
+                          <div class="flex items-baseline justify-between mt-auto mb-4 pt-3 border-t border-neutral-light">
+                            <div class="text-sm text-neutral-charcoal">{t.duration_days} jours</div>
+                            <div class="text-base font-bold text-primary-green">{formatPrice(t.price)} <span class="text-xs font-medium">FCFA</span></div>
+                          </div>
+
+                          <span class="inline-flex items-center justify-center gap-2 bg-neutral-sand text-neutral-charcoal group-hover:bg-primary-green group-hover:text-white px-4 py-2.5 rounded-full text-sm font-semibold transition-all">
+                            En savoir plus
+                            <ArrowRight class="w-4 h-4" />
+                          </span>
+                        </div>
+                      </a>
+                    </ScrollReveal>
+                  {/each}
+                </div>
+              </div>
+            {/if}
+          {/each}
         </div>
       </div>
     {/if}

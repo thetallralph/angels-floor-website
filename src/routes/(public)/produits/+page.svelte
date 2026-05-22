@@ -80,13 +80,12 @@
 
 <PageHeader
   imageKey="products.hero.image"
-  defaultImage="https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=1920&h=1080&fit=crop&q=80"
-  overlineKey="products.hero.overline"
-  overline="Notre Catalogue"
+  defaultImage="/images/products/hero.jpg"
   titleKey="products.hero.title"
   title="Nos Produits"
   subtitleKey="products.hero.subtitle"
   subtitle="Une sélection de produits béninois naturels, transformés avec soin par nos productrices"
+  compact
 />
 
 <!-- Products Section with Sidebar -->

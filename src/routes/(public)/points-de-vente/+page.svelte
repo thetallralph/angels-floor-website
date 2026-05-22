@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { MapPin, Phone, Clock, Search, Filter } from 'lucide-svelte';
 	import type { PublicSalesPoint } from '$lib/cms/salesPoints';
-	import PageHeader from '$lib/components/ui/PageHeader.svelte';
+	import { CmsText } from '$lib/components/cms';
 
 	export let data: { salesPoints: PublicSalesPoint[] };
 	$: salesPoints = data.salesPoints;
@@ -141,16 +141,21 @@
 </script>
 
 <div class="min-h-screen bg-neutral-sand">
-	<PageHeader
-		imageKey="sales-points.hero.image"
-		defaultImage="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=1920&h=1080&fit=crop&q=80"
-		overlineKey="sales-points.hero.overline"
-		overline="Trouvez-nous"
-		titleKey="sales-points.hero.title"
-		title="Nos Points de Vente"
-		subtitleKey="sales-points.hero.subtitle"
-		subtitle="Trouvez nos produits dans plus de {salesPoints.length} points de vente à travers le Bénin"
-	/>
+	<!-- Simple page header — white bg, left-aligned, no overline -->
+	<section class="bg-white">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+			<CmsText
+				key="sales-points.hero.title"
+				tag="h1"
+				class="text-4xl md:text-5xl font-bold text-black mb-4 leading-tight"
+			>Nos Points de Vente</CmsText>
+			<CmsText
+				key="sales-points.hero.subtitle"
+				tag="p"
+				class="text-lg text-neutral-charcoal max-w-2xl leading-relaxed"
+			>Trouvez nos produits dans plus de {salesPoints.length} points de vente à travers le Bénin</CmsText>
+		</div>
+	</section>
 	
 	<!-- Filtres -->
 	<section class="bg-white border-b sticky top-0 z-40 shadow-sm">
