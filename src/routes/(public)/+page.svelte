@@ -437,16 +437,12 @@
           </div>
           <span class="ml-2 text-sm text-neutral-slate">5.0</span>
         </div>
-        <p class="text-neutral-charcoal mb-6 italic">
-          "Le fonio précuit d'Angel's Floor a révolutionné mes petits-déjeuners. Rapide, nutritif et délicieux. Je ne peux plus m'en passer!"
-        </p>
+        <CmsText key="home.testimonials.1.quote" tag="p" class="text-neutral-charcoal mb-6 italic">"Le fonio précuit d'Angel's Floor a révolutionné mes petits-déjeuners. Rapide, nutritif et délicieux. Je ne peux plus m'en passer!"</CmsText>
         <div class="flex items-center">
-          <div class="w-12 h-12 bg-primary-green-bright rounded-full flex items-center justify-center text-white font-bold">
-            MA
-          </div>
+          <CmsText key="home.testimonials.1.initials" tag="div" class="w-12 h-12 bg-primary-green-bright rounded-full flex items-center justify-center text-white font-bold">MA</CmsText>
           <div class="ml-3">
-            <h4 class="font-semibold text-neutral-obsidian">Marie Adjovi</h4>
-            <p class="text-sm text-neutral-slate">Cotonou</p>
+            <CmsText key="home.testimonials.1.name" tag="h4" class="font-semibold text-neutral-obsidian">Marie Adjovi</CmsText>
+            <CmsText key="home.testimonials.1.location" tag="p" class="text-sm text-neutral-slate">Cotonou</CmsText>
           </div>
         </div>
       </div>
@@ -466,16 +462,12 @@
           </div>
           <span class="ml-2 text-sm text-neutral-slate">5.0</span>
         </div>
-        <p class="text-neutral-charcoal mb-6 italic">
-          "La pulpe de baobab est mon secret pour rester en forme. Un vrai boost d'énergie naturelle. Merci Angel's Floor pour cette qualité exceptionnelle!"
-        </p>
+        <CmsText key="home.testimonials.2.quote" tag="p" class="text-neutral-charcoal mb-6 italic">"La pulpe de baobab est mon secret pour rester en forme. Un vrai boost d'énergie naturelle. Merci Angel's Floor pour cette qualité exceptionnelle!"</CmsText>
         <div class="flex items-center">
-          <div class="w-12 h-12 bg-accent-sunset rounded-full flex items-center justify-center text-white font-bold">
-            PK
-          </div>
+          <CmsText key="home.testimonials.2.initials" tag="div" class="w-12 h-12 bg-accent-sunset rounded-full flex items-center justify-center text-white font-bold">PK</CmsText>
           <div class="ml-3">
-            <h4 class="font-semibold text-neutral-obsidian">Paul Koudjo</h4>
-            <p class="text-sm text-neutral-slate">Porto-Novo</p>
+            <CmsText key="home.testimonials.2.name" tag="h4" class="font-semibold text-neutral-obsidian">Paul Koudjo</CmsText>
+            <CmsText key="home.testimonials.2.location" tag="p" class="text-sm text-neutral-slate">Porto-Novo</CmsText>
           </div>
         </div>
       </div>
@@ -495,16 +487,12 @@
           </div>
           <span class="ml-2 text-sm text-neutral-slate">5.0</span>
         </div>
-        <p class="text-neutral-charcoal mb-6 italic">
-          "Les biscuits enrichis sont parfaits pour mes enfants. Sains, croustillants et savoureux. Enfin une collation dont je n'ai pas à culpabiliser!"
-        </p>
+        <CmsText key="home.testimonials.3.quote" tag="p" class="text-neutral-charcoal mb-6 italic">"Les biscuits enrichis sont parfaits pour mes enfants. Sains, croustillants et savoureux. Enfin une collation dont je n'ai pas à culpabiliser!"</CmsText>
         <div class="flex items-center">
-          <div class="w-12 h-12 bg-creative-purple rounded-full flex items-center justify-center text-white font-bold">
-            SH
-          </div>
+          <CmsText key="home.testimonials.3.initials" tag="div" class="w-12 h-12 bg-creative-purple rounded-full flex items-center justify-center text-white font-bold">SH</CmsText>
           <div class="ml-3">
-            <h4 class="font-semibold text-neutral-obsidian">Sophie Houessou</h4>
-            <p class="text-sm text-neutral-slate">Parakou</p>
+            <CmsText key="home.testimonials.3.name" tag="h4" class="font-semibold text-neutral-obsidian">Sophie Houessou</CmsText>
+            <CmsText key="home.testimonials.3.location" tag="p" class="text-sm text-neutral-slate">Parakou</CmsText>
           </div>
         </div>
       </div>

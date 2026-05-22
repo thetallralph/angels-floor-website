@@ -175,20 +175,15 @@
           </div>
           
           <!-- Quote Text -->
-          <p class="text-xl md:text-2xl text-neutral-charcoal leading-relaxed text-center mb-10 max-w-3xl mx-auto">
-            « Partenaire depuis 3 ans, Angel's Floor nous garantit des produits de qualité constante 
-            et des livraisons toujours à temps. Leur accompagnement commercial est exceptionnel et 
-            nos clients adorent la qualité de leurs produits bio. C'est un partenariat gagnant-gagnant 
-            qui nous permet de nous différencier sur le marché. »
-          </p>
-          
+          <CmsText key="wholesale.testimonial.quote" tag="p" class="text-xl md:text-2xl text-neutral-charcoal leading-relaxed text-center mb-10 max-w-3xl mx-auto">« Partenaire depuis 3 ans, Angel's Floor nous garantit des produits de qualité constante et des livraisons toujours à temps. Leur accompagnement commercial est exceptionnel et nos clients adorent la qualité de leurs produits bio. C'est un partenariat gagnant-gagnant qui nous permet de nous différencier sur le marché. »</CmsText>
+
           <!-- Author Info -->
           <div class="text-center">
-            
+
             <!-- Author Details -->
-            <p class="text-xl font-bold text-neutral-obsidian">Jean-Baptiste Soglo</p>
-            <p class="text-neutral-slate">Directeur, Supermarché Champion</p>
-            <p class="text-sm text-neutral-slate">Cotonou</p>
+            <CmsText key="wholesale.testimonial.name" tag="p" class="text-xl font-bold text-neutral-obsidian">Jean-Baptiste Soglo</CmsText>
+            <CmsText key="wholesale.testimonial.role" tag="p" class="text-neutral-slate">Directeur, Supermarché Champion</CmsText>
+            <CmsText key="wholesale.testimonial.location" tag="p" class="text-sm text-neutral-slate">Cotonou</CmsText>
           </div>
         </div>
       </div>
