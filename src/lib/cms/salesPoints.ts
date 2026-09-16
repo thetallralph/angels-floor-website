@@ -1,68 +1,62 @@
 import type { RecordModel } from 'pocketbase';
 import { createPB } from '$lib/server/pocketbase';
-import type { SalesPoint as AdminSalesPoint, SalesPointType } from '$lib/admin/types';
-import { salesPoints as SEED_SALES_POINTS } from '$lib/data/salesPoints';
+import {
+  SALES_POINT_TYPES,
+  type SalesPoint as AdminSalesPoint,
+  type SalesPointType
+} from '$lib/admin/types';
 
-/**
- * Public-site shape. Keeps `coordinates: { lat, lng }` so the existing public
- * page doesn't have to be rewritten.
- */
+/** Public-site shape, mirroring what the admin stores in PocketBase. */
 export interface PublicSalesPoint {
-	id: string;
-	name: string;
-	address: string;
-	department: string;
-	city: string;
-	coordinates: { lat: number; lng: number };
-	phone?: string;
-	hours?: string;
-	type: SalesPointType;
+  id: string;
+  name: string;
+  address: string;
+  department: string;
+  city: string;
+  /** Free-text directions entered in the admin, in place of GPS coordinates. */
+  situation: string;
+  phone?: string;
+  hours?: string;
+  type: SalesPointType;
+}
+
+function normalizeType(value: unknown): SalesPointType {
+  const raw = String(value ?? '');
+  return SALES_POINT_TYPES.some((t) => t.value === raw) ? (raw as SalesPointType) : 'boutique';
 }
 
 function mapRecord(record: RecordModel): PublicSalesPoint {
-	return {
-		id: record.id,
-		name: record.name,
-		address: record.address || '',
-		department: record.department || '',
-		city: record.city || '',
-		coordinates: { lat: Number(record.lat ?? 0), lng: Number(record.lng ?? 0) },
-		phone: record.phone || '',
-		hours: record.hours || '',
-		type: (record.type as SalesPointType) || 'boutique'
-	};
-}
-
-function seedFallback(): PublicSalesPoint[] {
-	return SEED_SALES_POINTS.map((p) => ({
-		id: p.id,
-		name: p.name,
-		address: p.address,
-		department: p.department,
-		city: p.city,
-		coordinates: { lat: p.coordinates.lat, lng: p.coordinates.lng },
-		phone: p.phone,
-		hours: p.hours,
-		type: p.type
-	}));
+  return {
+    id: record.id,
+    name: record.name,
+    address: record.address || '',
+    department: record.department || '',
+    city: record.city || '',
+    situation: record.situation || '',
+    // `contact` is the legacy column name from the first PocketBase schema.
+    phone: record.phone || record.contact || '',
+    hours: record.hours || '',
+    type: normalizeType(record.type)
+  };
 }
 
 /**
- * Load sales points from PocketBase. Falls back to the static seed data if the
- * collection isn't provisioned yet, so the public site keeps working before
- * the admin runs the bootstrap.
+ * Load sales points from PocketBase.
+ *
+ * Returns an empty list when the collection is missing or empty: showing the old
+ * hard-coded demo points here made the public site advertise addresses that the
+ * admin panel didn't list (and that don't exist).
  */
 export async function loadSalesPointsFromPB(): Promise<PublicSalesPoint[]> {
-	try {
-		const pb = createPB();
-		const records = await pb
-			.collection('sales_points')
-			.getFullList({ sort: 'department,city,name' });
-		if (records.length === 0) return seedFallback();
-		return records.map(mapRecord);
-	} catch {
-		return seedFallback();
-	}
+  try {
+    const pb = createPB();
+    const records = await pb
+      .collection('sales_points')
+      .getFullList({ sort: 'department,city,name' });
+    return records.map(mapRecord);
+  } catch {
+    return [];
+  }
 }
 
 // Re-export the admin type name for consumers that want it.
