@@ -2,11 +2,23 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { getContent, saveContent, publishContent, saveProductImages } from '$lib/admin/api';
+	import {
+		getContent,
+		saveContent,
+		publishContent,
+		saveProductImages,
+		compactTranslation
+	} from '$lib/admin/api';
 	import { listCategories } from '$lib/admin/categories';
-	import { DEFAULT_CATEGORIES, type Category, type Product } from '$lib/admin/types';
+	import {
+		DEFAULT_CATEGORIES,
+		type Category,
+		type Product,
+		type ProductTranslation,
+		type Recipe
+	} from '$lib/admin/types';
 	import MediaPickerModal from '$lib/admin/MediaPickerModal.svelte';
-	import { ArrowLeft, Save, Send, X, Plus, Eye, ImagePlus, FolderOpen, Tag } from 'lucide-svelte';
+	import { ArrowLeft, Save, Send, X, Plus, Eye, ImagePlus, FolderOpen, Tag, Languages } from 'lucide-svelte';
 
 	const MAX_IMAGES = 10;
 
@@ -42,8 +54,18 @@
 		origin: 'Bénin',
 		certification: '',
 		featured: false,
-		published: false
+		published: false,
+		en: {}
 	});
+
+	/** Which version of the texts the main column edits. Prices, images, variants… are shared. */
+	let activeLang = $state<'fr' | 'en'>('fr');
+	/** English overrides, saved to the record's `en` JSON. Empty fields fall back to French. */
+	let en = $state<ProductTranslation>({});
+	let newClaimEn = $state('');
+	let newBenefitEn = $state('');
+	let newMineralEn = $state('');
+	let newVitaminEn = $state('');
 
 	let loading = $state(id !== 'nouveau');
 	let saving = $state(false);
@@ -88,9 +110,14 @@
 				}
 			}
 			syncExistingImagesFromProduct();
+			syncEnFromProduct();
 			loading = false;
 		}
 	});
+
+	function syncEnFromProduct() {
+		en = JSON.parse(JSON.stringify(product.en ?? {})) as ProductTranslation;
+	}
 
 	function syncExistingImagesFromProduct() {
 		const filenames = product.imageFilenames ?? [];
@@ -144,6 +171,7 @@
 		try {
 			const saveId = getSlug();
 			const { _id, _hasDraft, _isPublished, _status, ...data } = product as Record<string, unknown>;
+			data.en = buildEnPayload();
 			const { id: savedId } = await saveContent('products', saveId, data);
 
 			const newFiles = pendingFiles.map((p) => p.file);
@@ -163,6 +191,7 @@
 				pendingFiles = [];
 				syncExistingImagesFromProduct();
 			}
+			product.en = data.en as ProductTranslation;
 		} catch (err) {
 			message = { type: 'error', text: err instanceof Error ? err.message : 'Erreur' };
 		} finally {
@@ -360,7 +389,76 @@
 		const vitamins = (nutrition.vitamins ?? []).filter((_, i) => i !== index);
 		product.nutritionalInfo = { ...nutrition, vitamins };
 	}
+
+	// --- English version ---
+
+	/** Strip empty values; recipes keep their `steps` array so the public page can iterate it. */
+	function buildEnPayload(): ProductTranslation {
+		const recipes = (en.preparation?.recipes ?? [])
+			.map((r) => ({ name: r.name.trim(), steps: r.steps.map((st) => st.trim()).filter(Boolean) }))
+			.filter((r) => r.name || r.steps.length > 0);
+		const out = compactTranslation<ProductTranslation>({
+			...en,
+			preparation: { ratio: en.preparation?.ratio ?? '', recipes }
+		});
+		if (out.preparation?.recipes) out.preparation.recipes = recipes;
+		return out;
+	}
+
+	function addEnListItem(field: 'qualityClaims' | 'benefits', value: string): boolean {
+		const t = value.trim();
+		if (!t) return false;
+		const existing = en[field] ?? [];
+		if (!existing.includes(t)) en[field] = [...existing, t];
+		return true;
+	}
+
+	function removeEnListItem(field: 'qualityClaims' | 'benefits', index: number) {
+		en[field] = (en[field] ?? []).filter((_, i) => i !== index);
+	}
+
+	function addEnNutritionItem(field: 'minerals' | 'vitamins', value: string): boolean {
+		const t = value.trim();
+		if (!t) return false;
+		const nutrition = en.nutritionalInfo ?? {};
+		const existing = nutrition[field] ?? [];
+		if (!existing.includes(t)) en.nutritionalInfo = { ...nutrition, [field]: [...existing, t] };
+		return true;
+	}
+
+	function removeEnNutritionItem(field: 'minerals' | 'vitamins', index: number) {
+		const nutrition = en.nutritionalInfo ?? {};
+		en.nutritionalInfo = { ...nutrition, [field]: (nutrition[field] ?? []).filter((_, i) => i !== index) };
+	}
+
+	function enRecipes(): Recipe[] {
+		return en.preparation?.recipes ?? [];
+	}
+
+	function setEnRecipes(recipes: Recipe[]) {
+		en.preparation = { ...(en.preparation ?? {}), recipes };
+	}
+
+	/** Create empty English recipes/steps mirroring the French ones (French text shown as placeholder). */
+	function copyFrRecipeStructure() {
+		setEnRecipes(
+			(product.preparation?.recipes ?? []).map((r) => ({ name: '', steps: r.steps.map(() => '') }))
+		);
+	}
+
+	function frList(items: string[] | undefined): string {
+		return items && items.length > 0 ? items.join(' · ') : '—';
+	}
+
+	const inputClass =
+		'w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm';
 </script>
+
+{#snippet frHint(value: string | undefined)}
+	<p class="text-xs text-neutral-slate mt-1 whitespace-pre-line">
+		<span class="font-semibold">FR :</span> {value?.trim() ? value : '—'}
+	</p>
+{/snippet}
 
 <div>
 	<!-- Header -->
@@ -427,9 +525,25 @@
 			<div class="animate-spin w-8 h-8 border-4 border-primary-green border-t-transparent rounded-full"></div>
 		</div>
 	{:else}
+		<div class="flex gap-1 mb-6 bg-white rounded-xl p-1 shadow-sm w-fit" role="group" aria-label="Langue des textes">
+			{#each [{ value: 'fr', label: 'Français' }, { value: 'en', label: 'Anglais' }] as const as tab}
+				<button
+					onclick={() => (activeLang = tab.value)}
+					aria-pressed={activeLang === tab.value}
+					class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+					class:bg-primary-green={activeLang === tab.value}
+					class:text-white={activeLang === tab.value}
+					class:text-neutral-charcoal={activeLang !== tab.value}
+					class:hover:bg-neutral-sand={activeLang !== tab.value}>
+					{tab.label}
+				</button>
+			{/each}
+		</div>
+
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 			<!-- Main Form -->
 			<div class="lg:col-span-2 space-y-6">
+				{#if activeLang === 'fr'}
 				<!-- Infos de base -->
 				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
 					<h2 class="font-semibold text-neutral-obsidian">Informations générales</h2>
@@ -1034,6 +1148,333 @@
 						/>
 					</div>
 				</div>
+				{:else}
+					<div class="bg-neutral-sand rounded-2xl px-5 py-4 text-sm text-neutral-charcoal flex items-start gap-3">
+						<Languages class="w-5 h-5 text-primary-green shrink-0 mt-0.5" />
+						<p>
+							Textes de la version anglaise du site (<code class="text-xs">/en/products</code>). Un champ laissé vide reprend le texte
+							français, affiché en gris pour vous guider. Prix, variantes, images et options sont communs aux deux langues.
+							Les changements sont enregistrés avec « Sauvegarder ».
+						</p>
+					</div>
+
+					<!-- EN: Infos de base -->
+					<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+						<h2 class="font-semibold text-neutral-obsidian">Informations générales (anglais)</h2>
+
+						<div>
+							<label for="en-name" class="block text-sm font-medium text-neutral-charcoal mb-1">Nom</label>
+							<input id="en-name" type="text" bind:value={en.name} class={inputClass} placeholder={product.name} />
+						</div>
+
+						<div>
+							<label for="en-description" class="block text-sm font-medium text-neutral-charcoal mb-1">Description courte</label>
+							<textarea
+								id="en-description"
+								bind:value={en.description}
+								rows="2"
+								class="{inputClass} resize-y"
+								placeholder={product.description}
+							></textarea>
+							{@render frHint(product.description)}
+						</div>
+
+						<div>
+							<label for="en-detailedDescription" class="block text-sm font-medium text-neutral-charcoal mb-1">Description détaillée</label>
+							<textarea
+								id="en-detailedDescription"
+								bind:value={en.detailedDescription}
+								rows="5"
+								class="{inputClass} resize-y"
+								placeholder={product.detailedDescription}
+							></textarea>
+							{@render frHint(product.detailedDescription)}
+						</div>
+					</div>
+
+					<!-- EN: Identité commerciale -->
+					<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+						<h2 class="font-semibold text-neutral-obsidian">Identité commerciale (anglais)</h2>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<label for="en-subtitle" class="block text-sm font-medium text-neutral-charcoal mb-1">Sous-titre / ligne produit</label>
+								<input id="en-subtitle" type="text" bind:value={en.subtitle} class={inputClass} placeholder={product.subtitle} />
+							</div>
+							<div>
+								<label for="en-specialMention" class="block text-sm font-medium text-neutral-charcoal mb-1">Mention spéciale (badge)</label>
+								<input id="en-specialMention" type="text" bind:value={en.specialMention} class={inputClass} placeholder={product.specialMention} />
+							</div>
+						</div>
+
+						<div>
+							<label for="en-tagline" class="block text-sm font-medium text-neutral-charcoal mb-1">Slogan / accroche</label>
+							<input id="en-tagline" type="text" bind:value={en.tagline} class={inputClass} placeholder={product.tagline} />
+						</div>
+
+						<div>
+							<div class="block text-sm font-medium text-neutral-charcoal mb-1">Claims qualité</div>
+							<div class="flex gap-2">
+								<input
+									type="text"
+									bind:value={newClaimEn}
+									onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addEnListItem('qualityClaims', newClaimEn) && (newClaimEn = ''))}
+									class="flex-1 {inputClass}"
+									placeholder="100% Natural, No preservatives…"
+								/>
+								<button
+									onclick={() => addEnListItem('qualityClaims', newClaimEn) && (newClaimEn = '')}
+									class="p-2.5 bg-primary-green text-white rounded-xl hover:bg-primary-green-vibrant transition-all"
+								>
+									<Plus class="w-4 h-4" />
+								</button>
+							</div>
+							{@render frHint(frList(product.qualityClaims))}
+							{#if en.qualityClaims && en.qualityClaims.length > 0}
+								<div class="flex flex-wrap gap-2 mt-3">
+									{#each en.qualityClaims as claim, i}
+										<span class="inline-flex items-center gap-1 bg-primary-green/10 text-primary-green-vibrant px-3 py-1 rounded-full text-xs font-medium">
+											{claim}
+											<button onclick={() => removeEnListItem('qualityClaims', i)} class="ml-1 hover:text-red-500 transition-colors" title="Retirer">
+												<X class="w-3 h-3" />
+											</button>
+										</span>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- EN: Bénéfices -->
+					<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+						<div>
+							<h2 class="font-semibold text-neutral-obsidian">Bénéfices (anglais)</h2>
+							<p class="text-xs text-neutral-slate mt-0.5">Dès qu'un bénéfice est saisi, la liste anglaise remplace toute la liste française.</p>
+						</div>
+						<div class="flex gap-2">
+							<input
+								type="text"
+								bind:value={newBenefitEn}
+								onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addEnListItem('benefits', newBenefitEn) && (newBenefitEn = ''))}
+								class="flex-1 {inputClass}"
+								placeholder="Add a benefit..."
+							/>
+							<button
+								onclick={() => addEnListItem('benefits', newBenefitEn) && (newBenefitEn = '')}
+								class="p-2.5 bg-primary-green text-white rounded-xl hover:bg-primary-green-vibrant transition-all"
+							>
+								<Plus class="w-4 h-4" />
+							</button>
+						</div>
+						{@render frHint(frList(product.benefits))}
+						{#if en.benefits && en.benefits.length > 0}
+							<ul class="space-y-2">
+								{#each en.benefits as benefit, i}
+									<li class="flex items-center justify-between bg-neutral-pearl px-4 py-2.5 rounded-xl text-sm">
+										<span>{benefit}</span>
+										<button onclick={() => removeEnListItem('benefits', i)} class="text-neutral-slate hover:text-red-500 transition-colors">
+											<X class="w-4 h-4" />
+										</button>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
+
+					<!-- EN: Préparation -->
+					<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+						<div>
+							<h2 class="font-semibold text-neutral-obsidian">Préparation (anglais)</h2>
+							<p class="text-xs text-neutral-slate mt-0.5">
+								Dès qu'une recette anglaise est saisie, les recettes anglaises remplacent toutes les recettes françaises : traduisez-les entièrement.
+							</p>
+						</div>
+
+						<div>
+							<label for="en-ratio" class="block text-sm font-medium text-neutral-charcoal mb-1">Ratio universel</label>
+							<input
+								id="en-ratio"
+								type="text"
+								value={en.preparation?.ratio ?? ''}
+								oninput={(e) => (en.preparation = { ...(en.preparation ?? {}), ratio: (e.target as HTMLInputElement).value })}
+								class={inputClass}
+								placeholder={product.preparation?.ratio}
+							/>
+						</div>
+
+						{#each enRecipes() as recipe, ri}
+							{@const frRecipe = product.preparation?.recipes?.[ri]}
+							<div class="rounded-xl border border-neutral-light p-4 space-y-3">
+								<div class="flex items-start gap-2">
+									<input
+										type="text"
+										value={recipe.name}
+										oninput={(e) => {
+											const recipes = enRecipes();
+											recipes[ri].name = (e.target as HTMLInputElement).value;
+											setEnRecipes([...recipes]);
+										}}
+										class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm font-medium"
+										placeholder={frRecipe?.name || 'Recipe name'}
+									/>
+									<button
+										onclick={() => setEnRecipes(enRecipes().filter((_, i) => i !== ri))}
+										class="p-2 text-neutral-slate hover:text-red-500 transition-colors"
+										title="Supprimer la recette"
+									>
+										<X class="w-4 h-4" />
+									</button>
+								</div>
+
+								<ol class="space-y-2 list-decimal pl-5">
+									{#each recipe.steps as step, si}
+										<li class="flex items-start gap-2">
+											<textarea
+												value={step}
+												oninput={(e) => {
+													const recipes = enRecipes();
+													recipes[ri].steps[si] = (e.target as HTMLTextAreaElement).value;
+													setEnRecipes([...recipes]);
+												}}
+												rows="2"
+												class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm resize-y"
+												placeholder={frRecipe?.steps?.[si] || 'Describe the step…'}
+											></textarea>
+											<button
+												onclick={() =>
+													setEnRecipes(
+														enRecipes().map((r, i) => (i === ri ? { ...r, steps: r.steps.filter((_, j) => j !== si) } : r))
+													)}
+												class="mt-1 p-1.5 text-neutral-slate hover:text-red-500 transition-colors"
+												title="Retirer l'étape"
+											>
+												<X class="w-3.5 h-3.5" />
+											</button>
+										</li>
+									{/each}
+								</ol>
+
+								<button
+									onclick={() =>
+										setEnRecipes(enRecipes().map((r, i) => (i === ri ? { ...r, steps: [...r.steps, ''] } : r)))}
+									class="flex items-center gap-1.5 text-sm text-primary-green hover:text-primary-green-vibrant transition-colors"
+								>
+									<Plus class="w-4 h-4" />
+									Ajouter une étape
+								</button>
+							</div>
+						{/each}
+
+						<div class="grid grid-cols-1 {enRecipes().length === 0 && (product.preparation?.recipes?.length ?? 0) > 0 ? 'md:grid-cols-2' : ''} gap-2">
+							{#if enRecipes().length === 0 && (product.preparation?.recipes?.length ?? 0) > 0}
+								<button
+									onclick={copyFrRecipeStructure}
+									class="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-primary-green/40 text-primary-green text-sm hover:border-primary-green transition-all w-full justify-center"
+								>
+									<Languages class="w-4 h-4" />
+									Traduire les {product.preparation?.recipes?.length} recette(s) françaises
+								</button>
+							{/if}
+							<button
+								onclick={() => setEnRecipes([...enRecipes(), { name: '', steps: [] }])}
+								class="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-neutral-light text-neutral-slate text-sm hover:border-primary-green hover:text-primary-green transition-all w-full justify-center"
+							>
+								<Plus class="w-4 h-4" />
+								Ajouter une recette
+							</button>
+						</div>
+					</div>
+
+					<!-- EN: Composition nutritionnelle -->
+					<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+						<div>
+							<h2 class="font-semibold text-neutral-obsidian">Composition nutritionnelle (anglais)</h2>
+							<p class="text-xs text-neutral-slate mt-0.5">
+								Seuls les minéraux et vitamines se traduisent ; les valeurs chiffrées restent celles de la version française.
+							</p>
+						</div>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							{#each [{ field: 'minerals', label: 'Minéraux', placeholder: 'Iron, Magnesium…' }, { field: 'vitamins', label: 'Vitamines', placeholder: 'B, C…' }] as const as list}
+								<div>
+									<div class="block text-sm font-medium text-neutral-charcoal mb-1">{list.label}</div>
+									<div class="flex gap-2">
+										{#if list.field === 'minerals'}
+											<input
+												type="text"
+												bind:value={newMineralEn}
+												onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addEnNutritionItem('minerals', newMineralEn) && (newMineralEn = ''))}
+												class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+												placeholder={list.placeholder}
+											/>
+											<button onclick={() => addEnNutritionItem('minerals', newMineralEn) && (newMineralEn = '')} class="p-2 bg-primary-green text-white rounded-lg hover:bg-primary-green-vibrant transition-all">
+												<Plus class="w-4 h-4" />
+											</button>
+										{:else}
+											<input
+												type="text"
+												bind:value={newVitaminEn}
+												onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), addEnNutritionItem('vitamins', newVitaminEn) && (newVitaminEn = ''))}
+												class="flex-1 px-3 py-2 rounded-lg border border-neutral-light focus:border-primary-green outline-none text-sm"
+												placeholder={list.placeholder}
+											/>
+											<button onclick={() => addEnNutritionItem('vitamins', newVitaminEn) && (newVitaminEn = '')} class="p-2 bg-primary-green text-white rounded-lg hover:bg-primary-green-vibrant transition-all">
+												<Plus class="w-4 h-4" />
+											</button>
+										{/if}
+									</div>
+									{@render frHint(frList(product.nutritionalInfo?.[list.field]))}
+									{#if (en.nutritionalInfo?.[list.field]?.length ?? 0) > 0}
+										<div class="flex flex-wrap gap-1.5 mt-2">
+											{#each en.nutritionalInfo?.[list.field] ?? [] as item, i}
+												<span class="inline-flex items-center gap-1 bg-neutral-pearl px-2 py-1 rounded-md text-xs">
+													{item}
+													<button onclick={() => removeEnNutritionItem(list.field, i)} class="text-neutral-slate hover:text-red-500 transition-colors">
+														<X class="w-3 h-3" />
+													</button>
+												</span>
+											{/each}
+										</div>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					</div>
+
+					<!-- EN: Conservation -->
+					<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+						<h2 class="font-semibold text-neutral-obsidian">Conservation (anglais)</h2>
+						<textarea bind:value={en.conservation} rows="3" class="{inputClass} resize-y" placeholder={product.conservation}></textarea>
+						{@render frHint(product.conservation)}
+					</div>
+
+					<!-- EN: Détails -->
+					<div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+						<h2 class="font-semibold text-neutral-obsidian">Détails (anglais)</h2>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<label for="en-packaging" class="block text-sm font-medium text-neutral-charcoal mb-1">Conditionnement</label>
+								<input id="en-packaging" type="text" bind:value={en.packaging} class={inputClass} placeholder={product.packaging} />
+							</div>
+							<div>
+								<label for="en-origin" class="block text-sm font-medium text-neutral-charcoal mb-1">Origine</label>
+								<input id="en-origin" type="text" bind:value={en.origin} class={inputClass} placeholder={product.origin} />
+							</div>
+						</div>
+
+						<div>
+							<label for="en-usage" class="block text-sm font-medium text-neutral-charcoal mb-1">Utilisation</label>
+							<textarea id="en-usage" bind:value={en.usage} rows="3" class="{inputClass} resize-y" placeholder={product.usage}></textarea>
+							{@render frHint(product.usage)}
+						</div>
+
+						<div>
+							<label for="en-certification" class="block text-sm font-medium text-neutral-charcoal mb-1">Certification</label>
+							<input id="en-certification" type="text" bind:value={en.certification} class={inputClass} placeholder={product.certification} />
+						</div>
+					</div>
+				{/if}
 			</div>
 
 			<!-- Sidebar -->

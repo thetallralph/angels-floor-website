@@ -14,6 +14,7 @@
 	} from '$lib/admin/api';
 	import RichTextEditor from '$lib/admin/RichTextEditor.svelte';
 	import { CMS_PAGES } from '$lib/cms/pages';
+	import { localizeHref, type Locale } from '$lib/i18n/routing';
 	import {
 		Save,
 		Image as ImageIcon,
@@ -22,7 +23,8 @@
 		ArrowUp,
 		ArrowDown,
 		RotateCcw,
-		Loader2
+		Loader2,
+		ExternalLink
 	} from 'lucide-svelte';
 
 	type DiscoveredField = {
@@ -31,7 +33,17 @@
 		defaultValue: string; // text / richtext default (HTML), or '' for image/gallery
 	};
 
+	const LOCALE_TABS: Array<{ value: Locale; label: string }> = [
+		{ value: 'fr', label: 'Français' },
+		{ value: 'en', label: 'English' }
+	];
+
 	let activePage = $state(CMS_PAGES[0]);
+	/** Language being edited. Text/richtext overrides are per language; images are shared (FR). */
+	let locale = $state<Locale>('fr');
+	/** Image/gallery fields hidden in EN mode (edited in the French version only). */
+	let sharedFieldCount = $state(0);
+	let loadSeq = 0;
 	let loading = $state(true);
 	let saving = $state(false);
 	let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -68,17 +80,27 @@
 		return discovered;
 	}
 
-	async function loadPage(page: (typeof CMS_PAGES)[number]) {
+	async function loadPage(page: (typeof CMS_PAGES)[number], loc: Locale = locale) {
 		activePage = page;
+		locale = loc;
 		loading = true;
 		message = null;
 		dirty = new Set();
+		// Ignore results of a previous load that finishes late (e.g. quick FR/EN switch),
+		// otherwise text of one language could be shown — and saved — under the other.
+		const seq = ++loadSeq;
 
 		try {
-			const [discovered, existing] = await Promise.all([
-				discoverFields(page.path),
-				getCmsOverrides(page.id)
+			const [allDiscovered, existing] = await Promise.all([
+				discoverFields(localizeHref(page.path, loc)),
+				getCmsOverrides(page.id, loc)
 			]);
+			if (seq !== loadSeq) return;
+			const discovered =
+				loc === 'fr'
+					? allDiscovered
+					: allDiscovered.filter((f) => f.type === 'text' || f.type === 'richtext');
+			sharedFieldCount = allDiscovered.length - discovered.length;
 			fields = discovered;
 			overrides = existing;
 
@@ -93,13 +115,20 @@
 			}
 			values = merged;
 		} catch (err) {
+			if (seq !== loadSeq) return;
 			console.error(err);
 			fields = [];
 			values = {};
 			overrides = {};
+			sharedFieldCount = 0;
 		} finally {
-			loading = false;
+			if (seq === loadSeq) loading = false;
 		}
+	}
+
+	function switchLocale(loc: Locale) {
+		if (loc === locale || saving) return;
+		loadPage(activePage, loc);
 	}
 
 	function markDirty(key: string) {
@@ -111,16 +140,18 @@
 	async function handleSaveText() {
 		saving = true;
 		message = null;
+		const pageId = activePage.id;
+		const loc = locale;
 		try {
 			for (const f of fields) {
 				if (f.type !== 'text' && f.type !== 'richtext') continue;
 				if (!dirty.has(f.key)) continue;
 				const val = values[f.key] ?? '';
 				if (val === f.defaultValue) {
-					// Value reverted to default — remove the override entry.
-					await clearCmsOverride(activePage.id, f.key);
+					// Value reverted to default — remove this language's override entry.
+					await clearCmsOverride(pageId, f.key, loc);
 				} else {
-					await saveCmsText(activePage.id, f.key, val, f.type);
+					await saveCmsText(pageId, f.key, val, f.type, loc);
 				}
 			}
 			await refreshOverrides();
@@ -134,7 +165,19 @@
 	}
 
 	async function refreshOverrides() {
-		overrides = await getCmsOverrides(activePage.id);
+		overrides = await getCmsOverrides(activePage.id, locale);
+	}
+
+	/** Drop this language's text override (the other language keeps its own) and re-read the page default. */
+	async function handleTextReset(key: string) {
+		if (!confirm('Supprimer la personnalisation de ce texte dans cette langue et revenir au texte par défaut ?')) return;
+		try {
+			await clearCmsOverride(activePage.id, key, locale);
+			await loadPage(activePage, locale);
+			message = { type: 'success', text: 'Texte réinitialisé' };
+		} catch (err) {
+			message = { type: 'error', text: err instanceof Error ? err.message : 'Erreur' };
+		}
 	}
 
 	async function handleImageUpload(key: string, event: Event) {
@@ -161,7 +204,7 @@
 	async function handleImageReset(key: string) {
 		if (!confirm('Supprimer la personnalisation et revenir à l\'image par défaut ?')) return;
 		try {
-			await clearCmsOverride(activePage.id, key);
+			await clearCmsOverride(activePage.id, key, 'fr');
 			await refreshOverrides();
 			message = { type: 'success', text: 'Image réinitialisée' };
 		} catch (err) {
@@ -262,7 +305,7 @@
 	<div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
 		<div>
 			<h1 class="text-2xl font-bold text-neutral-obsidian">Contenu des pages</h1>
-			<p class="text-neutral-slate text-sm mt-1">Modifier textes, images et galeries de chaque page</p>
+			<p class="text-neutral-slate text-sm mt-1">Modifier textes, images et galeries de chaque page, en français et en anglais</p>
 		</div>
 		<button
 			onclick={handleSaveText}
@@ -280,6 +323,31 @@
 			{message.text}
 		</div>
 	{/if}
+
+	<div class="flex items-center gap-3 mb-4 flex-wrap">
+		<div class="flex gap-1 bg-white rounded-xl p-1 shadow-sm w-fit" role="group" aria-label="Langue éditée">
+			{#each LOCALE_TABS as tab}
+				<button
+					onclick={() => switchLocale(tab.value)}
+					disabled={saving}
+					aria-pressed={locale === tab.value}
+					class="px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-50"
+					class:bg-primary-green={locale === tab.value}
+					class:text-white={locale === tab.value}
+					class:text-neutral-charcoal={locale !== tab.value}
+					class:hover:bg-neutral-sand={locale !== tab.value}>
+					{tab.value.toUpperCase()} · {tab.label}
+				</button>
+			{/each}
+		</div>
+		<a
+			href={localizeHref(activePage.path, locale)}
+			target="_blank"
+			rel="noopener"
+			class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-light text-neutral-charcoal text-sm font-medium hover:bg-white transition-all">
+			<ExternalLink class="w-4 h-4" /> Voir la page
+		</a>
+	</div>
 
 	<div class="flex gap-1 mb-6 bg-white rounded-xl p-1 shadow-sm w-fit flex-wrap">
 		{#each CMS_PAGES as page}
@@ -301,6 +369,10 @@
 				class="animate-spin w-8 h-8 border-4 border-primary-green border-t-transparent rounded-full">
 			</div>
 		</div>
+	{:else if fields.length === 0 && sharedFieldCount > 0}
+		<div class="bg-white rounded-2xl p-8 shadow-sm text-center">
+			<p class="text-neutral-slate">Cette page n'a que des images ou galeries : elles sont communes aux deux langues et se modifient dans la version française.</p>
+		</div>
 	{:else if fields.length === 0}
 		<div class="bg-white rounded-2xl p-8 shadow-sm text-center">
 			<p class="text-neutral-slate">Aucun champ éditable trouvé sur cette page.</p>
@@ -312,6 +384,11 @@
 			</p>
 		</div>
 	{:else}
+		{#if locale === 'en' && sharedFieldCount > 0}
+			<p class="text-sm text-neutral-slate bg-neutral-sand rounded-xl px-4 py-3 mb-6">
+				Les images et galeries sont communes aux deux langues : modifiez-les dans la version française.
+			</p>
+		{/if}
 		<div class="space-y-6">
 			{#each groupBySection(fields) as [section, sectionFields]}
 				<div class="bg-white rounded-2xl p-6 shadow-sm space-y-5">
@@ -328,6 +405,14 @@
 								</span>
 								{#if isDirty(field.key)}
 									<span class="text-[10px] uppercase tracking-wider text-accent-sunset">modifié</span>
+								{/if}
+								{#if (field.type === 'text' || field.type === 'richtext') && overrides[field.key]}
+									<button
+										type="button"
+										onclick={() => handleTextReset(field.key)}
+										class="ml-auto inline-flex items-center gap-1 text-xs text-neutral-slate hover:text-accent-sunset transition">
+										<RotateCcw class="w-3.5 h-3.5" /> Réinitialiser
+									</button>
 								{/if}
 							</div>
 

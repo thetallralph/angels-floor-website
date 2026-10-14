@@ -43,6 +43,14 @@ npm run format       # Format code with Prettier
 
 **IMPORTANT**: Always run `npm run check` and `npm run lint` before completing any task to ensure code quality.
 
+## i18n (FR / EN)
+- Français à la racine (`/produits`), anglais sous `/en` avec premier segment traduit (`/en/products`). Mapping dans `src/lib/i18n/routing.ts` ; le hook `reroute` (`src/hooks.ts`) sert les URLs `/en/...` depuis les mêmes fichiers de `src/routes/(public)`.
+- Chaque texte visible d'une page publique doit exister dans les deux langues : `t('Français', 'English')`, liens internes via `href('/produits')` (toujours le chemin FR), nombres via `formatNumber` — tout vient de `$lib/i18n`. Ces helpers lisent `page.url` : les appeler dans le template ou dans `$derived`, jamais au niveau module ni dans un `load` (là : `localeFromUrl(url)`).
+- CMS : `<CmsText key="…" en="English">Français</CmsText>`, `<CmsRichText key="…">{#snippet en()}…{/snippet}Français</CmsRichText>`. Les surcharges texte de `cms_content` ont un champ `locale` ; images/galeries communes aux deux langues.
+- Contenu PocketBase (products, categories, trainings, sales_points) : champ JSON `en` superposé aux champs FR par `localizeRecord` (`src/lib/cms/translate.ts`). Les loaders prennent un paramètre `locale`.
+- Nouvelle page publique : ajouter son segment FR→EN dans `SEGMENTS_EN` (`routing.ts`).
+- Schéma : `npm run i18n:init-schema` ; traductions initiales du catalogue : `npm run i18n:seed-en` (`scripts/data/en-translations.json`).
+
 ## Deployment
 - Déployé sur VPS via Coolify (adapter-node)
 - PocketBase hébergé sur le même VPS
@@ -71,10 +79,10 @@ npm run format       # Format code with Prettier
 Products are organized by categories: fonio, baobab, nere-fagara, mangue, bisbab. Each product has TypeScript interfaces defined in `src/lib/stores/app.ts`.
 
 ### Routing Structure
-- `/` - Homepage
-- `/produits` - Products catalog
-- `/a-propos` - About page
-- `/impact` - Social impact page
+- `/` - Homepage (`/en`)
+- `/produits` - Products catalog (`/en/products`)
+- `/a-propos` - About page (`/en/about`)
+- `/impact` - Social impact page (`/en/impact`)
 
 ## Important Notes
 

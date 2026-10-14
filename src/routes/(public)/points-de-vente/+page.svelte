@@ -2,38 +2,46 @@
   import { MapPin, Phone, Clock, Search, Filter, Navigation } from 'lucide-svelte';
   import type { PublicSalesPoint } from '$lib/cms/salesPoints';
   import { CmsText } from '$lib/components/cms';
+  import { t } from '$lib/i18n';
 
-  export let data: { salesPoints: PublicSalesPoint[] };
-  $: salesPoints = data.salesPoints;
+  let { data }: { data: { salesPoints: PublicSalesPoint[] } } = $props();
+  const salesPoints = $derived(data.salesPoints);
 
-  let selectedDepartment = 'Tous';
-  let selectedType = 'Tous';
-  let searchQuery = '';
+  let selectedDepartment = $state('Tous');
+  let selectedType = $state('Tous');
+  let searchQuery = $state('');
 
-  $: departments = ['Tous', ...Array.from(new Set(salesPoints.map((p) => p.department))).sort()];
-  $: types = ['Tous', 'boutique', 'supermarché', 'marché', 'pharmacie'];
+  const departments = $derived([
+    'Tous',
+    ...Array.from(new Set(salesPoints.map((p) => p.department))).sort()
+  ]);
+  const types = ['Tous', 'boutique', 'supermarché', 'marché', 'pharmacie'];
 
-  $: filteredSalesPoints = salesPoints.filter((point) => {
-    const matchesDepartment =
-      selectedDepartment === 'Tous' || point.department === selectedDepartment;
-    const matchesType = selectedType === 'Tous' || point.type === selectedType;
-    const matchesSearch =
-      searchQuery === '' ||
-      point.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      point.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      point.city.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesDepartment && matchesType && matchesSearch;
-  });
+  const filteredSalesPoints = $derived(
+    salesPoints.filter((point) => {
+      const matchesDepartment =
+        selectedDepartment === 'Tous' || point.department === selectedDepartment;
+      const matchesType = selectedType === 'Tous' || point.type === selectedType;
+      const matchesSearch =
+        searchQuery === '' ||
+        point.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        point.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        point.city.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesDepartment && matchesType && matchesSearch;
+    })
+  );
 
-  $: salesPointsByDepartment = filteredSalesPoints.reduce(
-    (acc, point) => {
-      if (!acc[point.department]) {
-        acc[point.department] = [];
-      }
-      acc[point.department].push(point);
-      return acc;
-    },
-    {} as Record<string, PublicSalesPoint[]>
+  const salesPointsByDepartment = $derived(
+    filteredSalesPoints.reduce(
+      (acc, point) => {
+        if (!acc[point.department]) {
+          acc[point.department] = [];
+        }
+        acc[point.department].push(point);
+        return acc;
+      },
+      {} as Record<string, PublicSalesPoint[]>
+    )
   );
 
   function getTypeColor(type: string) {
@@ -53,14 +61,16 @@
 
   function getTypeLabel(type: string) {
     switch (type) {
+      case 'Tous':
+        return t('Tous', 'All');
       case 'boutique':
-        return 'Boutique';
+        return t('Boutique', 'Shop');
       case 'supermarché':
-        return 'Supermarché';
+        return t('Supermarché', 'Supermarket');
       case 'marché':
-        return 'Marché';
+        return t('Marché', 'Market');
       case 'pharmacie':
-        return 'Pharmacie';
+        return t('Pharmacie', 'Pharmacy');
       default:
         return type;
     }
@@ -75,12 +85,14 @@
         key="sales-points.hero.title"
         tag="h1"
         class="text-4xl md:text-5xl font-bold text-black mb-4 leading-tight"
+        en="Where to Buy"
         >Nos Points de Vente</CmsText
       >
       <CmsText
         key="sales-points.hero.subtitle"
         tag="p"
         class="text-lg text-neutral-charcoal max-w-2xl leading-relaxed"
+        en="Find our products at our partner retailers across Benin"
         >Trouvez nos produits chez nos revendeurs partenaires à travers le Bénin</CmsText
       >
     </div>
@@ -96,7 +108,7 @@
           <input
             type="text"
             bind:value={searchQuery}
-            placeholder="Rechercher un point de vente..."
+            placeholder={t('Rechercher un point de vente...', 'Search for a sales point...')}
             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-green"
           />
         </div>
@@ -109,7 +121,7 @@
             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-green appearance-none bg-white"
           >
             {#each departments as dept}
-              <option value={dept}>{dept}</option>
+              <option value={dept}>{dept === 'Tous' ? t('Tous', 'All') : dept}</option>
             {/each}
           </select>
         </div>
@@ -130,7 +142,10 @@
         <!-- Résultats -->
         <div class="flex items-center justify-center md:justify-end">
           <span class="text-neutral-charcoal font-semibold">
-            {filteredSalesPoints.length} point{filteredSalesPoints.length > 1 ? 's' : ''} de vente
+            {t(
+              `${filteredSalesPoints.length} point${filteredSalesPoints.length > 1 ? 's' : ''} de vente`,
+              `${filteredSalesPoints.length} sales point${filteredSalesPoints.length === 1 ? '' : 's'}`
+            )}
           </span>
         </div>
       </div>
@@ -143,16 +158,19 @@
       {#if salesPoints.length === 0}
         <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
           <MapPin class="w-12 h-12 text-neutral-slate mx-auto mb-4" />
-          <p class="text-lg text-neutral-charcoal">Nos points de vente arrivent bientôt</p>
+          <p class="text-lg text-neutral-charcoal">{t('Nos points de vente arrivent bientôt', 'Our sales points are coming soon')}</p>
           <p class="text-sm text-neutral-slate mt-2">
-            Contactez-nous pour connaître le revendeur le plus proche de chez vous.
+            {t(
+              'Contactez-nous pour connaître le revendeur le plus proche de chez vous.',
+              'Contact us to find the retailer nearest you.'
+            )}
           </p>
         </div>
       {:else if Object.keys(salesPointsByDepartment).length === 0}
         <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
           <MapPin class="w-12 h-12 text-neutral-slate mx-auto mb-4" />
-          <p class="text-lg text-neutral-charcoal">Aucun point de vente trouvé</p>
-          <p class="text-sm text-neutral-slate mt-2">Essayez de modifier vos filtres</p>
+          <p class="text-lg text-neutral-charcoal">{t('Aucun point de vente trouvé', 'No sales points found')}</p>
+          <p class="text-sm text-neutral-slate mt-2">{t('Essayez de modifier vos filtres', 'Try adjusting your filters')}</p>
         </div>
       {:else}
         {#each Object.entries(salesPointsByDepartment) as [department, points]}
@@ -213,23 +231,23 @@
   <section class="pb-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="bg-white rounded-2xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-neutral-obsidian mb-4">Légende</h3>
+        <h3 class="text-lg font-semibold text-neutral-obsidian mb-4">{t('Légende', 'Legend')}</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="flex items-center">
             <div class="w-6 h-6 rounded-full mr-3" style="background-color: #4ADE80;"></div>
-            <span class="text-sm text-neutral-charcoal">Boutique</span>
+            <span class="text-sm text-neutral-charcoal">{getTypeLabel('boutique')}</span>
           </div>
           <div class="flex items-center">
             <div class="w-6 h-6 rounded-full mr-3" style="background-color: #F59E0B;"></div>
-            <span class="text-sm text-neutral-charcoal">Supermarché</span>
+            <span class="text-sm text-neutral-charcoal">{getTypeLabel('supermarché')}</span>
           </div>
           <div class="flex items-center">
             <div class="w-6 h-6 rounded-full mr-3" style="background-color: #8B5CF6;"></div>
-            <span class="text-sm text-neutral-charcoal">Marché</span>
+            <span class="text-sm text-neutral-charcoal">{getTypeLabel('marché')}</span>
           </div>
           <div class="flex items-center">
             <div class="w-6 h-6 rounded-full mr-3" style="background-color: #EF4444;"></div>
-            <span class="text-sm text-neutral-charcoal">Pharmacie</span>
+            <span class="text-sm text-neutral-charcoal">{getTypeLabel('pharmacie')}</span>
           </div>
         </div>
       </div>

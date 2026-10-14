@@ -1,0 +1,403 @@
+{
+  "products": {
+    "marmelade-de-mangue": {
+      "name": "Mango Marmalade (90 ML / 370ML)",
+      "description": "Made mainly from ripe mango purée with a touch of sugar and lime. Rich in fibre, vitamins A and C, and beta-carotene. Contains carbohydrates, fats, potassium and dietary fibre.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Spread on bread and enjoy",
+      "packaging": "90 ML / 370 ML",
+      "origin": "Benin"
+    },
+    "farine-de-fonio": {
+      "name": "Fonio Flour",
+      "subtitle": "PURE FONIO GRAINS",
+      "tagline": "Choose your well-being",
+      "special_mention": "GLUTEN-FREE",
+      "description": "Naturally gluten-free, light and easy to digest, our fonio flour is made from carefully selected, finely milled fonio grains.\n\nRich in fibre, protein, carbohydrates, minerals and B vitamins, it provides around 360 kcal per 100 g.\n\nIdeal for porridges, crêpes, breads, biscuits, pastries and sauces, it fits easily into a varied, balanced diet.\n\n100% fonio | Gluten-free | Versatile | Local product",
+      "benefits": [
+        "Gluten-free",
+        "Light and easy to digest",
+        "Rich in carbohydrates, protein, fibre, minerals and B vitamins"
+      ],
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Fonio porridge: 1 measure of fonio flour, 5 measures of water, sugar, baobab pulp, whole milk",
+      "packaging": "600G / 1000G",
+      "origin": "Benin"
+    },
+    "couscous-de-fonio": {
+      "name": "Fonio Couscous",
+      "description": "A gluten-free, easily digestible dish rich in nutrients (B vitamins, iron, zinc, magnesium, fibre). Provides lasting energy while promoting local consumption.",
+      "benefits": ["Gluten-free", "Rich in fibre", "Ready in minutes"],
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Fonio couscous salad with fish, vegetables or meat.",
+      "packaging": "350G / 1000G",
+      "origin": "Benin"
+    },
+    "fonio-grain": {
+      "name": "Fonio Grains",
+      "subtitle": "PURE FONIO GRAINS",
+      "tagline": "Choose your well-being!",
+      "special_mention": "GLUTEN-FREE",
+      "quality_claims": ["100% Natural", "No preservatives", "Produced to HACCP standards"],
+      "description": "Fonio is a gluten-free cereal grain about 1.3 mm long and 0.8 mm wide, rich in energy, carbohydrates, protein, fibre, minerals (iron, magnesium, zinc, calcium) and B vitamins. Light and easy to digest, it provides around 360 kcal per 100 g.",
+      "detailed_description": "Grown on the lands of Atacora in northern Benin, Boukoumbé fonio is an ancestral grain with many virtues. Gluten-free and easy to digest, it is rich in fibre, essential fatty acids, amino acids and slow-release carbohydrates — a valuable ally for a balanced diet.",
+      "benefits": [
+        "Can synthesise insulin",
+        "Recommended for people with diabetes",
+        "Energising",
+        "Easy to digest",
+        "Rich in fibre, essential fatty acids, amino acids and slow-release carbohydrates"
+      ],
+      "preparation": {
+        "ratio": "1 measure of fonio = 8 measures of water",
+        "recipes": [
+          {
+            "name": "Fonio grain porridge",
+            "steps": [
+              "Bring water to the boil, then pour in the desired amount of fonio.",
+              "Stir the mixture for 3 minutes.",
+              "Put the lid back on and leave to cook for 10 to 13 minutes.",
+              "Add water if the consistency seems too thick, then cook for another 2 to 4 minutes.",
+              "Add baobab pulp or néré powder and a moderate amount of sugar."
+            ]
+          },
+          {
+            "name": "Fonio pâte (stiff porridge)",
+            "steps": [
+              "Bring water to the boil, then pour in the desired amount of fonio.",
+              "Stir with a spatula until smooth, then put the lid back on.",
+              "Leave to cook for 5 to 10 minutes and stir again. You will get a thick, firm mixture, like maize pâte.",
+              "For red pâte, replace the water with tomato sauce and follow the same method."
+            ]
+          }
+        ]
+      },
+      "nutritional_info": {
+        "fiber": "2.4g",
+        "minerals": ["Iron", "Magnesium", "Phosphorus", "Zinc"]
+      },
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Used to make fonio porridge, couscous, salads, and steamed or jollof-style fonio.",
+      "packaging": "500G / 900G / 1800G",
+      "origin": "Boukoumbé, Atacora, Benin",
+      "certification": "HACCP"
+    },
+    "fonio-biscuit": {
+      "name": "Fonio Biscuit",
+      "description": "Biscuit made with fonio flour.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Ideal with breakfast.",
+      "packaging": "22G"
+    },
+    "fonio-galette": {
+      "name": "Fonio Galette"
+    },
+    "fonio-chips": {
+      "name": "Fonio Chips",
+      "description": "Chips made from fonio flour, available plain, sweet, salted or spicy. Crunchy and gluten-free.",
+      "conservation": "3 months. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Enjoy with drinks or as a snack.",
+      "packaging": "Sachet (sold by the dozen)"
+    },
+    "baobab-pulpe": {
+      "name": "Baobab Pulp",
+      "description": "A natural powder made from the pulp of the baobab fruit. Rich in fibre, vitamin C, calcium and potassium. Ideal for strengthening the immune system, aiding digestion and providing energy and well-being.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "For making porridges and instant juices (dilute in lukewarm water). Recommended for constipation.",
+      "packaging": "250G / 500G / 1000G / 1500G"
+    },
+    "baobab-huile": {
+      "name": "Baobab Oil"
+    },
+    "nere-pulpe": {
+      "name": "Néré Pulp",
+      "description": "A natural powder rich in protein, fats, vitamins A and C, iron, calcium and potassium. Has anti-neuralgic, diuretic, tonic and antiseptic properties. A quality source of nutrition, especially recommended for children.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "As a nourishing drink (mixed with water, sugar, honey, milk or baobab). In baking (biscuits, galettes, dragées). As a food supplement in porridges for children or convalescents.",
+      "packaging": "100G / 200G / 500G / 1KG"
+    },
+    "mangue-sechee": {
+      "name": "Dried Mango",
+      "description": "Dried mango rich in fibre, vitamins A and C, and beta-carotene. Contains carbohydrates, fats, potassium and dietary fibre. A natural source of energy.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Enjoy as a healthy snack, anytime, anywhere.",
+      "packaging": "100G"
+    },
+    "tchakpalo-mangue": {
+      "name": "Mango Tchakpalo (YEP-YEP)",
+      "description": "A traditional fermented drink made from ripe mango pulp. Lightly sparkling, sweet and tangy, it is enjoyed as a refreshing drink to share. Provides quick energy from natural sugars, as well as antioxidants (vitamin C, beta-carotene).",
+      "conservation": "3 months. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve chilled as a drink.",
+      "packaging": "1L / 1.5L / 3L / 5L (individual sizes: 1/4, 1/3, 1/2)"
+    },
+    "papaye-sechee": {
+      "name": "Dried Papaya",
+      "description": "100% natural fruit, a source of energy thanks to its carbohydrates, rich in fibre, vitamins A and C, potassium and antioxidants. Good for immunity and eyesight.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Enjoy as a healthy snack or add to cereals and desserts.",
+      "packaging": "85G"
+    },
+    "papaye-compote": {
+      "name": "Papaya Compote (90 ML / 370ML)"
+    },
+    "couscous-igname": {
+      "name": "Yam Couscous",
+      "description": "Couscous made from dried yam chip flour. A nourishing traditional dish, prepared with chilli, vegetables and water.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Prepare with chilli, vegetables and water.",
+      "packaging": "500G / 700G"
+    },
+    "couscous-patate": {
+      "name": "Sweet Potato Couscous"
+    },
+    "chips-manioc": {
+      "name": "Cassava Chips",
+      "description": "Cassava chips, available plain, sweet, salted or spicy. Crunchy and full of flavour.",
+      "conservation": "3 months. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Enjoy with drinks or as a snack.",
+      "packaging": "Sachet (sold by the dozen)"
+    },
+    "chips-riz": {
+      "name": "Rice Chips",
+      "description": "Chips made from rice flour, available plain, sweet, salted or spicy. Crunchy and full of flavour.",
+      "conservation": "3 months. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Enjoy with drinks or as a snack.",
+      "packaging": "Sachet (sold by the dozen)"
+    },
+    "poudre-curcuma": {
+      "name": "Turmeric Powder"
+    },
+    "pur-miel": {
+      "name": "Pure Honey"
+    },
+    "tomate-entiere": {
+      "name": "Whole Tomatoes"
+    },
+    "puree-tomate": {
+      "name": "Tomato Purée"
+    },
+    "concentre-tomate": {
+      "name": "Tomato Paste"
+    },
+    "farine-enrichie-de-fonio": {
+      "name": "Enriched Fonio Flour",
+      "description": "Enriched flour made from cereals, fonio, sorghum, mango, dates and small fish. A nutritious blend specially formulated for porridges.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Mainly used to make enriched porridge.",
+      "packaging": "300G / 1000G"
+    },
+    "bisbab-dragee": {
+      "name": "Bisbab Dragée",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "3G / 5G"
+    },
+    "bisbab-nature": {
+      "name": "Bisbab Plain (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "bisbab-bissap": {
+      "name": "Bisbab Bissap (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack. Flavoured with bissap (hibiscus).",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "bisbab-nere": {
+      "name": "Bisbab Néré (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack. Enriched with néré pulp.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "bisbab-gingembre": {
+      "name": "Bisbab Ginger (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack. Flavoured with ginger.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "bisbab-curcuma": {
+      "name": "Bisbab Turmeric (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack. Flavoured with turmeric.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "bisbab-artemisia": {
+      "name": "Bisbab Artemisia (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack. Flavoured with artemisia.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "bisbab-fagara": {
+      "name": "Bisbab Fagara (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack. Flavoured with fagara (African pepper).",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "bisbab-grand-format": {
+      "name": "Bisbab (250G/500G/1KG)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "250G / 500G / 1000G"
+    },
+    "biscuit-de-nere-petit-format": {
+      "name": "Néré Biscuit (3G / 5G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "3G / 5G"
+    },
+    "super-biscuit-de-nere": {
+      "name": "Néré Super Biscuit (50G)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack. Super biscuit size.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "50G"
+    },
+    "biscuit-de-nere-grand-format": {
+      "name": "Néré Biscuit (500G/1KG)",
+      "description": "A néré-based confection combining a sweet taste with plenty of protein, fibre and minerals. A healthy, energising snack.",
+      "conservation": "2 years. Store in a cool, dry place away from moisture. Consume before the expiry date.",
+      "usage": "Serve with porridge, with drinks or as a snack.",
+      "packaging": "500G / 1000G"
+    }
+  },
+  "categories": {
+    "fonio": { "name": "Fonio" },
+    "baobab": { "name": "Baobab" },
+    "nere": { "name": "Néré" },
+    "mangue": { "name": "Mango" },
+    "papaye": { "name": "Papaya" },
+    "autres": { "name": "Other products" }
+  },
+  "trainings": {
+    "fonio-sale-en-fonio-propre-pret-pour-la-cuisine": {
+      "title": "Uncleaned fonio into clean, ready-to-cook fonio"
+    },
+    "farine-de-fonio-en-galette": { "title": "Fonio flour into galettes" },
+    "farine-de-fonio-en-crepe-de-fonio": { "title": "Fonio flour into fonio crêpes" },
+    "fonio-en-farine-panifiable": { "title": "Fonio into bread-making flour" },
+    "fonio-grain-propre-en-couscous-precuit": {
+      "title": "Clean fonio grain into couscous (pre-cooked)"
+    },
+    "fonio-grain-en-degue-granule": { "title": "Fonio grain into dègue (granules)" },
+    "baobab-et-lait-en-jus-rafraichissant": {
+      "title": "Baobab and milk into a refreshing juice"
+    },
+    "pulpe-de-baobab-en-biscuit-de-baobab": { "title": "Baobab pulp into baobab biscuits" },
+    "farine-panifiable-et-pulpe-de-baobab-en-biscuit": {
+      "title": "Bread-making flour and baobab pulp into biscuits"
+    },
+    "pulpe-de-baobab-en-bonbon": { "title": "Baobab pulp into sweets" },
+    "tomate-en-conserve": { "title": "Tinned tomatoes" },
+    "tomate-en-bocal-conserve": { "title": "Tomatoes preserved in jars" },
+    "tomate-moulu-conservee": { "title": "Preserved ground tomatoes" },
+    "fruit-frais-en-fruit-seche": { "title": "Fresh fruit into dried fruit" },
+    "fruit-en-jus": { "title": "Fruit into juice" },
+    "beignet-de-mangue-farine-panifiable-mangue-fraiche-en-beignet-de-mangues": {
+      "title": "Mango fritters: bread-making flour + fresh mango into mango fritters"
+    },
+    "confiture-mangue-mangues-fruit-en-confiture": { "title": "Mango jam: mangoes into jam" },
+    "pop-corn-mille-couleur-2-mais-en-pop-corn-avec-d-autre-ingredient": {
+      "title": "Multicoloured popcorn (2): maize into popcorn with other ingredients"
+    },
+    "pop-corn-mille-couleur-1-mais-en-pop-corn-avec-d-autre-ingredient": {
+      "title": "Multicoloured popcorn (1): maize into popcorn with other ingredients"
+    },
+    "pop-corn-mille-couleur-4-mais-en-pop-corn-avec-d-autre-ingredient": {
+      "title": "Multicoloured popcorn (4): maize into popcorn with other ingredients"
+    },
+    "wassa-wassa-farine-de-cosette-d-igname-en-granule-precuit": {
+      "title": "Wassa-wassa: dried yam flour into pre-cooked granules"
+    },
+    "arachide-en-concada-au-curcuma-a-la-menthe-au-bissap-a-la-citronnelle-et-au-ging": {
+      "title": "Groundnuts into concada with turmeric, mint, bissap, lemongrass and ginger"
+    },
+    "sesame-en-grain-de-concada": { "title": "Sesame into concada pieces" },
+    "friture-chips-epice": { "title": "Spicy fried chips" },
+    "petit-cailloux-riz-farine-de-riz-en-de-petit-cailloux": {
+      "title": "Little pebbles (rice): rice flour into little pebble snacks"
+    },
+    "biscuit-de-nere-pulpe-de-nere-en-biscuit-de-nere": {
+      "title": "Néré biscuits: néré pulp into néré biscuits"
+    },
+    "coffret-de-concada-grain-de-concada": { "title": "Concada gift box: concada pieces" },
+    "nougat-arachide-en-pate-d-arachide-caramelisee": {
+      "title": "Nougat: groundnuts into caramelised groundnut paste"
+    },
+    "farine-panifiable-de-riz-en-chips-de-riz": {
+      "title": "Bread-making rice flour into rice chips"
+    },
+    "graine-de-cereale-moulu-pour-obtenir-une-farine": {
+      "title": "Milling cereal grains into flour"
+    },
+    "toffee-au-lait-lait-de-vache-en-toffee": { "title": "Milk toffee: cow's milk into toffee" },
+    "fruit-en-boisson": { "title": "Fruit into drinks" },
+    "chips-de-tubercule-tubercule-igname-et-patate-en-chips": {
+      "title": "Tuber chips: tubers, yam and sweet potato into chips"
+    },
+    "gingembre-en-croquette": { "title": "Ginger into croquettes (crunchy bites)" },
+    "lait-de-vache-en-yaourt": { "title": "Cow's milk into yoghurt" },
+    "farine-de-ble-en-beignet": { "title": "Wheat flour into doughnuts" },
+    "manioc-frais-en-du-gari": { "title": "Fresh cassava into gari" },
+    "manioc-frais-en-du-tapioca": { "title": "Fresh cassava into tapioca" },
+    "cereales-en-farine-panifiable": { "title": "Cereals into bread-making flour" },
+    "cendre-des-coques-ou-tiges-en-savon": { "title": "Ash from husks or stalks into soap" },
+    "noix-de-karite-en-beurre": { "title": "Shea nuts into shea butter" }
+  },
+  "sales_points": {
+    "h920zwz8mkn02nq": { "hours": "Monday to Saturday, 9am to 9pm" },
+    "qof6vqtzap3amsq": { "hours": "Monday to Sunday, 8:30am to 10:30pm" },
+    "hzsrefhh3qcuw76": { "hours": "Monday to Sunday, 8:30am to 10:30pm" },
+    "fdmk5e425aierix": { "hours": "Monday to Saturday, 9:30am to 9pm; Sunday, 10am to 8pm" },
+    "umam8nq580k9z6i": {
+      "situation": "Near A.T.D.A, just below Le BALAFOND restaurant",
+      "hours": "Monday to Saturday, 9am to 9pm"
+    },
+    "rvc1idprz1kwj4e": {
+      "situation": "Next to Orabank",
+      "hours": "Monday to Saturday, 9am to 8pm"
+    },
+    "nhpr8oyfnirccuy": {
+      "situation": "Opposite the neighbourhood delegate's lane, near the CANAN clinic",
+      "hours": "Monday to Saturday, 9am to 8:30pm"
+    },
+    "ixcjjw4yhnetg6e": {
+      "situation": "Carrefour des Banques",
+      "hours": "Monday to Friday, 9am to 8pm"
+    },
+    "737sosd3t0g0w7x": {
+      "situation": "Place TOFFA",
+      "hours": "Monday to Saturday, 9am to 8pm; Sunday, 10am to 1pm"
+    },
+    "pb54x9r5rch06ro": {
+      "situation": "Between Pharmacie Salem and the Le Dauphin hotel complex",
+      "hours": "Monday to Saturday, 9am to 9pm"
+    },
+    "91jayibpqd6r4m2": {
+      "situation": "Coming from Vèdoko, at the Étoile Rouge roundabout: second-to-last block before the Cadjèhoun road, on the right",
+      "hours": "Monday to Sunday, 8am to 11pm"
+    },
+    "fz5c97euymwu0wm": {
+      "situation": "OUROUBOUGA district / opposite St Bernadette church",
+      "hours": "Monday to Saturday, 7am to 8pm"
+    },
+    "7obpixm8vl9vahl": {
+      "situation": "Opposite Hôtel KABA",
+      "hours": "Monday to Saturday, 8am to 7pm"
+    },
+    "trd5d8qcobbgqof": {
+      "situation": "First shop at Marie Auxiliatrice church, just past the church gate on the paved road.",
+      "hours": "Monday to Saturday, 9am to 8pm"
+    }
+  }
+}

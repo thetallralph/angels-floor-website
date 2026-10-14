@@ -15,8 +15,13 @@ function map(pb: PocketBase, record: Record<string, unknown>): Category {
 		order: Number(record.order ?? 0),
 		image: imageUrl,
 		imageFilename: filename,
-		published: Boolean(record.published)
+		published: Boolean(record.published),
+		en: isEnObject(record.en) ? (record.en as Category['en']) : {}
 	};
+}
+
+function isEnObject(value: unknown): boolean {
+	return value != null && typeof value === 'object' && !Array.isArray(value);
 }
 
 /** Returns null if the `categories` collection doesn't exist yet. */
@@ -115,7 +120,8 @@ export async function bootstrapCategoriesCollection(): Promise<void> {
 					maxSize: 5_242_880,
 					mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
 				},
-				{ name: 'published', type: 'bool' }
+				{ name: 'published', type: 'bool' },
+				{ name: 'en', type: 'json', maxSize: 2_000_000 }
 			],
 			indexes: ['CREATE UNIQUE INDEX idx_categories_slug ON categories (slug)']
 		});

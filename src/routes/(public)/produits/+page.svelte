@@ -5,13 +5,15 @@
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import PageHeader from '$lib/components/ui/PageHeader.svelte';
   import { ChevronDown, Filter } from 'lucide-svelte';
+  import { t } from '$lib/i18n';
   
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
   
-  let activeCategory = 'fonio';
-  let mobileMenuOpen = false;
+  let activeCategory = $state('fonio');
+  let mobileMenuOpen = $state(false);
   
-  $: ({ categories, productsByCategory } = data);
+  const categories = $derived(data.categories);
+  const productsByCategory = $derived(data.productsByCategory);
   
   function scrollToCategory(categoryId: string) {
     const element = document.getElementById(`category-${categoryId}`);
@@ -31,13 +33,13 @@
     }
   }
   
-  $: if (typeof window !== 'undefined') {
+  $effect(() => {
     if (mobileMenuOpen) {
       document.addEventListener('click', handleClickOutside);
     } else {
       document.removeEventListener('click', handleClickOutside);
     }
-  }
+  });
   
   onMount(() => {
     // Observe category sections for active state
@@ -69,22 +71,22 @@
     };
   });
   
-  $: categoryName = (slug: string) =>
-    categories.find((c) => c.id === slug)?.name ?? slug;
+  const categoryName = $derived((slug: string) =>
+    categories.find((c) => c.id === slug)?.name ?? slug);
 </script>
 
 <svelte:head>
-  <title>Nos Produits - Angel's Floor</title>
-  <meta name="description" content="Découvrez notre gamme complète de produits béninois naturels : fonio précuit, pulpe de baobab, biscuits enrichis et plus encore." />
+  <title>{t('Nos Produits', 'Our Products')} - Angel's Floor</title>
+  <meta name="description" content={t('Découvrez notre gamme complète de produits béninois naturels : fonio précuit, pulpe de baobab, biscuits enrichis et plus encore.', 'Discover our full range of natural Beninese products: pre-cooked fonio, baobab pulp, enriched biscuits and more.')} />
 </svelte:head>
 
 <PageHeader
   imageKey="products.hero.image"
   defaultImage="/images/products/hero.jpg"
   titleKey="products.hero.title"
-  title="Nos Produits"
+  title={t('Nos Produits', 'Our Products')}
   subtitleKey="products.hero.subtitle"
-  subtitle="Une sélection de produits béninois naturels, transformés avec soin par nos productrices"
+  subtitle={t('Une sélection de produits béninois naturels, transformés avec soin par nos productrices', 'A selection of natural Beninese products, carefully processed by our women producers')}
   compact
 />
 
@@ -97,13 +99,13 @@
         <!-- Fixed Header Bar -->
         <div class="fixed top-0 left-0 right-0 z-30 bg-white border-b border-neutral-light shadow-md">
           <button
-            on:click={() => mobileMenuOpen = !mobileMenuOpen}
+            onclick={() => mobileMenuOpen = !mobileMenuOpen}
             class="w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-sand transition-colors"
           >
             <div class="flex items-center gap-2">
               <Filter class="w-5 h-5 text-primary-green" />
               <span class="font-semibold text-neutral-charcoal">
-                {categories.find(c => c.id === activeCategory)?.name || 'Catégories'}
+                {categories.find(c => c.id === activeCategory)?.name || t('Catégories', 'Categories')}
               </span>
             </div>
             <ChevronDown class="w-5 h-5 text-neutral-charcoal transition-transform duration-200 {mobileMenuOpen ? 'rotate-180' : ''}" />
@@ -115,7 +117,7 @@
               <nav class="py-2">
                 {#each categories.filter(c => c.id !== 'all') as category}
                   <button
-                    on:click={() => {
+                    onclick={() => {
                       scrollToCategory(category.id);
                       mobileMenuOpen = false;
                     }}
@@ -140,11 +142,11 @@
       <aside class="hidden lg:block lg:w-64 lg:sticky lg:top-24 lg:h-fit">
         <ScrollReveal animation="fade-right">
         <div>
-          <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-slate mb-4">Catégories</h2>
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-slate mb-4">{t('Catégories', 'Categories')}</h2>
           <nav class="space-y-1">
             {#each categories.filter(c => c.id !== 'all') as category}
               <button
-                on:click={() => scrollToCategory(category.id)}
+                onclick={() => scrollToCategory(category.id)}
                 class="w-full text-left px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-between
                   {activeCategory === category.id 
                     ? 'bg-neutral-sand text-primary-green font-medium' 
@@ -160,7 +162,7 @@
           
           <!-- Contact Info -->
           <div class="mt-12">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-neutral-slate mb-4">Pour commander</h3>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-neutral-slate mb-4">{t('Pour commander', 'To order')}</h3>
             <div class="space-y-3 text-sm">
               <a href="tel:+22901961219771" class="flex items-center gap-2 text-neutral-charcoal hover:text-primary-green transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +190,7 @@
             <ScrollReveal animation="fade-up">
               <div class="mb-8 pb-4 border-b border-neutral-light">
                 <h2 class="text-2xl font-semibold text-neutral-charcoal">{categoryName(category)}</h2>
-                <p class="text-sm text-neutral-slate mt-1">{categoryProducts.length} produit{categoryProducts.length > 1 ? 's' : ''}</p>
+                <p class="text-sm text-neutral-slate mt-1">{categoryProducts.length} {t(categoryProducts.length > 1 ? 'produits' : 'produit', categoryProducts.length === 1 ? 'product' : 'products')}</p>
               </div>
             </ScrollReveal>
             

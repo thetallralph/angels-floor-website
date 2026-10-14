@@ -23,15 +23,17 @@
   import ProductCard from '$lib/components/ui/ProductCard.svelte';
   import { addItem as addCartItem } from '$lib/cart/store';
   import { onMount, onDestroy } from 'svelte';
+  import { t, href, formatNumber } from '$lib/i18n';
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
 
-  const { product, similarProducts } = data;
+  const product = $derived(data.product);
+  const similarProducts = $derived(data.similarProducts);
 
   // --- Variant selection ---
-  $: variants = product.variants ?? [];
-  let selectedVariantIdx = 0;
-  $: selectedVariant = variants[selectedVariantIdx];
+  const variants = $derived(product.variants ?? []);
+  let selectedVariantIdx = $state(0);
+  const selectedVariant = $derived(variants[selectedVariantIdx]);
   function variantLabel(v: { size?: string; flavor?: string; label?: string } | undefined): string {
     if (!v) return '';
     return [v.size, v.flavor, v.label].filter(Boolean).join(' · ');
@@ -40,18 +42,19 @@
     if (!v) return 'default';
     return `${v.size ?? ''}|${v.flavor ?? ''}|${v.label ?? ''}|${idx}`;
   }
-  $: currentPrice =
+  const currentPrice = $derived(
     selectedVariant && typeof selectedVariant.price === 'number' && selectedVariant.price > 0
       ? selectedVariant.price
-      : product.price;
-  $: currentVariantLabel = selectedVariant ? variantLabel(selectedVariant) : product.packaging || '';
+      : product.price
+  );
+  const currentVariantLabel = $derived(selectedVariant ? variantLabel(selectedVariant) : product.packaging || '');
 
   // --- Add to cart ---
-  let addedFlash = false;
+  let addedFlash = $state(false);
   let addedFlashTimeout: ReturnType<typeof setTimeout> | null = null;
   function handleAddToCart() {
     const key = selectedVariant ? variantKey(selectedVariant, selectedVariantIdx) : 'default';
-    const label = selectedVariant ? variantLabel(selectedVariant) : product.packaging || 'Unité';
+    const label = selectedVariant ? variantLabel(selectedVariant) : product.packaging || t('Unité', 'Unit');
     addCartItem({
       productId: product.id,
       productSlug: product.slug,
@@ -66,21 +69,21 @@
     addedFlashTimeout = setTimeout(() => (addedFlash = false), 2500);
   }
   
-  let selectedImage = 0;
-  let showShareMenu = false;
+  let selectedImage = $state(0);
+  let showShareMenu = $state(false);
 
   // Accordion states — only nutrition is collapsible now (préparation & conservation are inline)
-  let accordionStates: { [key: string]: boolean } = {
+  let accordionStates: { [key: string]: boolean } = $state({
     nutritional: false
-  };
+  });
   
   function toggleAccordion(key: string) {
     accordionStates[key] = !accordionStates[key];
   }
   
   // Mobile floating buttons visibility
-  let showMobileButtons = true;
-  let productSectionRef: HTMLElement;
+  let showMobileButtons = $state(true);
+  let productSectionRef: HTMLElement | undefined = $state();
   let observer: IntersectionObserver;
   
   onMount(() => {
@@ -112,15 +115,6 @@
     }
   });
   
-  function formatPrice(price: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  }
-  
   const placeholderImages: Record<string, string[]> = {
     'fonio': [
       'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800&h=800&fit=crop',
@@ -147,13 +141,16 @@
     ]
   };
   
-  const productImages = product.images?.length ? product.images : placeholderImages[product.category] || [product.image];
+  const productImages = $derived(product.images?.length ? product.images : placeholderImages[product.category] || [product.image]);
   
 
 
   async function shareProduct() {
     const url = window.location.href;
-    const text = `Découvrez ${product.name} de Angel's Floor - ${product.description}`;
+    const text = t(
+      `Découvrez ${product.name} de Angel's Floor - ${product.description}`,
+      `Discover ${product.name} by Angel's Floor - ${product.description}`
+    );
     
     // Check if native share API is available (mobile)
     if (navigator.share) {
@@ -175,7 +172,10 @@
   
   function shareProductVia(platform: string) {
     const url = window.location.href;
-    const text = `Découvrez ${product.name} de Angel's Floor - ${product.description}`;
+    const text = t(
+      `Découvrez ${product.name} de Angel's Floor - ${product.description}`,
+      `Discover ${product.name} by Angel's Floor - ${product.description}`
+    );
     
     switch(platform) {
       case 'whatsapp':
@@ -189,7 +189,7 @@
         break;
       case 'copy':
         navigator.clipboard.writeText(url);
-        alert('Lien copié!');
+        alert(t('Lien copié!', 'Link copied!'));
         break;
     }
     showShareMenu = false;
@@ -207,9 +207,9 @@
   <!-- Back Navigation -->
   <div class="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-neutral-light">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <a href="/produits" class="inline-flex items-center gap-2 text-neutral-charcoal hover:text-primary-green transition-colors">
+      <a href={href('/produits')} class="inline-flex items-center gap-2 text-neutral-charcoal hover:text-primary-green transition-colors">
         <ArrowLeft class="w-5 h-5" />
-        <span class="font-medium">Retour aux produits</span>
+        <span class="font-medium">{t('Retour aux produits', 'Back to products')}</span>
       </a>
     </div>
   </div>
@@ -234,7 +234,7 @@
           <div class="flex gap-2 overflow-x-auto pb-1">
             {#each productImages as image, index}
               <button
-                on:click={() => selectedImage = index}
+                onclick={() => selectedImage = index}
                 class="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden ring-2 transition-all
                   {selectedImage === index ? 'ring-primary-green ring-offset-2' : 'ring-transparent'}"
               >
@@ -267,12 +267,12 @@
             </p>
           {/if}
           {#if product.tagline}
-            <p class="text-lg italic text-neutral-charcoal mb-4">« {product.tagline} »</p>
+            <p class="text-lg italic text-neutral-charcoal mb-4">{t(`« ${product.tagline} »`, `“${product.tagline}”`)}</p>
           {/if}
           <div class="flex items-baseline gap-4">
             {#if currentPrice > 0}
               <span class="text-3xl font-bold text-primary-green">
-                {formatPrice(currentPrice)}
+                {formatNumber(currentPrice)} FCFA
               </span>
             {/if}
             {#if currentVariantLabel}
@@ -285,13 +285,13 @@
         {#if variants.length > 0}
           <div>
             <p class="text-sm font-semibold text-neutral-charcoal mb-2">
-              Choisissez un conditionnement
+              {t('Choisissez un conditionnement', 'Choose a pack size')}
             </p>
             <div class="flex flex-wrap gap-2">
               {#each variants as v, idx}
                 <button
                   type="button"
-                  on:click={() => (selectedVariantIdx = idx)}
+                  onclick={() => (selectedVariantIdx = idx)}
                   class="px-4 py-2 rounded-full border-2 text-sm font-semibold transition-all
                     {selectedVariantIdx === idx
                       ? 'border-primary-green bg-primary-green text-white shadow-md'
@@ -299,7 +299,7 @@
                 >
                   {variantLabel(v) || '—'}
                   {#if typeof v.price === 'number' && v.price > 0}
-                    <span class="opacity-75 ml-1">· {new Intl.NumberFormat('fr-FR').format(v.price)} FCFA</span>
+                    <span class="opacity-75 ml-1">· {formatNumber(v.price)} FCFA</span>
                   {/if}
                 </button>
               {/each}
@@ -341,55 +341,55 @@
           {#if addedFlash}
             <div class="flex items-center gap-2 bg-primary-green/10 border border-primary-green/30 text-primary-green-vibrant px-4 py-2 rounded-xl text-sm font-semibold">
               <Check class="w-4 h-4" />
-              Ajouté au panier !
+              {t('Ajouté au panier !', 'Added to cart!')}
             </div>
           {/if}
           <!-- Main CTA -->
           <div class="flex gap-3">
             <button
-              on:click={handleAddToCart}
+              onclick={handleAddToCart}
               class="flex-1 bg-primary-green text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-primary-green-vibrant transition-all transform hover:scale-105 flex items-center justify-center gap-3"
             >
               <Plus class="w-6 h-6" />
-              Ajouter au panier
+              {t('Ajouter au panier', 'Add to cart')}
             </button>
             
             <!-- Share Button - Updated with Native Sharing -->
             <div class="relative">
               <button 
-                on:click={shareProduct}
+                onclick={shareProduct}
                 class="p-4 bg-white border-2 border-primary-green text-primary-green rounded-full hover:bg-primary-green hover:text-white transition-all font-semibold flex items-center gap-2"
-                title="Partager"
+                title={t('Partager', 'Share')}
               >
                 <Share2 class="w-6 h-6" />
-                <span class="hidden sm:inline">Partager</span>
+                <span class="hidden sm:inline">{t('Partager', 'Share')}</span>
               </button>
               
               {#if showShareMenu}
                 <div class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-neutral-light p-2 z-50">
                   <button 
-                    on:click={() => shareProductVia('whatsapp')}
+                    onclick={() => shareProductVia('whatsapp')}
                     class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
                   >
                     WhatsApp
                   </button>
                   <button 
-                    on:click={() => shareProductVia('facebook')}
+                    onclick={() => shareProductVia('facebook')}
                     class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
                   >
                     Facebook
                   </button>
                   <button 
-                    on:click={() => shareProductVia('twitter')}
+                    onclick={() => shareProductVia('twitter')}
                     class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
                   >
                     Twitter
                   </button>
                   <button 
-                    on:click={() => shareProductVia('copy')}
+                    onclick={() => shareProductVia('copy')}
                     class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
                   >
-                    Copier le lien
+                    {t('Copier le lien', 'Copy link')}
                   </button>
                 </div>
               {/if}
@@ -402,7 +402,7 @@
           <div class="border-t border-neutral-light pt-8">
             <h3 class="flex items-center gap-2 text-sm font-semibold text-neutral-slate uppercase tracking-wider mb-2">
               <MapPin class="w-4 h-4" />
-              Origine
+              {t('Origine', 'Origin')}
             </h3>
             <p class="text-neutral-charcoal font-medium">{product.origin}</p>
           </div>
@@ -413,7 +413,7 @@
           <div class="border-t border-neutral-light pt-8 space-y-4">
             <h3 class="flex items-center gap-2 text-sm font-semibold text-neutral-slate uppercase tracking-wider">
               <ChefHat class="w-4 h-4" />
-              Préparation
+              {t('Préparation', 'Preparation')}
             </h3>
 
             {#if product.preparation?.ratio}
@@ -452,7 +452,7 @@
           <div class="border-t border-neutral-light pt-8">
             <h3 class="flex items-center gap-2 text-sm font-semibold text-neutral-slate uppercase tracking-wider mb-2">
               <Package class="w-4 h-4" />
-              Conservation
+              {t('Conservation', 'Storage')}
             </h3>
             <p class="text-sm text-neutral-charcoal leading-relaxed">{product.conservation}</p>
           </div>
@@ -466,12 +466,12 @@
       {#if product.nutritionalInfo && (product.nutritionalInfo.energy || product.nutritionalInfo.carbs || product.nutritionalInfo.protein || product.nutritionalInfo.fiber || product.nutritionalInfo.fat || product.nutritionalInfo.minerals?.length || product.nutritionalInfo.vitamins?.length)}
         <div class="border border-neutral-light rounded-2xl overflow-hidden">
           <button
-            on:click={() => toggleAccordion('nutritional')}
+            onclick={() => toggleAccordion('nutritional')}
             class="w-full px-6 py-4 bg-white hover:bg-neutral-sand transition-colors flex items-center justify-between text-left"
           >
             <h3 class="flex items-center gap-2 text-xl font-bold text-neutral-charcoal">
               <Apple class="w-5 h-5 text-primary-green" />
-              Composition nutritionnelle
+              {t('Composition nutritionnelle', 'Nutritional information')}
             </h3>
             {#if accordionStates.nutritional}
               <ChevronUp class="w-5 h-5 text-neutral-charcoal" />
@@ -481,14 +481,14 @@
           </button>
           {#if accordionStates.nutritional}
             <div class="px-6 py-6 bg-white border-t border-neutral-light space-y-6">
-              <p class="text-sm text-neutral-slate">Pour {product.nutritionalInfo.per || '100g'}</p>
+              <p class="text-sm text-neutral-slate">{t('Pour', 'Per')} {product.nutritionalInfo.per || '100g'}</p>
               <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                 {#if product.nutritionalInfo.energy}
                   <div class="flex items-start gap-3">
                     <Flame class="w-6 h-6 text-primary-green flex-shrink-0 mt-1" />
                     <div>
                       <div class="text-2xl font-bold text-primary-green">{product.nutritionalInfo.energy}</div>
-                      <div class="text-sm text-neutral-slate">Énergie</div>
+                      <div class="text-sm text-neutral-slate">{t('Énergie', 'Energy')}</div>
                     </div>
                   </div>
                 {/if}
@@ -497,7 +497,7 @@
                     <Wheat class="w-6 h-6 text-primary-green flex-shrink-0 mt-1" />
                     <div>
                       <div class="text-2xl font-bold text-primary-green">{product.nutritionalInfo.carbs}</div>
-                      <div class="text-sm text-neutral-slate">Glucides</div>
+                      <div class="text-sm text-neutral-slate">{t('Glucides', 'Carbohydrates')}</div>
                     </div>
                   </div>
                 {/if}
@@ -506,7 +506,7 @@
                     <Egg class="w-6 h-6 text-primary-green flex-shrink-0 mt-1" />
                     <div>
                       <div class="text-2xl font-bold text-primary-green">{product.nutritionalInfo.protein}</div>
-                      <div class="text-sm text-neutral-slate">Protéines</div>
+                      <div class="text-sm text-neutral-slate">{t('Protéines', 'Protein')}</div>
                     </div>
                   </div>
                 {/if}
@@ -515,7 +515,7 @@
                     <Sprout class="w-6 h-6 text-primary-green flex-shrink-0 mt-1" />
                     <div>
                       <div class="text-2xl font-bold text-primary-green">{product.nutritionalInfo.fiber}</div>
-                      <div class="text-sm text-neutral-slate">Fibres</div>
+                      <div class="text-sm text-neutral-slate">{t('Fibres', 'Fibre')}</div>
                     </div>
                   </div>
                 {/if}
@@ -524,7 +524,7 @@
                     <Droplet class="w-6 h-6 text-primary-green flex-shrink-0 mt-1" />
                     <div>
                       <div class="text-2xl font-bold text-primary-green">{product.nutritionalInfo.fat}</div>
-                      <div class="text-sm text-neutral-slate">Lipides</div>
+                      <div class="text-sm text-neutral-slate">{t('Lipides', 'Fat')}</div>
                     </div>
                   </div>
                 {/if}
@@ -532,7 +532,7 @@
 
               {#if product.nutritionalInfo.minerals && product.nutritionalInfo.minerals.length > 0}
                 <div>
-                  <p class="text-sm font-semibold text-neutral-charcoal mb-2">Minéraux</p>
+                  <p class="text-sm font-semibold text-neutral-charcoal mb-2">{t('Minéraux', 'Minerals')}</p>
                   <div class="flex flex-wrap gap-2">
                     {#each product.nutritionalInfo.minerals as mineral}
                       <span class="inline-block bg-neutral-sand text-neutral-charcoal px-3 py-1 rounded-full text-sm">{mineral}</span>
@@ -543,10 +543,10 @@
 
               {#if product.nutritionalInfo.vitamins && product.nutritionalInfo.vitamins.length > 0}
                 <div>
-                  <p class="text-sm font-semibold text-neutral-charcoal mb-2">Vitamines</p>
+                  <p class="text-sm font-semibold text-neutral-charcoal mb-2">{t('Vitamines', 'Vitamins')}</p>
                   <div class="flex flex-wrap gap-2">
                     {#each product.nutritionalInfo.vitamins as vit}
-                      <span class="inline-block bg-neutral-sand text-neutral-charcoal px-3 py-1 rounded-full text-sm">Vitamine {vit}</span>
+                      <span class="inline-block bg-neutral-sand text-neutral-charcoal px-3 py-1 rounded-full text-sm">{t('Vitamine', 'Vitamin')} {vit}</span>
                     {/each}
                   </div>
                 </div>
@@ -562,8 +562,8 @@
     {#if similarProducts.length > 0}
       <div class="bg-neutral-sand rounded-3xl p-8 lg:p-12">
         <div class="text-center mb-10">
-          <h2 class="text-3xl lg:text-4xl font-bold text-neutral-charcoal mb-4">Vous aimerez aussi</h2>
-          <p class="text-lg text-neutral-slate max-w-2xl mx-auto">Découvrez d'autres produits naturels de notre gamme</p>
+          <h2 class="text-3xl lg:text-4xl font-bold text-neutral-charcoal mb-4">{t('Vous aimerez aussi', 'You may also like')}</h2>
+          <p class="text-lg text-neutral-slate max-w-2xl mx-auto">{t("Découvrez d'autres produits naturels de notre gamme", 'Discover more natural products from our range')}</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           {#each similarProducts as similarProduct}
@@ -572,10 +572,10 @@
         </div>
         <div class="text-center mt-8">
           <a 
-            href="/produits" 
+            href={href('/produits')} 
             class="inline-flex items-center gap-2 bg-primary-green text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-green-vibrant transition-all"
           >
-            Voir tous les produits
+            {t('Voir tous les produits', 'View all products')}
             <ArrowLeft class="w-5 h-5 rotate-180" />
           </a>
         </div>
@@ -591,20 +591,20 @@
   <div class="flex gap-2 p-3">
     <!-- Share Button -->
     <button 
-      on:click={shareProduct}
+      onclick={shareProduct}
       class="p-3 bg-white border-2 border-primary-green text-primary-green rounded-full hover:bg-primary-green hover:text-white transition-all font-semibold flex items-center justify-center"
-      title="Partager"
+      title={t('Partager', 'Share')}
     >
       <Share2 class="w-5 h-5" />
     </button>
     
     <!-- Main Order Button -->
     <button
-      on:click={handleAddToCart}
+      onclick={handleAddToCart}
       class="flex-1 bg-primary-green text-white px-6 py-3 rounded-full font-bold text-base hover:bg-primary-green-vibrant transition-all flex items-center justify-center gap-2 shadow-lg"
     >
       <Plus class="w-5 h-5" />
-      {addedFlash ? 'Ajouté !' : 'Ajouter au panier'}
+      {addedFlash ? t('Ajouté !', 'Added!') : t('Ajouter au panier', 'Add to cart')}
     </button>
   </div>
   
@@ -612,28 +612,28 @@
   {#if showShareMenu}
     <div class="absolute bottom-full right-3 mb-2 w-48 bg-white rounded-2xl shadow-xl border border-neutral-light p-2">
       <button 
-        on:click={() => shareProductVia('whatsapp')}
+        onclick={() => shareProductVia('whatsapp')}
         class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
       >
         WhatsApp
       </button>
       <button 
-        on:click={() => shareProductVia('facebook')}
+        onclick={() => shareProductVia('facebook')}
         class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
       >
         Facebook
       </button>
       <button 
-        on:click={() => shareProductVia('twitter')}
+        onclick={() => shareProductVia('twitter')}
         class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
       >
         Twitter
       </button>
       <button 
-        on:click={() => shareProductVia('copy')}
+        onclick={() => shareProductVia('copy')}
         class="w-full text-left px-4 py-2 hover:bg-neutral-sand rounded-lg transition-colors"
       >
-        Copier le lien
+        {t('Copier le lien', 'Copy link')}
       </button>
     </div>
   {/if}

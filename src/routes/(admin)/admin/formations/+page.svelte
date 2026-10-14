@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getContentList, saveContent, deleteContent, publishContent, unpublishContent, saveTrainingImage } from '$lib/admin/api';
+	import { getContentList, saveContent, deleteContent, publishContent, unpublishContent, saveTrainingImage, compactTranslation } from '$lib/admin/api';
 	import { TRAINING_CATEGORIES, type Training, type TrainingCategory } from '$lib/admin/types';
 	import { Plus, Pencil, Trash2, Save, X, GraduationCap, Search, Send, EyeOff, Image as ImageIcon } from 'lucide-svelte';
 
@@ -18,6 +18,8 @@
 	let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
 	let search = $state('');
 	let categoryFilter = $state<'all' | TrainingCategory>('all');
+	/** English overrides of the training being edited (saved to its `en` JSON). */
+	let enDraft = $state({ title: '', description: '' });
 
 	function slugify(s: string): string {
 		return s
@@ -60,6 +62,7 @@
 			image: '',
 			imageFilename: ''
 		};
+		enDraft = { title: '', description: '' };
 		imageFile = null;
 		imagePreview = '';
 		clearExistingImage = false;
@@ -67,6 +70,7 @@
 
 	function startEdit(t: Training) {
 		editing = { ...t };
+		enDraft = { title: t.en?.title ?? '', description: t.en?.description ?? '' };
 		imageFile = null;
 		imagePreview = '';
 		clearExistingImage = false;
@@ -113,7 +117,8 @@
 				duration_days: Number(editing.duration_days) || 0,
 				description: editing.description || '',
 				order_index: Number(editing.order_index) || 0,
-				published: editing.published
+				published: editing.published,
+				en: compactTranslation(enDraft)
 			};
 			const id = editing.id || slug;
 			const result = await saveContent('trainings', id, payload);
@@ -292,6 +297,23 @@
 							class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
 							placeholder="Détails supplémentaires affichés dans la fiche..."
 						></textarea>
+					</div>
+
+					<div class="lg:col-span-2">
+						<div class="pt-4 mt-2 border-t border-neutral-sand space-y-4">
+							<div>
+								<h3 class="text-sm font-semibold text-neutral-obsidian">Version anglaise</h3>
+								<p class="text-xs text-neutral-slate mt-0.5">Affichée sur le site en anglais (/en). Laisser vide pour reprendre le texte français (en gris).</p>
+							</div>
+							<div>
+								<label for="t-en-title" class="block text-sm font-medium text-neutral-charcoal mb-1">Titre (anglais)</label>
+								<input id="t-en-title" type="text" bind:value={enDraft.title} class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm" placeholder={editing.title} />
+							</div>
+							<div>
+								<label for="t-en-description" class="block text-sm font-medium text-neutral-charcoal mb-1">Description (anglais)</label>
+								<textarea id="t-en-description" rows="3" bind:value={enDraft.description} class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm resize-y" placeholder={editing.description || 'Optionnel'}></textarea>
+							</div>
+						</div>
 					</div>
 
 					<div class="lg:col-span-2">

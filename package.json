@@ -16,6 +16,8 @@
 		"format:check": "prettier --check .",
 		"cms:sync": "npx --yes tsx --env-file=.env scripts/sync-cms.ts",
 		"cms:init-schema": "npx --yes tsx --env-file=.env scripts/init-cms-schema.ts",
+		"i18n:init-schema": "npx --yes tsx --env-file=.env scripts/init-i18n-schema.ts",
+		"i18n:seed-en": "npx --yes tsx --env-file=.env scripts/seed-en-translations.ts",
 		"catalog:migrate": "npx --yes tsx --env-file=.env scripts/migrate-catalog.ts",
 		"catalog:seed": "npx --yes tsx --env-file=.env scripts/seed-products.ts",
 		"catalog:fill-fonio": "npx --yes tsx --env-file=.env scripts/fill-super-fonio.ts",

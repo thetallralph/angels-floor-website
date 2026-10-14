@@ -1,6 +1,8 @@
 import type { RecordModel } from 'pocketbase';
 import { createPB } from '$lib/server/pocketbase';
 import { DEFAULT_CATEGORIES, type Category } from '$lib/admin/types';
+import type { Locale } from '$lib/i18n/routing';
+import { localizeRecord } from './translate';
 
 function mapCategory(pb: ReturnType<typeof createPB>, record: RecordModel): Category {
 	const filename = typeof record.image === 'string' ? record.image : '';
@@ -21,14 +23,14 @@ function mapCategory(pb: ReturnType<typeof createPB>, record: RecordModel): Cate
  * Falls back to DEFAULT_CATEGORIES if the collection isn't provisioned yet,
  * so the public site keeps working before the admin runs the bootstrap.
  */
-export async function loadCategoriesFromPB(): Promise<Category[]> {
+export async function loadCategoriesFromPB(locale: Locale = 'fr'): Promise<Category[]> {
 	try {
 		const pb = createPB();
 		const records = await pb.collection('categories').getFullList({ sort: 'order,name' });
 		if (records.length === 0) {
 			return DEFAULT_CATEGORIES.map((c, i) => ({ id: `default-${i}`, ...c }));
 		}
-		return records.map((r) => mapCategory(pb, r));
+		return records.map((r) => mapCategory(pb, localizeRecord(r, 'categories', locale)));
 	} catch {
 		return DEFAULT_CATEGORIES.map((c, i) => ({ id: `default-${i}`, ...c }));
 	}

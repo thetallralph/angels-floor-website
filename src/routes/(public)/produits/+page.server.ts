@@ -1,10 +1,12 @@
 import type { PageServerLoad } from './$types';
 import { loadProducts, getCategories } from '$lib/cms/content';
+import { localeFromUrl } from '$lib/i18n/routing';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
+  const locale = localeFromUrl(url);
   const [products, categories] = await Promise.all([
-    loadProducts(),
-    getCategories()
+    loadProducts(locale),
+    getCategories(locale)
   ]);
 
   // Group products by category

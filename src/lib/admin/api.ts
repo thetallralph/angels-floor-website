@@ -5,6 +5,7 @@
  */
 
 import PocketBase from 'pocketbase';
+import type { Locale } from '$lib/i18n/routing';
 
 let pb: PocketBase | null = null;
 
@@ -121,11 +122,30 @@ const PRODUCT_FIELD_ALIASES: Record<string, string> = {
 	quality_claims: 'qualityClaims'
 };
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+	return value != null && typeof value === 'object' && !Array.isArray(value);
+}
+
+/** Rename snake_case keys of a product's `en` JSON to the admin's camelCase. */
+function renameKeys(obj: Record<string, unknown>, from: 'snake' | 'camel'): Record<string, unknown> {
+	const out = { ...obj };
+	for (const [snake, camel] of Object.entries(PRODUCT_FIELD_ALIASES)) {
+		const [src, dst] = from === 'snake' ? [snake, camel] : [camel, snake];
+		if (src in out) {
+			out[dst] = out[src];
+			delete out[src];
+		}
+	}
+	return out;
+}
+
 function aliasProductFieldsFromPB(record: Record<string, unknown>): Record<string, unknown> {
 	const out = { ...record };
 	for (const [snake, camel] of Object.entries(PRODUCT_FIELD_ALIASES)) {
 		if (snake in out) out[camel] = out[snake];
 	}
+	// The `en` JSON is stored with PB's snake_case keys (see $lib/cms/translate).
+	out.en = isPlainObject(out.en) ? renameKeys(out.en, 'snake') : {};
 	return out;
 }
 
@@ -137,7 +157,34 @@ function aliasProductFieldsToPB(data: Record<string, unknown>): Record<string, u
 			delete out[camel];
 		}
 	}
+	if (isPlainObject(out.en)) out.en = renameKeys(out.en, 'camel');
 	return out;
+}
+
+/**
+ * Drop empty strings, arrays and objects (recursively) from an `en` translation
+ * object, trimming strings. Empty English values fall back to French on the public
+ * site, so they shouldn't be stored at all.
+ */
+export function compactTranslation<T extends object>(en: T | null | undefined): Partial<T> {
+	const compact = (value: unknown): unknown => {
+		if (typeof value === 'string') {
+			const trimmed = value.trim();
+			return trimmed === '' ? undefined : trimmed;
+		}
+		if (Array.isArray(value)) {
+			const items = value.map(compact).filter((v) => v !== undefined);
+			return items.length > 0 ? items : undefined;
+		}
+		if (isPlainObject(value)) {
+			const entries = Object.entries(value)
+				.map(([k, v]) => [k, compact(v)] as const)
+				.filter(([, v]) => v !== undefined);
+			return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+		}
+		return value ?? undefined;
+	};
+	return (compact(en ?? {}) ?? {}) as Partial<T>;
 }
 
 /**
@@ -313,11 +360,29 @@ export type CmsOverride = {
 	galleryUrls?: string[];
 };
 
-export async function getCmsOverrides(page: string): Promise<Record<string, CmsOverride>> {
+/**
+ * Filter cms_content records of one page (and optionally one key) for a locale.
+ * Records without a locale predate i18n and count as French, like in the public loader.
+ */
+function cmsFilter(p: PocketBase, page: string, locale: Locale, key?: string): string {
+	const parts = ['page = {:page}'];
+	if (key !== undefined) parts.push('key = {:key}');
+	parts.push(locale === 'fr' ? '(locale = {:locale} || locale = "")' : 'locale = {:locale}');
+	return p.filter(parts.join(' && '), { page, key: key ?? '', locale });
+}
+
+/**
+ * Overrides of a page for one locale. Text/richtext overrides exist per locale;
+ * images and galleries are shared and only stored on French records.
+ */
+export async function getCmsOverrides(
+	page: string,
+	locale: Locale = 'fr'
+): Promise<Record<string, CmsOverride>> {
 	const p = await initPB();
 	try {
 		const records = await p.collection('cms_content').getFullList({
-			filter: `page = "${page}"`
+			filter: cmsFilter(p, page, locale)
 		});
 		const overrides: Record<string, CmsOverride> = {};
 		for (const r of records) {
@@ -337,17 +402,16 @@ export async function getCmsOverrides(page: string): Promise<Record<string, CmsO
 	}
 }
 
-async function findOrCreate(page: string, key: string, type: CmsOverrideType) {
+async function findOrCreate(page: string, key: string, type: CmsOverrideType, locale: Locale = 'fr') {
 	const p = await initPB();
 	try {
-		return await p.collection('cms_content').getFirstListItem(
-			`page = "${page}" && key = "${key}"`
-		);
+		return await p.collection('cms_content').getFirstListItem(cmsFilter(p, page, locale, key));
 	} catch {
 		return await p.collection('cms_content').create({
 			page,
 			key,
 			type,
+			locale,
 			value: ''
 		});
 	}
@@ -357,22 +421,26 @@ export async function saveCmsText(
 	page: string,
 	key: string,
 	value: string,
-	type: 'text' | 'richtext' = 'text'
+	type: 'text' | 'richtext' = 'text',
+	locale: Locale = 'fr'
 ) {
 	const p = await initPB();
-	const record = await findOrCreate(page, key, type);
-	await p.collection('cms_content').update(record.id, { value, type });
+	const record = await findOrCreate(page, key, type, locale);
+	// Also tags pre-i18n records (empty locale) as French.
+	await p.collection('cms_content').update(record.id, { value, type, locale });
 }
 
 /** Legacy alias — keeps old admin code working. `key` must be the full `page.section.field` form. */
-export async function saveCmsOverride(page: string, key: string, value: string) {
+export async function saveCmsOverride(page: string, key: string, value: string, locale: Locale = 'fr') {
 	const fullKey = key.startsWith(`${page}.`) ? key : `${page}.${key}`;
-	return saveCmsText(page, fullKey, value, 'text');
+	return saveCmsText(page, fullKey, value, 'text', locale);
 }
+
+// Images and galleries are shared between languages: always stored on French records.
 
 export async function saveCmsImage(page: string, key: string, file: File) {
 	const p = await initPB();
-	const record = await findOrCreate(page, key, 'image');
+	const record = await findOrCreate(page, key, 'image', 'fr');
 	const formData = new FormData();
 	formData.append('image', file);
 	formData.append('type', 'image');
@@ -381,7 +449,7 @@ export async function saveCmsImage(page: string, key: string, file: File) {
 
 export async function saveCmsGallery(page: string, key: string, files: File[]) {
 	const p = await initPB();
-	const record = await findOrCreate(page, key, 'gallery');
+	const record = await findOrCreate(page, key, 'gallery', 'fr');
 	const formData = new FormData();
 	formData.append('type', 'gallery');
 	// Replace the whole images list with the provided files.
@@ -394,7 +462,7 @@ export async function saveCmsGallery(page: string, key: string, files: File[]) {
 
 export async function appendCmsGalleryImages(page: string, key: string, files: File[]) {
 	const p = await initPB();
-	const record = await findOrCreate(page, key, 'gallery');
+	const record = await findOrCreate(page, key, 'gallery', 'fr');
 	const formData = new FormData();
 	formData.append('type', 'gallery');
 	for (const file of files) {
@@ -405,7 +473,7 @@ export async function appendCmsGalleryImages(page: string, key: string, files: F
 
 export async function removeCmsGalleryImage(page: string, key: string, filename: string) {
 	const p = await initPB();
-	const record = await findOrCreate(page, key, 'gallery');
+	const record = await findOrCreate(page, key, 'gallery', 'fr');
 	await p.collection('cms_content').update(record.id, {
 		'images-': [filename]
 	});
@@ -413,28 +481,29 @@ export async function removeCmsGalleryImage(page: string, key: string, filename:
 
 export async function reorderCmsGallery(page: string, key: string, filenames: string[]) {
 	const p = await initPB();
-	const record = await findOrCreate(page, key, 'gallery');
+	const record = await findOrCreate(page, key, 'gallery', 'fr');
 	await p.collection('cms_content').update(record.id, { images: filenames });
 }
 
 export async function getCmsGalleryFilenames(page: string, key: string): Promise<string[]> {
 	const p = await initPB();
 	try {
-		const record = await p.collection('cms_content').getFirstListItem(
-			`page = "${page}" && key = "${key}"`
-		);
+		const record = await p
+			.collection('cms_content')
+			.getFirstListItem(cmsFilter(p, page, 'fr', key));
 		return Array.isArray(record.images) ? (record.images as string[]) : [];
 	} catch {
 		return [];
 	}
 }
 
-export async function clearCmsOverride(page: string, key: string) {
+/** Delete the override of `key` in `locale` only (the other language is untouched). */
+export async function clearCmsOverride(page: string, key: string, locale: Locale = 'fr') {
 	const p = await initPB();
 	try {
-		const record = await p.collection('cms_content').getFirstListItem(
-			`page = "${page}" && key = "${key}"`
-		);
+		const record = await p
+			.collection('cms_content')
+			.getFirstListItem(cmsFilter(p, page, locale, key));
 		await p.collection('cms_content').delete(record.id);
 	} catch {
 		// already missing

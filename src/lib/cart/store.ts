@@ -1,5 +1,6 @@
 import { writable, derived, type Readable } from 'svelte/store';
 import { browser } from '$app/environment';
+import { LOCALE_TAGS, type Locale } from '$lib/i18n/routing';
 
 export type CartItem = {
 	productId: string;
@@ -89,24 +90,35 @@ export function clearCart() {
 	cart.set([]);
 }
 
-export function formatPrice(amount: number): string {
-	return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
+export function formatPrice(amount: number, locale: Locale = 'fr'): string {
+	return new Intl.NumberFormat(LOCALE_TAGS[locale]).format(amount) + ' FCFA';
 }
 
-/** Assemble a multi-line WhatsApp order message in French. */
-export function buildOrderMessage(items: CartItem[]): string {
+/** Assemble a multi-line WhatsApp order message in French (or English when `locale` is 'en'). */
+export function buildOrderMessage(items: CartItem[], locale: Locale = 'fr'): string {
 	if (items.length === 0) return '';
+	const en = locale === 'en';
 	const lines: string[] = [];
-	lines.push("Bonjour Angel's Floor, je souhaite passer une commande :");
+	lines.push(
+		en
+			? "Hello Angel's Floor, I would like to place an order:"
+			: "Bonjour Angel's Floor, je souhaite passer une commande :"
+	);
 	lines.push('');
 	for (const it of items) {
 		const lineTotal = it.unitPrice * it.quantity;
-		lines.push(`• ${it.productName} — ${it.variantLabel} × ${it.quantity} = ${formatPrice(lineTotal)}`);
+		lines.push(
+			`• ${it.productName} — ${it.variantLabel} × ${it.quantity} = ${formatPrice(lineTotal, locale)}`
+		);
 	}
 	const total = items.reduce((s, it) => s + it.unitPrice * it.quantity, 0);
 	lines.push('');
-	lines.push(`Total : ${formatPrice(total)}`);
+	lines.push(en ? `Total: ${formatPrice(total, locale)}` : `Total : ${formatPrice(total, locale)}`);
 	lines.push('');
-	lines.push('Merci de me confirmer les modalités de retrait ou de livraison.');
+	lines.push(
+		en
+			? 'Could you please confirm the pickup or delivery arrangements? Thank you.'
+			: 'Merci de me confirmer les modalités de retrait ou de livraison.'
+	);
 	return lines.join('\n');
 }

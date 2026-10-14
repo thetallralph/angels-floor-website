@@ -1,21 +1,27 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  
-  export let text: string;
-  export let className: string = '';
-  export let delay: number = 0;
-  export let stagger: number = 0.03;
-  
-  let visible = false;
-  let words: string[] = [];
-  
+
+  type Props = {
+    text: string;
+    className?: string;
+    delay?: number;
+    stagger?: number;
+  };
+
+  let { text, className = '', delay = 0, stagger = 0.03 }: Props = $props();
+
+  let visible = $state(false);
+  let mounted = $state(false);
+  // Derived from `text` so a translated string updates when the language switches
+  const words = $derived(mounted ? text.split(' ') : []);
+
   onMount(() => {
-    words = text.split(' ');
+    mounted = true;
     setTimeout(() => {
       visible = true;
     }, delay);
   });
-  
+
   function splitIntoChars(word: string) {
     return word.split('');
   }
@@ -25,7 +31,7 @@
   {#each words as word, wordIndex}
     <div style="position:relative;display:inline-block;">
       {#each splitIntoChars(word) as char, charIndex}
-        <div 
+        <div
           class="char"
           style="
             position: relative;

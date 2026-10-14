@@ -2,11 +2,12 @@
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import { Building2, Mail, Phone, Globe, Scale, FileText } from 'lucide-svelte';
   import { CmsText, CmsRichText } from '$lib/components/cms';
+  import { t, getLocale } from '$lib/i18n';
 </script>
 
 <svelte:head>
-  <title>Mentions Légales - Angel's Floor</title>
-  <meta name="description" content="Mentions légales et informations juridiques d'Angel's Floor, entreprise béninoise spécialisée dans la transformation de produits africains naturels." />
+  <title>{t('Mentions Légales', 'Legal Notice')} - Angel's Floor</title>
+  <meta name="description" content={t("Mentions légales et informations juridiques d'Angel's Floor, entreprise béninoise spécialisée dans la transformation de produits africains naturels.", "Legal notice and legal information for Angel's Floor, a Beninese company specialising in processing natural African products.")} />
 </svelte:head>
 
 <!-- Hero Section -->
@@ -18,8 +19,8 @@
   
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <ScrollReveal animation="fade-down">
-      <CmsText key="legal.hero.title" tag="h1" class="text-4xl md:text-5xl font-bold text-white mb-4">Mentions Légales</CmsText>
-      <CmsText key="legal.hero.subtitle" tag="p" class="text-lg text-white/90 max-w-2xl mx-auto">Informations légales et réglementaires</CmsText>
+      <CmsText key="legal.hero.title" tag="h1" class="text-4xl md:text-5xl font-bold text-white mb-4" en="Legal Notice">Mentions Légales</CmsText>
+      <CmsText key="legal.hero.subtitle" tag="p" class="text-lg text-white/90 max-w-2xl mx-auto" en="Legal and regulatory information">Informations légales et réglementaires</CmsText>
     </ScrollReveal>
   </div>
 </section>
@@ -27,7 +28,233 @@
 <!-- Content Section -->
 <section class="py-16 bg-white">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  {#if getLocale() === 'en'}
+    <p class="text-sm text-neutral-slate text-center mb-12">
+      This English version is provided for convenience. In case of discrepancy, the French version prevails.
+    </p>
+  {/if}
   <CmsRichText key="legal.body" class="prose prose-lg max-w-none">
+    {#snippet en()}
+    <!-- Éditeur du Site -->
+    <ScrollReveal animation="fade-up">
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-primary-green rounded-full flex items-center justify-center">
+            <Building2 class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Website Publisher</h2>
+        </div>
+        <div class="bg-neutral-sand rounded-2xl p-6 space-y-3">
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Company name:</strong> Angel's Floor SARL
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Legal form:</strong> Société à Responsabilité Limitée – SARL (private limited liability company)
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Share capital:</strong> 1,000,000 FCFA
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Registered office:</strong> Quartier Wansirou, Natitingou, République du Bénin
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">RCCM (Trade and Personal Property Credit Register):</strong> RB/NAT/22 A 1234
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">IFU (Unique Tax Identification Number):</strong> 3202210123456
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Directeur de Publication -->
+    <ScrollReveal animation="fade-up" delay={100}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-accent-gold rounded-full flex items-center justify-center">
+            <FileText class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Publication Director</h2>
+        </div>
+        <div class="bg-neutral-sand rounded-2xl p-6">
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Name:</strong> Ms Angélique KOUPONI
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Position:</strong> Chair and Chief Executive Officer
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Contact -->
+    <ScrollReveal animation="fade-up" delay={200}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-primary-green rounded-full flex items-center justify-center">
+            <Mail class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Contact</h2>
+        </div>
+        <div class="bg-neutral-sand rounded-2xl p-6 space-y-3">
+          <div class="flex items-center gap-3">
+            <Phone class="w-5 h-5 text-primary-green" />
+            <p class="text-neutral-charcoal">
+              <strong class="text-black">Telephone:</strong> +229 01 96 12 19 71
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <Mail class="w-5 h-5 text-primary-green" />
+            <p class="text-neutral-charcoal">
+              <strong class="text-black">Email:</strong> contact@angelsfloor.bj
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <Globe class="w-5 h-5 text-primary-green" />
+            <p class="text-neutral-charcoal">
+              <strong class="text-black">Website:</strong> www.angelsfloor.bj
+            </p>
+          </div>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Hébergement -->
+    <ScrollReveal animation="fade-up" delay={300}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-accent-sunset rounded-full flex items-center justify-center">
+            <Globe class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Hosting</h2>
+        </div>
+        <div class="bg-neutral-sand rounded-2xl p-6 space-y-3">
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Hosting provider:</strong> Vercel Inc.
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Address:</strong> 340 S Lemon Ave #4133, Walnut, CA 91789, USA
+          </p>
+          <p class="text-neutral-charcoal">
+            <strong class="text-black">Website:</strong> https://vercel.com
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Propriété Intellectuelle -->
+    <ScrollReveal animation="fade-up" delay={400}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-creative-purple rounded-full flex items-center justify-center">
+            <Scale class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Intellectual Property</h2>
+        </div>
+        <div class="prose prose-lg max-w-none text-neutral-charcoal">
+          <p>
+            All content on this website (texts, images, videos, logos, trademarks, etc.) is the exclusive property of Angel's Floor SARL or its partners and is protected by Beninese and international intellectual property laws.
+          </p>
+          <p class="mt-4">
+            Any reproduction, representation, modification, publication or adaptation of all or part of the elements of this website, by whatever means or process, is prohibited without the prior written authorisation of Angel's Floor SARL.
+          </p>
+          <p class="mt-4">
+            Any unauthorised use of the website or of any of the elements it contains will be deemed to constitute an infringement (contrefaçon) and will be prosecuted in accordance with the legal provisions in force.
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Données Personnelles -->
+    <ScrollReveal animation="fade-up" delay={500}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-primary-green-vibrant rounded-full flex items-center justify-center">
+            <FileText class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Personal Data Protection</h2>
+        </div>
+        <div class="prose prose-lg max-w-none text-neutral-charcoal">
+          <p>
+            In accordance with loi n° 2017-20 du 20 avril 2018 portant code du numérique en République du Bénin (Law No. 2017-20 of 20 April 2018 on the Digital Code of the Republic of Benin), you have the right to access, rectify and delete data concerning you.
+          </p>
+          <p class="mt-4">
+            To exercise this right, please contact us at the following address: contact@angelsfloor.bj
+          </p>
+          <p class="mt-4">
+            Angel's Floor undertakes not to disclose to third parties the personal information you provide to us. This information is confidential and will be used solely to process your orders and improve our services.
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Cookies -->
+    <ScrollReveal animation="fade-up" delay={600}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-accent-gold rounded-full flex items-center justify-center">
+            <Globe class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Cookies</h2>
+        </div>
+        <div class="prose prose-lg max-w-none text-neutral-charcoal">
+          <p>
+            This website uses cookies to improve your browsing experience. Cookies are small text files stored on your device that allow us to remember your preferences and analyse how the website is used.
+          </p>
+          <p class="mt-4">
+            You can configure your browser to refuse cookies or to alert you when a website attempts to place one on your computer. However, refusing cookies may limit your access to certain features of the website.
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Responsabilité -->
+    <ScrollReveal animation="fade-up" delay={700}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-primary-green rounded-full flex items-center justify-center">
+            <Scale class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Limitation of Liability</h2>
+        </div>
+        <div class="prose prose-lg max-w-none text-neutral-charcoal">
+          <p>
+            Angel's Floor endeavours to ensure that the information published on this website is accurate and up to date, and reserves the right to modify its content at any time and without notice.
+          </p>
+          <p class="mt-4">
+            However, Angel's Floor cannot guarantee the accuracy, precision or completeness of the information made available on this website. Consequently, Angel's Floor disclaims all liability for any imprecision, inaccuracy or omission relating to information available on the website.
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Droit Applicable -->
+    <ScrollReveal animation="fade-up" delay={800}>
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-accent-sunset rounded-full flex items-center justify-center">
+            <Scale class="w-6 h-6 text-white" />
+          </div>
+          <h2 class="text-2xl font-bold text-primary-green">Governing Law and Jurisdiction</h2>
+        </div>
+        <div class="prose prose-lg max-w-none text-neutral-charcoal">
+          <p>
+            This legal notice is governed by Beninese law. In the event of a dispute and failing an amicable settlement, the dispute will be brought before the competent courts of Natitingou, Republic of Benin.
+          </p>
+        </div>
+      </div>
+    </ScrollReveal>
+
+    <!-- Date de mise à jour -->
+    <ScrollReveal animation="fade">
+      <div class="text-center mt-16 pt-8 border-t border-neutral-light">
+        <p class="text-sm text-neutral-slate">
+          Last updated: January 2025
+        </p>
+      </div>
+    </ScrollReveal>
+    {/snippet}
+
     <!-- Éditeur du Site -->
     <ScrollReveal animation="fade-up">
       <div class="mb-12">

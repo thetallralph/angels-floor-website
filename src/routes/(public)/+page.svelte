@@ -6,6 +6,7 @@
   import ProductCard from '$lib/components/ui/ProductCard.svelte';
   import { CmsText, CmsImage } from '$lib/components/cms';
   import { appStore } from '$lib/stores/app.js';
+  import { t, href } from '$lib/i18n';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
@@ -100,8 +101,8 @@
 </script>
 
 <svelte:head>
-  <title>Angel's Floor - Accueil</title>
-  <meta name="description" content="Spécialiste de la transformation artisanale de produits africains naturels : fonio précuit, poudre de baobab, farines enrichies. Produits prêts à consommer, certifiés biologiques." />
+  <title>{t("Angel's Floor - Accueil", "Angel's Floor - Home")}</title>
+  <meta name="description" content={t("Spécialiste de la transformation artisanale de produits africains naturels : fonio précuit, poudre de baobab, farines enrichies. Produits prêts à consommer, certifiés biologiques.", "Specialists in the artisanal processing of natural African products: pre-cooked fonio, baobab powder, enriched flours. Ready-to-eat, certified organic products.")} />
 </svelte:head>
 
 <!-- Anniversary Banner - Hidden for now -->
@@ -139,23 +140,23 @@
       <!-- Text Content -->
       <div class="relative z-10 text-center lg:text-left flex flex-col items-center lg:items-start">
         <div class="hero-heading" class:visible={heroVisible}>
-          <CmsText key="home.hero.title" tag="h1" class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center lg:text-left hero-title">Produits africains transformés avec expertise et tradition</CmsText>
+          <CmsText key="home.hero.title" tag="h1" class="text-5xl md:text-6xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center lg:text-left hero-title" en="Local products crafted with passion, tradition and commitment">Produits africains transformés avec expertise et tradition</CmsText>
 
           <div class="hero-desc opacity-0 translate-y-8" class:show={heroVisible}>
-            <CmsText key="home.hero.subtitle" tag="p" class="text-lg md:text-xl lg:text-xl text-white/90 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">Spécialistes de la transformation artisanale de produits africains naturels. Du fonio au baobab, nous valorisons les richesses du terroir béninois pour vous offrir des produits prêts à consommer de qualité premium.</CmsText>
+            <CmsText key="home.hero.subtitle" tag="p" class="text-lg md:text-xl lg:text-xl text-white/90 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0" en="Our mission: to transform local agricultural riches into high-quality food products that are healthy and accessible.">Spécialistes de la transformation artisanale de produits africains naturels. Du fonio au baobab, nous valorisons les richesses du terroir béninois pour vous offrir des produits prêts à consommer de qualité premium.</CmsText>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full lg:w-auto">
               <a 
-                href="/produits"
+                href={href('/produits')}
                 class="block sm:inline-block w-full sm:w-auto text-center bg-white text-primary-green px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
               >
-                Découvrir Nos Produits
+                {t('Découvrir Nos Produits', 'Discover Our Products')}
               </a>
               <a 
-                href="/a-propos"
+                href={href('/a-propos')}
                 class="block sm:inline-block w-full sm:w-auto text-center bg-transparent border-2 border-white text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all duration-300"
               >
-                Notre Histoire
+                {t('Notre Histoire', 'Our Story')}
               </a>
             </div>
           </div>
@@ -187,7 +188,7 @@
                   <div class="w-full h-full rounded-[30px] overflow-hidden shadow-2xl">
                     <img 
                       src={image}
-                      alt="Produits Angel's Floor"
+                      alt={t("Produits Angel's Floor", "Angel's Floor products")}
                       class="w-full h-full object-cover"
                     />
                     <!-- Overlay gradient -->
@@ -223,8 +224,8 @@
       <ScrollReveal animation="fade-up" delay={0}>
       <div class="text-center">
         <CmsText key="home.stats.1.number" tag="div" class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">500+</CmsText>
-        <CmsText key="home.stats.1.label" tag="p" class="text-black font-bold text-lg md:text-xl">Femmes Productrices</CmsText>
-        <CmsText key="home.stats.1.desc" tag="p" class="text-base text-black mt-2">Autonomisées depuis 2015</CmsText>
+        <CmsText key="home.stats.1.label" tag="p" class="text-black font-bold text-lg md:text-xl" en="Women Producers">Femmes Productrices</CmsText>
+        <CmsText key="home.stats.1.desc" tag="p" class="text-base text-black mt-2" en="Empowered since 2015">Autonomisées depuis 2015</CmsText>
       </div>
       </ScrollReveal>
 
@@ -232,8 +233,8 @@
       <ScrollReveal animation="fade-up" delay={100}>
       <div class="text-center">
         <CmsText key="home.stats.2.number" tag="div" class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">10</CmsText>
-        <CmsText key="home.stats.2.label" tag="p" class="text-black font-bold text-lg md:text-xl">Années d'Excellence</CmsText>
-        <CmsText key="home.stats.2.desc" tag="p" class="text-base text-black mt-2">De savoir-faire artisanal</CmsText>
+        <CmsText key="home.stats.2.label" tag="p" class="text-black font-bold text-lg md:text-xl" en="Years of Excellence">Années d'Excellence</CmsText>
+        <CmsText key="home.stats.2.desc" tag="p" class="text-base text-black mt-2" en="Of artisanal know-how">De savoir-faire artisanal</CmsText>
       </div>
       </ScrollReveal>
 
@@ -241,8 +242,8 @@
       <ScrollReveal animation="fade-up" delay={200}>
       <div class="text-center">
         <CmsText key="home.stats.3.number" tag="div" class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">15+</CmsText>
-        <CmsText key="home.stats.3.label" tag="p" class="text-black font-bold text-lg md:text-xl">Points de Vente</CmsText>
-        <CmsText key="home.stats.3.desc" tag="p" class="text-base text-black mt-2">À travers le Bénin</CmsText>
+        <CmsText key="home.stats.3.label" tag="p" class="text-black font-bold text-lg md:text-xl" en="Sales Points">Points de Vente</CmsText>
+        <CmsText key="home.stats.3.desc" tag="p" class="text-base text-black mt-2" en="Across Benin">À travers le Bénin</CmsText>
       </div>
       </ScrollReveal>
 
@@ -250,8 +251,8 @@
       <ScrollReveal animation="fade-up" delay={300}>
       <div class="text-center">
         <CmsText key="home.stats.4.number" tag="div" class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-green mb-3">100%</CmsText>
-        <CmsText key="home.stats.4.label" tag="p" class="text-black font-bold text-lg md:text-xl">Produits Naturels</CmsText>
-        <CmsText key="home.stats.4.desc" tag="p" class="text-base text-black mt-2">Certifiés biologiques</CmsText>
+        <CmsText key="home.stats.4.label" tag="p" class="text-black font-bold text-lg md:text-xl" en="Natural Products">Produits Naturels</CmsText>
+        <CmsText key="home.stats.4.desc" tag="p" class="text-base text-black mt-2" en="Certified organic">Certifiés biologiques</CmsText>
       </div>
       </ScrollReveal>
     </div>
@@ -264,21 +265,21 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <ScrollReveal animation="fade-up">
     <div class="text-center mb-12">
-      <CmsText key="home.products.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">Nos Produits</CmsText>
-      <CmsText key="home.products.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4">Produits Transformés du Terroir Béninois</CmsText>
-      <CmsText key="home.products.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto mb-6">Découvrez nos gammes de produits soigneusement sélectionnés, transformés avec amour par nos productrices pour vous offrir le meilleur du terroir béninois.</CmsText>
+      <CmsText key="home.products.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3" en="Our Products">Nos Produits</CmsText>
+      <CmsText key="home.products.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4" en="Products Crafted from Beninese Terroir">Produits Transformés du Terroir Béninois</CmsText>
+      <CmsText key="home.products.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto mb-6" en="Discover our carefully selected product ranges, lovingly processed by our women producers to bring you the very best of Benin's terroir.">Découvrez nos gammes de produits soigneusement sélectionnés, transformés avec amour par nos productrices pour vous offrir le meilleur du terroir béninois.</CmsText>
       <div class="flex flex-wrap justify-center gap-4 text-sm">
         <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
-          Sans Gluten
+          {t('Sans Gluten', 'Gluten-Free')}
         </span>
         <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
-          100% Naturel
+          {t('100% Naturel', '100% Natural')}
         </span>
         <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
-          Prêt à Consommer
+          {t('Prêt à Consommer', 'Ready to Eat')}
         </span>
         <span class="border border-neutral-slate text-neutral-slate px-4 py-2 rounded-full font-medium">
-          Certifié Bio
+          {t('Certifié Bio', 'Certified Organic')}
         </span>
       </div>
     </div>
@@ -296,9 +297,9 @@
     {:else}
       <div class="text-center py-12 max-w-2xl mx-auto">
         <Package class="w-12 h-12 text-neutral-light mx-auto mb-4" />
-        <p class="text-neutral-charcoal">Aucun produit vedette pour le moment.</p>
-        <a href="/produits" class="inline-block mt-4 text-primary-green font-semibold hover:underline">
-          Voir tous nos produits →
+        <p class="text-neutral-charcoal">{t('Aucun produit vedette pour le moment.', 'No featured products at the moment.')}</p>
+        <a href={href('/produits')} class="inline-block mt-4 text-primary-green font-semibold hover:underline">
+          {t('Voir tous nos produits →', 'See all our products →')}
         </a>
       </div>
     {/if}
@@ -307,10 +308,10 @@
     <ScrollReveal animation="fade">
     <div class="text-center mt-12">
       <a 
-        href="/produits"
+        href={href('/produits')}
         class="inline-flex items-center gap-3 bg-primary-green text-white px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:bg-primary-green-vibrant hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
       >
-        <span>Voir Tous Nos Produits</span>
+        <span>{t('Voir Tous Nos Produits', 'View All Our Products')}</span>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
@@ -326,9 +327,9 @@
     <!-- Header -->
     <ScrollReveal animation="fade-up">
     <div class="text-center mb-12">
-      <CmsText key="home.lifestyle.overline" tag="p" class="text-sm font-semibold text-neutral-obsidian uppercase tracking-wider mb-3">Mode de Vie</CmsText>
-      <CmsText key="home.lifestyle.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4">Votre Allié Nutrition au Quotidien</CmsText>
-      <CmsText key="home.lifestyle.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto">Nos produits s'adaptent à votre rythme de vie tout en vous apportant le meilleur du Bénin.</CmsText>
+      <CmsText key="home.lifestyle.overline" tag="p" class="text-sm font-semibold text-neutral-obsidian uppercase tracking-wider mb-3" en="Lifestyle">Mode de Vie</CmsText>
+      <CmsText key="home.lifestyle.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4" en="Your Everyday Nutrition Ally">Votre Allié Nutrition au Quotidien</CmsText>
+      <CmsText key="home.lifestyle.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto" en="Our products fit your pace of life while bringing you the very best of Benin.">Nos produits s'adaptent à votre rythme de vie tout en vous apportant le meilleur du Bénin.</CmsText>
     </div>
     </ScrollReveal>
     
@@ -338,12 +339,12 @@
       <ScrollReveal animation="fade-up" delay={0}>
       <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
         <Sun class="w-10 h-10 text-orange-500 mb-6" />
-        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">Petit-Déjeuner</h4>
-        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Commencez votre journée avec énergie et vitalité grâce à nos produits riches en nutriments</p>
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">{t('Petit-Déjeuner', 'Breakfast')}</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">{t('Commencez votre journée avec énergie et vitalité grâce à nos produits riches en nutriments', 'Start your day with energy and vitality thanks to our nutrient-rich products')}</p>
         <div class="border-t pt-4">
-          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
-          <a href="/produits/fonio-precuit" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
-            Fonio au lait de coco
+          <p class="text-xs text-gray-500 mb-2">{t('Recommandé:', 'Recommended:')}</p>
+          <a href={href('/produits/fonio-precuit')} class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            {t('Fonio au lait de coco', 'Fonio with coconut milk')}
           </a>
         </div>
       </div>
@@ -353,12 +354,12 @@
       <ScrollReveal animation="fade-up" delay={100}>
       <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
         <Dumbbell class="w-10 h-10 text-green-500 mb-6" />
-        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">Sport & Énergie</h4>
-        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Boostez vos performances naturellement avec nos super-aliments adaptés aux sportifs</p>
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">{t('Sport & Énergie', 'Sport & Energy')}</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">{t('Boostez vos performances naturellement avec nos super-aliments adaptés aux sportifs', 'Boost your performance naturally with our superfoods made for active lifestyles')}</p>
         <div class="border-t pt-4">
-          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
-          <a href="/produits/baobab-poudre" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
-            Smoothie baobab boost
+          <p class="text-xs text-gray-500 mb-2">{t('Recommandé:', 'Recommended:')}</p>
+          <a href={href('/produits/baobab-poudre')} class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            {t('Smoothie baobab boost', 'Baobab boost smoothie')}
           </a>
         </div>
       </div>
@@ -368,12 +369,12 @@
       <ScrollReveal animation="fade-up" delay={200}>
       <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
         <Heart class="w-10 h-10 text-pink-500 mb-6" />
-        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">En Famille</h4>
-        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Des moments de partage savoureux autour de nos produits sains et délicieux</p>
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">{t('En Famille', 'Family Time')}</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">{t('Des moments de partage savoureux autour de nos produits sains et délicieux', 'Tasty moments to share around our healthy, delicious products')}</p>
         <div class="border-t pt-4">
-          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
-          <a href="/produits/biscuits-baobab" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
-            Goûter biscuits maison
+          <p class="text-xs text-gray-500 mb-2">{t('Recommandé:', 'Recommended:')}</p>
+          <a href={href('/produits/biscuits-baobab')} class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            {t('Goûter biscuits maison', 'Homemade biscuit snack')}
           </a>
         </div>
       </div>
@@ -383,12 +384,12 @@
       <ScrollReveal animation="fade-up" delay={300}>
       <div class="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
         <Briefcase class="w-10 h-10 text-blue-500 mb-6" />
-        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">Au Bureau</h4>
-        <p class="text-sm text-gray-600 mb-4 leading-relaxed">La pause saine et productive pour maintenir votre concentration toute la journée</p>
+        <h4 class="font-bold text-xl text-neutral-obsidian mb-3">{t('Au Bureau', 'At the Office')}</h4>
+        <p class="text-sm text-gray-600 mb-4 leading-relaxed">{t('La pause saine et productive pour maintenir votre concentration toute la journée', 'The healthy, productive break that keeps you focused all day long')}</p>
         <div class="border-t pt-4">
-          <p class="text-xs text-gray-500 mb-2">Recommandé:</p>
-          <a href="/produits/biscuits-baobab" class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
-            Snacks nutritifs
+          <p class="text-xs text-gray-500 mb-2">{t('Recommandé:', 'Recommended:')}</p>
+          <a href={href('/produits/biscuits-baobab')} class="text-sm text-primary-green font-semibold hover:text-primary-green-vibrant hover:underline">
+            {t('Snacks nutritifs', 'Nutritious snacks')}
           </a>
         </div>
       </div>
@@ -399,10 +400,10 @@
     <ScrollReveal animation="fade">
     <div class="text-center mt-12">
       <a 
-        href="/produits"
+        href={href('/produits')}
         class="inline-flex items-center gap-3 bg-neutral-obsidian/10 text-neutral-obsidian border-2 border-neutral-obsidian/20 px-6 py-3 rounded-full font-semibold text-base hover:bg-neutral-obsidian hover:text-white hover:border-neutral-obsidian transition-all duration-300"
       >
-        <span>Découvrir Nos Produits</span>
+        <span>{t('Découvrir Nos Produits', 'Discover Our Products')}</span>
         <ArrowRight class="w-5 h-5" />
       </a>
     </div>
@@ -416,9 +417,9 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <ScrollReveal animation="fade-up">
     <div class="text-center mb-16">
-      <CmsText key="home.testimonials.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">Témoignages</CmsText>
-      <CmsText key="home.testimonials.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4">Ce Que Disent Nos Clients</CmsText>
-      <CmsText key="home.testimonials.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto">Des milliers de béninois ont adopté nos produits pour une alimentation saine et savoureuse</CmsText>
+      <CmsText key="home.testimonials.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3" en="Testimonials">Témoignages</CmsText>
+      <CmsText key="home.testimonials.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4" en="What Our Customers Say">Ce Que Disent Nos Clients</CmsText>
+      <CmsText key="home.testimonials.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto" en="Thousands of people in Benin have embraced our products for healthy, flavourful eating">Des milliers de béninois ont adopté nos produits pour une alimentation saine et savoureuse</CmsText>
     </div>
     </ScrollReveal>
     
@@ -437,7 +438,7 @@
           </div>
           <span class="ml-2 text-sm text-neutral-slate">5.0</span>
         </div>
-        <CmsText key="home.testimonials.1.quote" tag="p" class="text-neutral-charcoal mb-6 italic">"Le fonio précuit d'Angel's Floor a révolutionné mes petits-déjeuners. Rapide, nutritif et délicieux. Je ne peux plus m'en passer!"</CmsText>
+        <CmsText key="home.testimonials.1.quote" tag="p" class="text-neutral-charcoal mb-6 italic" en={`"Angel's Floor pre-cooked fonio has transformed my breakfasts. Quick, nutritious and delicious. I can't do without it now!"`}>"Le fonio précuit d'Angel's Floor a révolutionné mes petits-déjeuners. Rapide, nutritif et délicieux. Je ne peux plus m'en passer!"</CmsText>
         <div class="flex items-center">
           <CmsText key="home.testimonials.1.initials" tag="div" class="w-12 h-12 bg-primary-green-bright rounded-full flex items-center justify-center text-white font-bold">MA</CmsText>
           <div class="ml-3">
@@ -462,7 +463,7 @@
           </div>
           <span class="ml-2 text-sm text-neutral-slate">5.0</span>
         </div>
-        <CmsText key="home.testimonials.2.quote" tag="p" class="text-neutral-charcoal mb-6 italic">"La pulpe de baobab est mon secret pour rester en forme. Un vrai boost d'énergie naturelle. Merci Angel's Floor pour cette qualité exceptionnelle!"</CmsText>
+        <CmsText key="home.testimonials.2.quote" tag="p" class="text-neutral-charcoal mb-6 italic" en={`"Baobab pulp is my secret to staying in shape. A real natural energy boost. Thank you, Angel's Floor, for such exceptional quality!"`}>"La pulpe de baobab est mon secret pour rester en forme. Un vrai boost d'énergie naturelle. Merci Angel's Floor pour cette qualité exceptionnelle!"</CmsText>
         <div class="flex items-center">
           <CmsText key="home.testimonials.2.initials" tag="div" class="w-12 h-12 bg-accent-sunset rounded-full flex items-center justify-center text-white font-bold">PK</CmsText>
           <div class="ml-3">
@@ -487,7 +488,7 @@
           </div>
           <span class="ml-2 text-sm text-neutral-slate">5.0</span>
         </div>
-        <CmsText key="home.testimonials.3.quote" tag="p" class="text-neutral-charcoal mb-6 italic">"Les biscuits enrichis sont parfaits pour mes enfants. Sains, croustillants et savoureux. Enfin une collation dont je n'ai pas à culpabiliser!"</CmsText>
+        <CmsText key="home.testimonials.3.quote" tag="p" class="text-neutral-charcoal mb-6 italic" en={`"The enriched biscuits are perfect for my children. Healthy, crunchy and tasty. At last, a snack I don't have to feel guilty about!"`}>"Les biscuits enrichis sont parfaits pour mes enfants. Sains, croustillants et savoureux. Enfin une collation dont je n'ai pas à culpabiliser!"</CmsText>
         <div class="flex items-center">
           <CmsText key="home.testimonials.3.initials" tag="div" class="w-12 h-12 bg-creative-purple rounded-full flex items-center justify-center text-white font-bold">SH</CmsText>
           <div class="ml-3">
@@ -516,39 +517,39 @@
       <!-- Left Content -->
       <ScrollReveal animation="fade-right">
       <div>
-        <CmsText key="home.wholesale.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3 text-center lg:text-left">Partenariat</CmsText>
-        <CmsText key="home.wholesale.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-6 text-center lg:text-left">Devenez Partenaire Distributeur</CmsText>
-        <CmsText key="home.wholesale.description" tag="p" class="text-xl text-neutral-charcoal mb-8 text-center lg:text-left">Rejoignez notre réseau de distribution avec des marges attractives jusqu'à 35%.</CmsText>
+        <CmsText key="home.wholesale.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3 text-center lg:text-left" en="Partnership">Partenariat</CmsText>
+        <CmsText key="home.wholesale.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-6 text-center lg:text-left" en="Become a Distribution Partner">Devenez Partenaire Distributeur</CmsText>
+        <CmsText key="home.wholesale.description" tag="p" class="text-xl text-neutral-charcoal mb-8 text-center lg:text-left" en="Join our distribution network with quality products and attractive margins.">Rejoignez notre réseau de distribution avec des marges attractives jusqu'à 35%.</CmsText>
         
         <!-- Benefits Grid - Simplified -->
         <div class="grid grid-cols-2 gap-4 mb-8">
           <div class="flex items-center gap-3">
             <TrendingUp class="w-6 h-6 text-primary-green" />
-            <span class="font-semibold text-neutral-obsidian">Marges 35%</span>
+            <span class="font-semibold text-neutral-obsidian">{t('Marges 35%', '35% Margins')}</span>
           </div>
           
           <div class="flex items-center gap-3">
             <Package class="w-6 h-6 text-accent-gold" />
-            <span class="font-semibold text-neutral-obsidian">Livraison 48h</span>
+            <span class="font-semibold text-neutral-obsidian">{t('Livraison 48h', '48h Delivery')}</span>
           </div>
           
           <div class="flex items-center gap-3">
             <Users class="w-6 h-6 text-creative-purple" />
-            <span class="font-semibold text-neutral-obsidian">Support Dédié</span>
+            <span class="font-semibold text-neutral-obsidian">{t('Support Dédié', 'Dedicated Support')}</span>
           </div>
           
           <div class="flex items-center gap-3">
             <Store class="w-6 h-6 text-primary-green" />
-            <span class="font-semibold text-neutral-obsidian">Marketing Inclus</span>
+            <span class="font-semibold text-neutral-obsidian">{t('Marketing Inclus', 'Marketing Included')}</span>
           </div>
         </div>
         
         <!-- CTA Button -->
         <a 
-          href="/grossistes"
+          href={href('/grossistes')}
           class="inline-flex items-center gap-3 bg-primary-green text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-primary-green-vibrant hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
         >
-          <span>Devenir Grossiste</span>
+          <span>{t('Devenir Grossiste', 'Become a Wholesaler')}</span>
           <ArrowRight class="w-5 h-5" />
         </a>
       </div>
@@ -560,7 +561,7 @@
         <CmsImage
           key="home.wholesale.image"
           src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800&h=600&fit=crop"
-          alt="Supermarché moderne avec nos produits"
+          alt={t('Supermarché moderne avec nos produits', 'Modern supermarket stocking our products')}
           class="rounded-3xl w-full"
         />
       </div>
@@ -640,21 +641,21 @@
 <section class="py-20 bg-footer-green relative overflow-hidden">
   <ScrollReveal animation="scale">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <CmsText key="home.cta.title" tag="h2" class="text-4xl md:text-6xl font-bold text-white mb-8">Prêt à Transformer Votre Alimentation ?</CmsText>
-    <CmsText key="home.cta.description" tag="p" class="text-xl text-white/90 mb-10 max-w-2xl mx-auto">Rejoignez des milliers de béninois qui ont déjà adopté nos produits naturels pour une alimentation saine et authentique.</CmsText>
+    <CmsText key="home.cta.title" tag="h2" class="text-4xl md:text-6xl font-bold text-white mb-8" en="Choose your well-being!">Prêt à Transformer Votre Alimentation ?</CmsText>
+    <CmsText key="home.cta.description" tag="p" class="text-xl text-white/90 mb-10 max-w-2xl mx-auto" en="Join the thousands of consumers who have already embraced our natural products for a healthy, authentic and balanced diet.">Rejoignez des milliers de béninois qui ont déjà adopté nos produits naturels pour une alimentation saine et authentique.</CmsText>
     
     <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
       <a 
-        href="/produits"
+        href={href('/produits')}
         class="block sm:inline-block w-full sm:w-auto text-center bg-accent-gold text-footer-green px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
       >
-        Commander Maintenant
+        {t('Commander Maintenant', 'Order Now')}
       </a>
       <a 
-        href="/grossistes"
+        href={href('/grossistes')}
         class="block sm:inline-block w-full sm:w-auto text-center bg-transparent border-2 border-accent-gold text-accent-gold px-6 py-3 rounded-full font-semibold text-base hover:bg-accent-gold/10 transition-all duration-300"
       >
-        Devenir Distributeur
+        {t('Devenir Distributeur', 'Become a Distributor')}
       </a>
     </div>
   </div>

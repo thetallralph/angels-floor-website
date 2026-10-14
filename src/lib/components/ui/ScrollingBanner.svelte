@@ -1,26 +1,27 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t } from '$lib/i18n';
   
-  let bannerOffset = 0;
+  let bannerOffset = $state(0);
   let animationFrame: number;
-  let rotation = 0;
+  let rotation = $state(0);
   let isPaused = false;
   
-  const taglines = [
-    "100% NATUREL",
-    "FIÈREMENT BÉNINOIS",
-    "SANS ADDITIFS",
-    "CULTIVÉ AVEC AMOUR",
-    "DIRECTEMENT DES PRODUCTEURS",
-    "CERTIFIÉ BIOLOGIQUE",
-    "SAVEURS ANCESTRALES",
-    "IMPACT SOCIAL POSITIF",
-    "500+ FEMMES AUTONOMISÉES",
-    "QUALITÉ ARTISANALE"
-  ];
+  const taglines = $derived([
+    t("100% NATUREL", "100% NATURAL"),
+    t("FIÈREMENT BÉNINOIS", "PROUDLY BENINESE"),
+    t("SANS ADDITIFS", "NO ADDITIVES"),
+    t("CULTIVÉ AVEC AMOUR", "GROWN WITH LOVE"),
+    t("DIRECTEMENT DES PRODUCTEURS", "STRAIGHT FROM THE PRODUCERS"),
+    t("CERTIFIÉ BIOLOGIQUE", "CERTIFIED ORGANIC"),
+    t("SAVEURS ANCESTRALES", "ANCESTRAL FLAVOURS"),
+    t("IMPACT SOCIAL POSITIF", "POSITIVE SOCIAL IMPACT"),
+    t("500+ FEMMES AUTONOMISÉES", "500+ WOMEN EMPOWERED"),
+    t("QUALITÉ ARTISANALE", "ARTISANAL QUALITY")
+  ]);
   
   // Duplicate taglines for seamless loop
-  const bannerContent = [...taglines, ...taglines, ...taglines];
+  const bannerContent = $derived([...taglines, ...taglines, ...taglines]);
   
   onMount(() => {
     const baseSpeed = 0.05; // Slow constant speed
@@ -61,8 +62,8 @@
 
 <div 
   class="banner-container"
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}>
+  onmouseenter={handleMouseEnter}
+  onmouseleave={handleMouseLeave}>
   <div 
     class="banner-track"
     style="transform: translateX({bannerOffset}%)"

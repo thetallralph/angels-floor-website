@@ -1,23 +1,24 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t, href } from '$lib/i18n';
   
-  let jokes = [
+  const jokes = $derived([
     {
-      setup: "Pourquoi cette page est-elle introuvable?",
-      punchline: "Elle est partie apprendre la recette secrète de nos biscuits!"
+      setup: t("Pourquoi cette page est-elle introuvable?", "Why can't this page be found?"),
+      punchline: t("Elle est partie apprendre la recette secrète de nos biscuits!", "It's gone off to learn the secret recipe for our biscuits!")
     },
     {
-      setup: "Qu'est-ce qu'une erreur 404 chez Angel's Floor?",
-      punchline: "C'est quand même le fonio ne peut pas vous aider!"
+      setup: t("Qu'est-ce qu'une erreur 404 chez Angel's Floor?", "What's a 404 error at Angel's Floor?"),
+      punchline: t("C'est quand même le fonio ne peut pas vous aider!", "It's when even fonio can't help you!")
     },
     {
-      setup: "Cette page est comme notre baobab...",
-      punchline: "Il faut du temps pour qu'elle mûrisse!"
+      setup: t("Cette page est comme notre baobab...", "This page is like our baobab..."),
+      punchline: t("Il faut du temps pour qu'elle mûrisse!", "It needs time to ripen!")
     }
-  ];
+  ]);
   
-  let currentJoke = 0;
-  let showPunchline = false;
+  let currentJoke = $state(0);
+  let showPunchline = $state(false);
   
   function nextJoke() {
     showPunchline = false;
@@ -35,7 +36,7 @@
 </script>
 
 <svelte:head>
-  <title>404 - Page en Construction | Angel's Floor</title>
+  <title>{t('404 - Page en Construction', '404 - Page Under Construction')} | Angel's Floor</title>
 </svelte:head>
 
 <div class="min-h-screen bg-primary-green relative overflow-hidden">
@@ -85,7 +86,7 @@
           </h1>
           <div class="absolute inset-0 flex items-center justify-center">
             <div class="bg-white rounded-3xl p-8 shadow-2xl transform -rotate-3 hover:rotate-3 transition-transform duration-300">
-              <p class="text-2xl font-bold text-primary-green">Oups!</p>
+              <p class="text-2xl font-bold text-primary-green">{t('Oups!', 'Oops!')}</p>
             </div>
           </div>
         </div>
@@ -100,10 +101,10 @@
           </p>
         {/if}
         <button 
-          on:click={nextJoke}
+          onclick={nextJoke}
           class="mt-6 text-white/80 hover:text-white underline text-sm transition-colors"
         >
-          Une autre blague? →
+          {t('Une autre blague? →', 'Another joke? →')}
         </button>
       </div>
       
@@ -115,32 +116,33 @@
           </svg>
         </div>
         <h2 class="text-2xl font-bold text-primary-green mb-4">
-          Page en Préparation
+          {t('Page en Préparation', 'Page in the Making')}
         </h2>
         <p class="text-neutral-charcoal mb-6">
-          Comme nos meilleurs produits, cette page demande du temps et de l'attention. 
-          Nos développeurs y travaillent avec le même soin que nos productrices 
-          mettent dans la préparation du fonio!
+          {t(
+            "Comme nos meilleurs produits, cette page demande du temps et de l'attention. Nos développeurs y travaillent avec le même soin que nos productrices mettent dans la préparation du fonio!",
+            'Like our finest products, this page needs time and care. Our developers are working on it with the same attention our women producers put into preparing fonio!'
+          )}
         </p>
         <div class="flex items-center justify-center space-x-2 text-sm text-neutral-slate">
           <div class="w-2 h-2 bg-primary-green rounded-full animate-pulse"></div>
-          <span>En cours de développement</span>
+          <span>{t('En cours de développement', 'In development')}</span>
         </div>
       </div>
       
       <!-- Navigation Options -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
         <a 
-          href="/" 
+          href={href('/')}
           class="bg-white text-primary-green px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
         >
-          Page d'Accueil
+          {t("Page d'Accueil", 'Home Page')}
         </a>
         <a 
-          href="/produits" 
+          href={href('/produits')}
           class="bg-accent-gold text-white px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
         >
-          Nos Produits
+          {t('Nos Produits', 'Our Products')}
         </a>
       </div>
     </div>

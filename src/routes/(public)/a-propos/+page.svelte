@@ -3,13 +3,14 @@
   import { Heart, Users, Target, Leaf, TrendingUp } from 'lucide-svelte';
   import ScrollReveal from '$lib/components/ui/ScrollReveal.svelte';
   import { CmsText, CmsImage } from '$lib/components/cms';
+  import { t, href } from '$lib/i18n';
 
   // Scroll-jacked horizontal timeline (desktop only).
-  let pinnedSection: HTMLElement;
-  let timelineTrack: HTMLElement;
-  let translateX = 0;
-  let progress = 0;
-  let sectionHeight = '400vh';
+  let pinnedSection = $state<HTMLElement>();
+  let timelineTrack = $state<HTMLElement>();
+  let translateX = $state(0);
+  let progress = $state(0);
+  let sectionHeight = $state('400vh');
   let rafScheduled = false;
 
   function measure() {
@@ -64,57 +65,78 @@
     };
   });
 
-  const timelineEvents = [
+  const timelineEvents = $derived([
     {
       year: 2015,
-      title: "La Naissance",
-      description: "Fondation avec 5 femmes productrices dans l'Atacora. Première transformation artisanale de fonio.",
-      milestone: "5 femmes productrices",
+      title: t("La Naissance", "The Beginning"),
+      description: t(
+        "Fondation avec 5 femmes productrices dans l'Atacora. Première transformation artisanale de fonio.",
+        "Founded with 5 women producers in the Atacora. Our first batches of hand-processed fonio."
+      ),
+      milestone: t("5 femmes productrices", "5 women producers"),
       image: "/images/about/timeline-2015.jpg"
     },
     {
       year: 2016,
-      title: "Premiers Pas",
-      description: "Développement des premières recettes et techniques de transformation. Formation des productrices.",
-      milestone: "Premières ventes locales",
+      title: t("Premiers Pas", "First Steps"),
+      description: t(
+        "Développement des premières recettes et techniques de transformation. Formation des productrices.",
+        "Developing our first recipes and processing techniques. Training the women producers."
+      ),
+      milestone: t("Premières ventes locales", "First local sales"),
       image: "/images/about/timeline-2016.jpg"
     },
     {
       year: 2018,
-      title: "Expansion du Réseau",
-      description: "50 femmes rejoignent le réseau. Lancement de la gamme baobab et premiers partenariats.",
-      milestone: "50 femmes productrices",
+      title: t("Expansion du Réseau", "A Growing Network"),
+      description: t(
+        "50 femmes rejoignent le réseau. Lancement de la gamme baobab et premiers partenariats.",
+        "50 women join the network. Launch of the baobab range and our first partnerships."
+      ),
+      milestone: t("50 femmes productrices", "50 women producers"),
       image: "/images/about/timeline-2018.jpg"
     },
     {
       year: 2020,
-      title: "Innovation & Résilience",
-      description: "Certification bio obtenue. Lancement des biscuits enrichis. 200 femmes actives malgré la pandémie.",
-      milestone: "Certification Bio",
+      title: t("Innovation & Résilience", "Innovation & Resilience"),
+      description: t(
+        "Certification bio obtenue. Lancement des biscuits enrichis. 200 femmes actives malgré la pandémie.",
+        "Organic certification achieved. Launch of our fortified biscuits. 200 women still active despite the pandemic."
+      ),
+      milestone: t("Certification Bio", "Organic Certification"),
       image: "/images/about/timeline-2020.jpg"
     },
     {
       year: 2022,
-      title: "Croissance Durable",
-      description: "Expansion dans 8 régions du Bénin. Partenariats avec des distributeurs nationaux.",
-      milestone: "8 régions couvertes",
+      title: t("Croissance Durable", "Sustainable Growth"),
+      description: t(
+        "Expansion dans 8 régions du Bénin. Partenariats avec des distributeurs nationaux.",
+        "Expansion into 8 regions of Benin. Partnerships with national distributors."
+      ),
+      milestone: t("8 régions couvertes", "8 regions covered"),
       image: "/images/about/timeline-2022.jpg"
     },
     {
       year: 2023,
-      title: "Reconnaissance Nationale",
-      description: "Prix de l'entrepreneuriat féminin béninois. Présence dans 15 points de vente.",
-      milestone: "Prix de l'entrepreneuriat",
+      title: t("Reconnaissance Nationale", "National Recognition"),
+      description: t(
+        "Prix de l'entrepreneuriat féminin béninois. Présence dans 15 points de vente.",
+        "Beninese Women's Entrepreneurship Award. Now stocked in 15 sales points."
+      ),
+      milestone: t("Prix de l'entrepreneuriat", "Entrepreneurship Award"),
       image: "/images/about/timeline-2023.jpg"
     },
     {
       year: 2025,
-      title: "10 Ans d'Excellence",
-      description: "500+ femmes impactées, gamme complète de produits, lancement de nouvelles innovations.",
-      milestone: "500+ femmes autonomisées",
+      title: t("10 Ans d'Excellence", "10 Years of Excellence"),
+      description: t(
+        "500+ femmes impactées, gamme complète de produits, lancement de nouvelles innovations.",
+        "500+ women reached, a complete product range and the launch of new innovations."
+      ),
+      milestone: t("500+ femmes autonomisées", "500+ women empowered"),
       image: "/images/about/timeline-2025.jpg"
     }
-  ];
+  ]);
 
   // Subtle organic rotations + tape positions for the polaroid feel.
   const laneStyles = [
@@ -129,8 +151,8 @@
 </script>
 
 <svelte:head>
-  <title>À Propos - Angel's Floor</title>
-  <meta name="description" content="Découvrez l'histoire d'Angel's Floor, 10 ans d'excellence dans la transformation des produits béninois et l'autonomisation des femmes." />
+  <title>{t("À Propos - Angel's Floor", "About - Angel's Floor")}</title>
+  <meta name="description" content={t("Découvrez l'histoire d'Angel's Floor, 10 ans d'excellence dans la transformation des produits béninois et l'autonomisation des femmes.", "Discover the story of Angel's Floor: 10 years of excellence in processing Beninese products and empowering women.")} />
 </svelte:head>
 
 <!-- About Hero — cooperative collage -->
@@ -211,12 +233,14 @@
           key="about.hero.title"
           tag="h1"
           class="text-5xl md:text-7xl lg:text-[5.5rem] font-bold leading-[1.02] tracking-tight mb-8"
+          en="Our Story"
         >Notre Histoire</CmsText>
 
         <CmsText
           key="about.hero.subtitle"
           tag="p"
           class="text-lg md:text-xl text-white/75 leading-relaxed max-w-xl mx-auto"
+          en="A cooperative of Beninese women processing fonio, baobab and the flavours of our land since 2015."
         >Une coopérative de femmes béninoises qui transforme le fonio, le baobab et les saveurs du terroir depuis 2015.</CmsText>
       </ScrollReveal>
 
@@ -244,7 +268,7 @@
   bind:this={pinnedSection}
   class="hidden md:block relative bg-[#071810] text-white"
   style="height: {sectionHeight};"
-  aria-label="Chronologie Angel's Floor"
+  aria-label={t("Chronologie Angel's Floor", "Angel's Floor timeline")}
 >
   <div class="sticky top-0 h-screen w-full overflow-hidden flex flex-col">
     <!-- Wall background -->
@@ -264,21 +288,24 @@
             key="about.timeline.overline"
             tag="p"
             class="text-xs font-semibold text-accent-gold uppercase tracking-[0.3em] mb-3"
+            en="Our Journey"
           >Notre Parcours</CmsText>
           <CmsText
             key="about.timeline.title"
             tag="h2"
             class="text-3xl lg:text-5xl font-bold leading-[1.05] mb-4"
+            en="A decade of transformation"
           >Une décennie de transformation</CmsText>
           <CmsText
             key="about.timeline.description"
             tag="p"
             class="text-white/60 text-base lg:text-lg leading-relaxed"
+            en="From 5 pioneering women in the Atacora to more than 500 empowered women producers across Benin."
           >De 5 femmes pionnières dans l'Atacora à plus de 500 productrices autonomisées à travers le Bénin.</CmsText>
         </div>
         <div class="hidden lg:flex flex-col gap-3 shrink-0 w-64">
           <div class="text-[10px] font-mono uppercase tracking-[0.3em] text-white/40 flex justify-between">
-            <span>Défilez ↓</span>
+            <span>{t('Défilez ↓', 'Scroll ↓')}</span>
             <span class="text-accent-gold/80">{Math.round(progress * 100)}%</span>
           </div>
           <div class="h-1 bg-white/10 rounded-full overflow-hidden">
@@ -366,7 +393,7 @@
 </section>
 
 <!-- Mobile timeline — native horizontal scroll, wall of polaroids -->
-<section class="md:hidden relative bg-[#071810] text-white py-16 overflow-hidden" aria-label="Chronologie Angel's Floor (mobile)">
+<section class="md:hidden relative bg-[#071810] text-white py-16 overflow-hidden" aria-label={t("Chronologie Angel's Floor (mobile)", "Angel's Floor timeline (mobile)")}>
   <div class="absolute inset-0 -z-10">
     <div class="absolute inset-0 bg-gradient-to-b from-footer-green/60 via-[#071810] to-[#05140C]"></div>
     <div class="absolute inset-0 opacity-[0.07] mix-blend-overlay"
@@ -378,16 +405,19 @@
       key="about.timeline.overline"
       tag="p"
       class="text-[11px] font-semibold text-accent-gold uppercase tracking-[0.3em] mb-3"
+      en="Our Journey"
     >Notre Parcours</CmsText>
     <CmsText
       key="about.timeline.title"
       tag="h2"
       class="text-3xl font-bold leading-[1.1] mb-3"
+      en="A decade of transformation"
     >Une décennie de transformation</CmsText>
     <CmsText
       key="about.timeline.description"
       tag="p"
       class="text-white/60 text-sm leading-relaxed"
+      en="From 5 pioneering women to more than 500 empowered producers."
     >De 5 femmes pionnières à plus de 500 productrices autonomisées.</CmsText>
   </div>
 
@@ -423,7 +453,7 @@
   </div>
 
   <p class="text-center text-[10px] font-mono uppercase tracking-[0.3em] text-white/40 mt-4">
-    ← Faire défiler →
+    {t('← Faire défiler →', '← Scroll →')}
   </p>
 </section>
 
@@ -438,7 +468,7 @@
             <CmsImage
               key="about.founder.portrait"
               src="/images/about/angele-tawari.jpg"
-              alt="Angèle Tawari, fondatrice d'Angel's Floor"
+              alt={t("Angèle Tawari, fondatrice d'Angel's Floor", "Angèle Tawari, founder of Angel's Floor")}
               class="w-full h-full object-cover"
             />
           </div>
@@ -448,29 +478,33 @@
       <!-- Story -->
       <div class="col-span-12 lg:col-span-7">
         <ScrollReveal animation="fade-up" delay={150}>
-          <CmsText key="about.founder.kicker" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">La fondatrice</CmsText>
+          <CmsText key="about.founder.kicker" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3" en="The founder">La fondatrice</CmsText>
           <CmsText key="about.founder.name" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-3 leading-tight">Angèle Tawari</CmsText>
-          <CmsText key="about.founder.role" tag="p" class="text-lg text-neutral-charcoal mb-8">Entrepreneure agroalimentaire, fondatrice d'Angel's Floor</CmsText>
+          <CmsText key="about.founder.role" tag="p" class="text-lg text-neutral-charcoal mb-8" en="Food-processing entrepreneur and founder of Angel's Floor">Entrepreneure agroalimentaire, fondatrice d'Angel's Floor</CmsText>
 
           <div class="space-y-5 text-base md:text-lg text-neutral-charcoal leading-relaxed">
             <CmsText
               key="about.founder.p1"
               tag="p"
+              en="Originally from Boukombé and now based in Natitingou, Angèle Tawari combines enterprise with a deep social commitment."
             >Originaire de Boukombé et basée à Natitingou, Angèle Tawari allie action économique et engagement social.</CmsText>
 
             <CmsText
               key="about.founder.p2"
               tag="p"
+              en="Since 2012, she has led Angel's Floor, her company dedicated to bringing out the value of local resources: fonio, baobab, néré and mango. These are foods that were long overlooked, some even at risk of disappearing, yet they are rich in nutritional, social and economic value."
             >Depuis 2012, elle dirige Angel's Floor, son entreprise dédiée à la valorisation des ressources locales : fonio, baobab, néré, mangue. Des produits longtemps sous-exploités, parfois en voie de disparition, mais à forte valeur nutritionnelle et socio-économique.</CmsText>
 
             <CmsText
               key="about.founder.p3"
               tag="p"
+              en="She has turned this venture into a driver of local development, creating jobs and opening up lasting economic opportunities for the young people and women of her region. Active in several community groups and networks, many of which she coordinates or chairs, she amplifies the economic and social impact of local entrepreneurship."
             >Elle a transformé cette initiative en levier de développement local, créant des emplois et ouvrant des opportunités économiques durables aux jeunes et aux femmes de sa région. Active dans plusieurs groupements et réseaux communautaires qu'elle coordonne ou préside, elle renforce l'impact économique et social de l'entrepreneuriat local.</CmsText>
 
             <CmsText
               key="about.founder.p4"
               tag="p"
+              en="Backed by numerous programmes and partnerships, she embodies a new generation of Beninese women in business who draw on innovation, tradition and civic engagement to transform the land they call home."
             >Soutenue par de nombreux programmes et partenariats, elle incarne une nouvelle génération d'actrices économiques béninoises qui misent sur l'innovation, la tradition et l'engagement citoyen pour transformer leur territoire.</CmsText>
           </div>
         </ScrollReveal>
@@ -484,9 +518,9 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <ScrollReveal animation="fade-up">
       <div class="text-center mb-12">
-        <CmsText key="about.mission.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">Ce Qui Nous Guide</CmsText>
-        <CmsText key="about.mission.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4">Notre Mission & Valeurs</CmsText>
-        <CmsText key="about.mission.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto">Transformer les produits locaux en opportunités durables pour nos communautés</CmsText>
+        <CmsText key="about.mission.overline" tag="p" class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3" en="What Guides Us">Ce Qui Nous Guide</CmsText>
+        <CmsText key="about.mission.title" tag="h2" class="text-4xl md:text-5xl font-bold text-black mb-4" en="Our Mission & Values">Notre Mission & Valeurs</CmsText>
+        <CmsText key="about.mission.description" tag="p" class="text-xl text-neutral-charcoal max-w-3xl mx-auto" en="Turning local products into lasting opportunities for our communities">Transformer les produits locaux en opportunités durables pour nos communautés</CmsText>
       </div>
     </ScrollReveal>
     
@@ -497,10 +531,12 @@
         <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
           <Target class="w-8 h-8" />
         </div>
-        <h3 class="text-2xl font-bold mb-4">Notre Mission</h3>
+        <h3 class="text-2xl font-bold mb-4">{t('Notre Mission', 'Our Mission')}</h3>
         <p class="text-white/90">
-          Valoriser les produits agricoles béninois en créant des opportunités économiques durables 
-          pour les femmes rurales tout en offrant des aliments sains et authentiques.
+          {t(
+            'Valoriser les produits agricoles béninois en créant des opportunités économiques durables pour les femmes rurales tout en offrant des aliments sains et authentiques.',
+            'To champion Beninese agricultural products by creating lasting economic opportunities for rural women, while offering healthy, authentic food.'
+          )}
         </p>
       </div>
       </ScrollReveal>
@@ -511,19 +547,19 @@
         <div class="w-16 h-16 bg-primary-green rounded-full flex items-center justify-center mb-6">
           <Heart class="w-8 h-8 text-white" />
         </div>
-        <h3 class="text-2xl font-bold text-primary-green mb-4">Authenticité</h3>
+        <h3 class="text-2xl font-bold text-primary-green mb-4">{t('Authenticité', 'Authenticity')}</h3>
         <ul class="space-y-3 text-neutral-charcoal">
           <li class="flex items-start">
             <span class="text-primary-green mr-2">•</span>
-            Produits 100% naturels et locaux
+            {t('Produits 100% naturels et locaux', '100% natural, local products')}
           </li>
           <li class="flex items-start">
             <span class="text-primary-green mr-2">•</span>
-            Méthodes traditionnelles préservées
+            {t('Méthodes traditionnelles préservées', 'Traditional methods preserved')}
           </li>
           <li class="flex items-start">
             <span class="text-primary-green mr-2">•</span>
-            Transparence totale sur nos processus
+            {t('Transparence totale sur nos processus', 'Full transparency about our processes')}
           </li>
         </ul>
       </div>
@@ -535,19 +571,19 @@
         <div class="w-16 h-16 bg-primary-green rounded-full flex items-center justify-center mb-6">
           <Users class="w-8 h-8 text-white" />
         </div>
-        <h3 class="text-2xl font-bold text-primary-green mb-4">Impact Social</h3>
+        <h3 class="text-2xl font-bold text-primary-green mb-4">{t('Impact Social', 'Social Impact')}</h3>
         <ul class="space-y-3 text-neutral-charcoal">
           <li class="flex items-start">
             <span class="text-primary-green mr-2">•</span>
-            Autonomisation des femmes rurales
+            {t('Autonomisation des femmes rurales', 'Empowering rural women')}
           </li>
           <li class="flex items-start">
             <span class="text-primary-green mr-2">•</span>
-            Commerce équitable et solidaire
+            {t('Commerce équitable et solidaire', 'Fair and ethical trade')}
           </li>
           <li class="flex items-start">
             <span class="text-primary-green mr-2">•</span>
-            Développement communautaire durable
+            {t('Développement communautaire durable', 'Sustainable community development')}
           </li>
         </ul>
       </div>
@@ -562,11 +598,13 @@
           <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
             <Leaf class="w-6 h-6" />
           </div>
-          <h3 class="text-xl font-bold">Durabilité Environnementale</h3>
+          <h3 class="text-xl font-bold">{t('Durabilité Environnementale', 'Environmental Sustainability')}</h3>
         </div>
         <p class="text-white/90">
-          Agriculture biologique, emballages éco-responsables, et pratiques de production 
-          respectueuses de l'environnement.
+          {t(
+            "Agriculture biologique, emballages éco-responsables, et pratiques de production respectueuses de l'environnement.",
+            'Organic farming, eco-friendly packaging and environmentally responsible production practices.'
+          )}
         </p>
       </div>
       </ScrollReveal>
@@ -577,11 +615,13 @@
           <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
             <TrendingUp class="w-6 h-6" />
           </div>
-          <h3 class="text-xl font-bold">Innovation Continue</h3>
+          <h3 class="text-xl font-bold">{t('Innovation Continue', 'Continuous Innovation')}</h3>
         </div>
         <p class="text-white/90">
-          Recherche constante de nouvelles recettes, amélioration des processus, et adaptation 
-          aux besoins changeants du marché.
+          {t(
+            'Recherche constante de nouvelles recettes, amélioration des processus, et adaptation aux besoins changeants du marché.',
+            "A constant search for new recipes, ever-better processes and close attention to the market's changing needs."
+          )}
         </p>
       </div>
       </ScrollReveal>
@@ -595,12 +635,12 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <ScrollReveal animation="fade-up">
       <div class="text-center mb-12">
-        <p class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">Les Visages d'Angel's Floor</p>
+        <p class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">{t("Les Visages d'Angel's Floor", "The Faces of Angel's Floor")}</p>
         <h2 class="text-4xl md:text-5xl font-bold text-black mb-4">
-          Notre Équipe
+          {t('Notre Équipe', 'Our Team')}
         </h2>
         <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
-          Des femmes passionnées qui transforment les traditions en innovations
+          {t('Des femmes passionnées qui transforment les traditions en innovations', 'Passionate women turning tradition into innovation')}
         </p>
       </div>
     </ScrollReveal>
@@ -617,10 +657,12 @@
         </div>
         <div class="p-6">
           <h3 class="text-xl font-bold text-primary-green mb-1">Angélique Foundatrice</h3>
-          <p class="text-primary-green font-semibold mb-3">Fondatrice & Directrice</p>
+          <p class="text-primary-green font-semibold mb-3">{t('Fondatrice & Directrice', 'Founder & Director')}</p>
           <p class="text-neutral-charcoal text-sm">
-            Visionnaire passionnée, elle a créé Angel's Floor pour transformer la vie des femmes 
-            de sa communauté à travers la valorisation des produits locaux.
+            {t(
+              "Visionnaire passionnée, elle a créé Angel's Floor pour transformer la vie des femmes de sa communauté à travers la valorisation des produits locaux.",
+              "A passionate visionary, she founded Angel's Floor to transform the lives of the women in her community by championing local products."
+            )}
           </p>
         </div>
       </div>
@@ -636,10 +678,12 @@
         </div>
         <div class="p-6">
           <h3 class="text-xl font-bold text-primary-green mb-1">Rose Kpohinto</h3>
-          <p class="text-primary-green font-semibold mb-3">Responsable Production</p>
+          <p class="text-primary-green font-semibold mb-3">{t('Responsable Production', 'Production Manager')}</p>
           <p class="text-neutral-charcoal text-sm">
-            Experte en transformation alimentaire, elle garantit la qualité exceptionnelle 
-            de chaque produit Angel's Floor.
+            {t(
+              "Experte en transformation alimentaire, elle garantit la qualité exceptionnelle de chaque produit Angel's Floor.",
+              "An expert in food processing, she guarantees the exceptional quality of every Angel's Floor product."
+            )}
           </p>
         </div>
       </div>
@@ -655,10 +699,12 @@
         </div>
         <div class="p-6">
           <h3 class="text-xl font-bold text-primary-green mb-1">Mariam Alidou</h3>
-          <p class="text-primary-green font-semibold mb-3">Coordinatrice Réseau</p>
+          <p class="text-primary-green font-semibold mb-3">{t('Coordinatrice Réseau', 'Network Coordinator')}</p>
           <p class="text-neutral-charcoal text-sm">
-            Elle coordonne le réseau de plus de 500 productrices et assure la formation 
-            continue des membres.
+            {t(
+              'Elle coordonne le réseau de plus de 500 productrices et assure la formation continue des membres.',
+              'She coordinates the network of more than 500 women producers and leads ongoing training for its members.'
+            )}
           </p>
         </div>
       </div>
@@ -672,27 +718,27 @@
 <section class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-12">
-      <p class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">Reconnaissance & Collaboration</p>
+      <p class="text-sm font-semibold text-primary-green uppercase tracking-wider mb-3">{t('Reconnaissance & Collaboration', 'Recognition & Collaboration')}</p>
       <h2 class="text-4xl md:text-5xl font-bold text-black mb-4">
-        Certifications & Partenaires
+        {t('Certifications & Partenaires', 'Certifications & Partners')}
       </h2>
       <p class="text-xl text-neutral-charcoal max-w-3xl mx-auto">
-        Des garanties de qualité et des collaborations qui renforcent notre impact
+        {t('Des garanties de qualité et des collaborations qui renforcent notre impact', 'Quality guarantees and collaborations that strengthen our impact')}
       </p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
       <!-- Certifications -->
       <div>
-        <h3 class="text-2xl font-bold text-primary-green mb-6">Nos Certifications</h3>
+        <h3 class="text-2xl font-bold text-primary-green mb-6">{t('Nos Certifications', 'Our Certifications')}</h3>
         <div class="space-y-4">
           <div class="bg-white border-2 border-primary-green/20 rounded-3xl p-6 flex items-center hover:shadow-lg transition-all duration-300">
             <div class="w-16 h-16 bg-primary-green rounded-full flex items-center justify-center mr-4 flex-shrink-0">
               <span class="text-white text-2xl">🌿</span>
             </div>
             <div>
-              <h4 class="font-semibold text-neutral-obsidian">Certification Bio</h4>
-              <p class="text-sm text-neutral-slate">Produits 100% biologiques certifiés</p>
+              <h4 class="font-semibold text-neutral-obsidian">{t('Certification Bio', 'Organic Certification')}</h4>
+              <p class="text-sm text-neutral-slate">{t('Produits 100% biologiques certifiés', 'Certified 100% organic products')}</p>
             </div>
           </div>
           
@@ -701,8 +747,8 @@
               <span class="text-white text-2xl">✓</span>
             </div>
             <div>
-              <h4 class="font-semibold text-neutral-obsidian">Normes HACCP</h4>
-              <p class="text-sm text-neutral-slate">Sécurité alimentaire garantie</p>
+              <h4 class="font-semibold text-neutral-obsidian">{t('Normes HACCP', 'HACCP Standards')}</h4>
+              <p class="text-sm text-neutral-slate">{t('Sécurité alimentaire garantie', 'Guaranteed food safety')}</p>
             </div>
           </div>
           
@@ -711,8 +757,8 @@
               <span class="text-white text-2xl">🤝</span>
             </div>
             <div>
-              <h4 class="font-semibold text-neutral-obsidian">Commerce Équitable</h4>
-              <p class="text-sm text-neutral-slate">Pratiques commerciales éthiques</p>
+              <h4 class="font-semibold text-neutral-obsidian">{t('Commerce Équitable', 'Fair Trade')}</h4>
+              <p class="text-sm text-neutral-slate">{t('Pratiques commerciales éthiques', 'Ethical trading practices')}</p>
             </div>
           </div>
         </div>
@@ -720,7 +766,7 @@
       
       <!-- Partners -->
       <div>
-        <h3 class="text-2xl font-bold text-primary-green mb-6">Partenaires Clés</h3>
+        <h3 class="text-2xl font-bold text-primary-green mb-6">{t('Partenaires Clés', 'Key Partners')}</h3>
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-white border-2 border-primary-green/20 rounded-3xl p-6 flex items-center justify-center h-24 hover:shadow-lg transition-all duration-300">
             <span class="text-primary-green font-bold">MASM</span>
@@ -729,23 +775,23 @@
             <span class="text-primary-green font-bold">TACA</span>
           </div>
           <div class="bg-white border-2 border-primary-green/20 rounded-3xl p-6 flex items-center justify-center h-24 hover:shadow-lg transition-all duration-300">
-            <span class="text-primary-green font-bold">ONG Locale</span>
+            <span class="text-primary-green font-bold">{t('ONG Locale', 'Local NGO')}</span>
           </div>
           <div class="bg-white border-2 border-primary-green/20 rounded-3xl p-6 flex items-center justify-center h-24 hover:shadow-lg transition-all duration-300">
-            <span class="text-primary-green font-bold">Distributeurs</span>
+            <span class="text-primary-green font-bold">{t('Distributeurs', 'Distributors')}</span>
           </div>
         </div>
         
         <div class="mt-6 p-6 bg-primary-green rounded-3xl text-white">
-          <h4 class="font-semibold mb-2">Devenir Partenaire</h4>
+          <h4 class="font-semibold mb-2">{t('Devenir Partenaire', 'Become a Partner')}</h4>
           <p class="text-sm text-white/90 mb-4">
-            Rejoignez notre réseau de partenaires engagés pour un impact durable.
+            {t('Rejoignez notre réseau de partenaires engagés pour un impact durable.', 'Join our network of committed partners for lasting impact.')}
           </p>
           <a 
-            href="/contact"
+            href={href('/contact')}
             class="inline-block bg-white text-primary-green px-6 py-2 rounded-full font-semibold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
           >
-            Nous contacter
+            {t('Nous contacter', 'Contact us')}
           </a>
         </div>
       </div>
@@ -762,21 +808,21 @@
   </div>
   
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <CmsText key="about.cta.title" tag="h2" class="text-4xl md:text-5xl font-bold text-white mb-6">Faites Partie de Notre Histoire</CmsText>
-    <CmsText key="about.cta.description" tag="p" class="text-lg md:text-xl text-white/90 mb-8 max-w-3xl mx-auto">Découvrez comment nos produits peuvent transformer votre alimentation tout en soutenant l'autonomisation des femmes béninoises.</CmsText>
+    <CmsText key="about.cta.title" tag="h2" class="text-4xl md:text-5xl font-bold text-white mb-6" en="Be Part of Our Story">Faites Partie de Notre Histoire</CmsText>
+    <CmsText key="about.cta.description" tag="p" class="text-lg md:text-xl text-white/90 mb-8 max-w-3xl mx-auto" en="Discover how our products can transform the way you eat while supporting the empowerment of Beninese women.">Découvrez comment nos produits peuvent transformer votre alimentation tout en soutenant l'autonomisation des femmes béninoises.</CmsText>
     
     <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
       <a 
-        href="/produits"
+        href={href('/produits')}
         class="block sm:inline-block w-full sm:w-auto text-center bg-white text-primary-green px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
       >
-        Découvrir Nos Produits
+        {t('Découvrir Nos Produits', 'Discover Our Products')}
       </a>
       <a 
-        href="/contact"
+        href={href('/contact')}
         class="block sm:inline-block w-full sm:w-auto text-center bg-transparent border-2 border-white text-white px-6 py-3 rounded-full font-semibold hover:bg-white/10 transition-all duration-300"
       >
-        Nous Contacter
+        {t('Nous Contacter', 'Contact Us')}
       </a>
     </div>
   </div>

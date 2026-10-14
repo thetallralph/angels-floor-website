@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import { Home, Package } from 'lucide-svelte';
+  import { t, href } from '$lib/i18n';
   
   let mounted = false;
   let floatingSeeds: Array<{id: number, x: number, delay: number}> = [];
@@ -18,8 +19,11 @@
 </script>
 
 <svelte:head>
-  <title>404 - Page Non Trouvée | Angel's Floor</title>
-  <meta name="description" content="La page que vous recherchez n'existe pas. Retournez à l'accueil ou découvrez nos produits africains naturels." />
+  <title>{t('404 - Page Non Trouvée', '404 - Page Not Found')} | Angel's Floor</title>
+  <meta name="description" content={t(
+      "La page que vous recherchez n'existe pas. Retournez à l'accueil ou découvrez nos produits africains naturels.",
+      "The page you're looking for doesn't exist. Head back to the homepage or discover our natural African products."
+    )} />
 </svelte:head>
 
 <!-- Hero Section with 404 -->
@@ -43,39 +47,41 @@
       <!-- Error Message -->
       <div class="max-w-2xl mx-auto {mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'} transition-all duration-700 delay-300">
         <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-          Cette Page S'est Égarée
+          {t("Cette Page S'est Égarée", 'This Page Has Wandered Off')}
         </h2>
         <p class="text-lg md:text-xl text-white/90 mb-10 leading-relaxed">
-          Comme une graine de fonio dans le vent du Sahel, cette page semble s'être envolée. 
-          Mais ne vous inquiétez pas, nous avons plein d'autres délices à vous proposer!
+          {t(
+            "Comme une graine de fonio dans le vent du Sahel, cette page semble s'être envolée. Mais ne vous inquiétez pas, nous avons plein d'autres délices à vous proposer!",
+            "Like a fonio seed in the Sahel wind, this page seems to have blown away. But don't worry, we have plenty of other treats to offer you!"
+          )}
         </p>
         
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
           <a 
-            href="/"
+            href={href('/')}
             class="inline-flex items-center justify-center gap-3 bg-white text-primary-green px-6 py-3 rounded-full font-semibold text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
           >
             <Home class="w-5 h-5" />
-            <span>Retour à l'Accueil</span>
+            <span>{t("Retour à l'Accueil", 'Back to Home')}</span>
           </a>
           <a 
-            href="/produits"
+            href={href('/produits')}
             class="inline-flex items-center justify-center gap-3 bg-transparent border-2 border-white text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all duration-300 w-full sm:w-auto"
           >
             <Package class="w-5 h-5" />
-            <span>Voir Nos Produits</span>
+            <span>{t('Voir Nos Produits', 'View Our Products')}</span>
           </a>
         </div>
         
         <!-- Error Status Display -->
         {#if $page.status}
           <div class="mt-12 text-sm text-white/50">
-            Code d'erreur: {$page.status} | 
+            {t("Code d'erreur:", 'Error code:')} {$page.status} | 
             {#if $page.error?.message}
               {$page.error.message}
             {:else}
-              Page introuvable
+              {t('Page introuvable', 'Page not found')}
             {/if}
           </div>
         {/if}

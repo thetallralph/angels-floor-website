@@ -2,8 +2,9 @@
   import { Plus, Check, X } from 'lucide-svelte';
   import { addItem as addCartItem } from '$lib/cart/store';
   import type { Product, ProductVariant } from '$lib/stores/app.js';
+  import { t, href, formatNumber } from '$lib/i18n';
 
-  export let product: Product;
+  let { product }: { product: Product } = $props();
 
   const placeholderImages: Record<string, string> = {
     'fonio': 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=400&fit=crop&crop=center',
@@ -14,22 +15,23 @@
     'autres': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop&crop=center'
   };
 
-  $: variants = product.variants ?? [];
-  $: hasVariants = variants.length > 0;
+  const variants = $derived(product.variants ?? []);
+  const hasVariants = $derived(variants.length > 0);
 
-  let pickerOpen = false;
-  let selectedVariantIdx = 0;
-  let addedFlash = false;
+  let pickerOpen = $state(false);
+  let selectedVariantIdx = $state(0);
+  let addedFlash = $state(false);
   let addedFlashTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  $: selectedVariant = variants[selectedVariantIdx];
-  $: currentPrice =
+  const selectedVariant = $derived(variants[selectedVariantIdx]);
+  const currentPrice = $derived(
     hasVariants && typeof selectedVariant?.price === 'number'
       ? selectedVariant.price
-      : product.price;
+      : product.price
+  );
 
   function formatPrice(amount: number): string {
-    return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
+    return formatNumber(amount) + ' FCFA';
   }
 
   function variantShortLabel(v: ProductVariant | undefined): string {
@@ -68,7 +70,7 @@
     const v = selectedVariant;
     const label = v
       ? variantShortLabel(v) || '—'
-      : product.packaging || 'Unité';
+      : product.packaging || t('Unité', 'Unit');
     const key = hasVariants ? variantKey(v, selectedVariantIdx) : 'default';
     const price = hasVariants && typeof v?.price === 'number' ? v.price : product.price;
 
@@ -91,7 +93,7 @@
 
 <div class="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col group">
   <!-- Image (clickable) -->
-  <a href="/produits/{product.slug}" class="block relative aspect-square overflow-hidden">
+  <a href={href(`/produits/${product.slug}`)} class="block relative aspect-square overflow-hidden">
     <img
       src={product.image || placeholderImages[product.category]}
       alt={product.name}
@@ -101,7 +103,7 @@
 
   <!-- Info -->
   <div class="p-5 flex-1 flex flex-col">
-    <a href="/produits/{product.slug}" class="block">
+    <a href={href(`/produits/${product.slug}`)} class="block">
       <h3 class="text-xl font-bold text-neutral-charcoal mb-2 group-hover:text-primary-green transition-colors line-clamp-2 min-h-[3.5rem]">
         {product.name}
       </h3>
@@ -116,12 +118,16 @@
     <div class="mt-auto">
       {#if pickerOpen}
         <!-- Variant picker -->
-        <p class="text-xs font-semibold text-neutral-charcoal mb-2">Choisissez un format</p>
+        <p class="text-xs font-semibold text-neutral-charcoal mb-2">{t('Choisissez un format', 'Choose an option')}</p>
         <div class="flex flex-wrap gap-1.5 mb-3">
           {#each variants as v, idx}
             <button
               type="button"
-              on:click|preventDefault|stopPropagation={() => (selectedVariantIdx = idx)}
+              onclick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selectedVariantIdx = idx;
+              }}
               class="px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all
                 {selectedVariantIdx === idx
                   ? 'border-primary-green bg-primary-green text-white'
@@ -134,17 +140,17 @@
         <div class="flex gap-2">
           <button
             type="button"
-            on:click={confirmAdd}
+            onclick={confirmAdd}
             class="flex-1 flex items-center justify-center gap-1.5 bg-primary-green text-white px-3 py-2.5 rounded-full text-sm font-semibold hover:bg-primary-green-vibrant transition-all"
           >
             <Check class="w-4 h-4" />
-            Ajouter ({formatPrice(currentPrice)})
+            {t('Ajouter', 'Add')} ({formatPrice(currentPrice)})
           </button>
           <button
             type="button"
-            on:click={cancelPicker}
+            onclick={cancelPicker}
             class="p-2.5 text-neutral-slate hover:text-red-500 rounded-full transition-colors"
-            aria-label="Annuler"
+            aria-label={t('Annuler', 'Cancel')}
           >
             <X class="w-4 h-4" />
           </button>
@@ -153,7 +159,7 @@
         <!-- Price + Add button -->
         <div class="mb-3">
           {#if hasVariants}
-            <p class="text-xs text-neutral-slate">À partir de</p>
+            <p class="text-xs text-neutral-slate">{t('À partir de', 'From')}</p>
           {/if}
           <span class="text-lg font-semibold text-primary-green">
             {formatPrice(currentPrice)}
@@ -161,7 +167,7 @@
         </div>
         <button
           type="button"
-          on:click={handleAddClick}
+          onclick={handleAddClick}
           class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all
             {addedFlash
               ? 'bg-primary-green/10 text-primary-green border-2 border-primary-green/30'
@@ -169,10 +175,10 @@
         >
           {#if addedFlash}
             <Check class="w-4 h-4" />
-            Ajouté au panier
+            {t('Ajouté au panier', 'Added to cart')}
           {:else}
             <Plus class="w-4 h-4" />
-            {hasVariants ? 'Choisir un format' : 'Ajouter au panier'}
+            {hasVariants ? t('Choisir un format', 'Choose an option') : t('Ajouter au panier', 'Add to cart')}
           {/if}
         </button>
       {/if}

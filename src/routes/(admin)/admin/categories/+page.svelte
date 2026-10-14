@@ -8,6 +8,7 @@
 		saveCategoryImage,
 		bootstrapCategoriesCollection
 	} from '$lib/admin/categories';
+	import { compactTranslation } from '$lib/admin/api';
 	import type { Category } from '$lib/admin/types';
 	import { Plus, Pencil, Trash2, Save, X, Tag, Zap, ImagePlus, Eye, EyeOff } from 'lucide-svelte';
 
@@ -24,6 +25,8 @@
 	let pendingImagePreview = $state<string>('');
 	let clearImage = $state(false);
 	let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
+	/** English overrides of the category being edited (saved to its `en` JSON). */
+	let enDraft = $state({ name: '', description: '' });
 
 	onMount(() => refresh());
 
@@ -69,11 +72,13 @@
 			order: categories.length + 1,
 			published: true
 		};
+		enDraft = { name: '', description: '' };
 		resetImageState();
 	}
 
 	function startEdit(cat: Category) {
 		editing = { ...cat };
+		enDraft = { name: cat.en?.name ?? '', description: cat.en?.description ?? '' };
 		resetImageState();
 	}
 
@@ -136,7 +141,8 @@
 				name: editing.name.trim(),
 				description: editing.description?.trim() || '',
 				order: Number(editing.order) || 0,
-				published: !!editing.published
+				published: !!editing.published,
+				en: compactTranslation(enDraft)
 			};
 
 			let savedId: string;
@@ -307,6 +313,21 @@
 									/>
 									<span class="text-sm text-neutral-charcoal">Publiée</span>
 								</label>
+							</div>
+						</div>
+
+						<div class="pt-4 mt-2 border-t border-neutral-sand space-y-4">
+							<div>
+								<h3 class="text-sm font-semibold text-neutral-obsidian">Version anglaise</h3>
+								<p class="text-xs text-neutral-slate mt-0.5">Affichée sur le site en anglais (/en). Laisser vide pour reprendre le texte français (en gris).</p>
+							</div>
+							<div>
+								<label for="cat-en-name" class="block text-sm font-medium text-neutral-charcoal mb-1">Nom (anglais)</label>
+								<input id="cat-en-name" type="text" bind:value={enDraft.name} class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm" placeholder={editing.name || 'Fonio'} />
+							</div>
+							<div>
+								<label for="cat-en-description" class="block text-sm font-medium text-neutral-charcoal mb-1">Description (anglais)</label>
+								<input id="cat-en-description" type="text" bind:value={enDraft.description} class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm" placeholder={editing.description || 'Optionnel'} />
 							</div>
 						</div>
 					</div>

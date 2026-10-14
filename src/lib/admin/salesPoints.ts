@@ -20,7 +20,11 @@ function map(record: Record<string, unknown>): SalesPoint {
     type: normalizeType(record.type),
     // `contact` is the legacy column name from the first PocketBase schema.
     phone: String(record.phone || record.contact || ''),
-    hours: record.hours ? String(record.hours) : ''
+    hours: record.hours ? String(record.hours) : '',
+    en:
+      record.en && typeof record.en === 'object' && !Array.isArray(record.en)
+        ? (record.en as SalesPoint['en'])
+        : {}
   };
 }
 
@@ -97,7 +101,9 @@ function desiredFields(): PBField[] {
       values: SALES_POINT_TYPES.map((t) => t.value)
     },
     { name: 'phone', type: 'text', required: false },
-    { name: 'hours', type: 'text', required: false }
+    { name: 'hours', type: 'text', required: false },
+    // English overrides, see $lib/cms/translate.
+    { name: 'en', type: 'json', required: false, maxSize: 2_000_000 }
   ];
 }
 

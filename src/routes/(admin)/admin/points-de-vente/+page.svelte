@@ -9,6 +9,7 @@
     describePBError
   } from '$lib/admin/salesPoints';
   import { SALES_POINT_TYPES, type SalesPoint, type SalesPointType } from '$lib/admin/types';
+  import { compactTranslation } from '$lib/admin/api';
   import { Plus, Pencil, Trash2, Save, X, MapPin, Zap, Search, Wrench } from 'lucide-svelte';
 
   type DraftSalesPoint = Omit<SalesPoint, 'id'> & { id?: string };
@@ -23,6 +24,8 @@
   let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
   let search = $state('');
   let typeFilter = $state<'all' | SalesPointType>('all');
+  /** English overrides of the sales point being edited (saved to its `en` JSON). */
+  let enDraft = $state({ situation: '', hours: '' });
 
   onMount(() => refresh());
 
@@ -77,11 +80,13 @@
       phone: '',
       hours: ''
     };
+    enDraft = { situation: '', hours: '' };
   }
 
   function startEdit(point: SalesPoint) {
     message = null;
     editing = { ...point };
+    enDraft = { situation: point.en?.situation ?? '', hours: point.en?.hours ?? '' };
   }
 
   function cancelEdit() {
@@ -109,7 +114,8 @@
         situation: (editing.situation || '').trim(),
         type: editing.type,
         phone: (editing.phone || '').trim(),
-        hours: (editing.hours || '').trim()
+        hours: (editing.hours || '').trim(),
+        en: compactTranslation(enDraft)
       };
       if (editing.id) {
         await updateSalesPoint(editing.id, payload);
@@ -353,6 +359,21 @@
                 class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
                 placeholder="Lun-Sam: 8h-20h"
               />
+            </div>
+
+            <div class="pt-4 mt-2 border-t border-neutral-sand space-y-4">
+              <div>
+                <h3 class="text-sm font-semibold text-neutral-obsidian">Version anglaise</h3>
+                <p class="text-xs text-neutral-slate mt-0.5">Affichée sur le site en anglais (/en). Laisser vide pour reprendre le texte français (en gris).</p>
+              </div>
+              <div>
+                <label for="sp-en-situation" class="block text-sm font-medium text-neutral-charcoal mb-1">Situation géographique (anglais)</label>
+                <textarea id="sp-en-situation" rows="3" bind:value={enDraft.situation} class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm resize-y" placeholder={editing.situation || 'Opposite the Agla pharmacy, 100 m from the crossroads'}></textarea>
+              </div>
+              <div>
+                <label for="sp-en-hours" class="block text-sm font-medium text-neutral-charcoal mb-1">Horaires (anglais)</label>
+                <input id="sp-en-hours" type="text" bind:value={enDraft.hours} class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm" placeholder={editing.hours || 'Mon–Sat: 8am–8pm'} />
+              </div>
             </div>
           </div>
         </div>

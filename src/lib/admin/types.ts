@@ -89,7 +89,36 @@ export interface Product extends SEOFields {
   certification?: string;
   featured: boolean;
   published?: boolean;
+  /** English overrides (PB `en` JSON). Empty / missing fields fall back to French. */
+  en?: ProductTranslation;
 }
+
+/**
+ * Translatable product fields (see TRANSLATABLE_FIELDS.products in $lib/cms/translate),
+ * in the admin's camelCase. api.ts renames them to snake_case in the stored JSON.
+ * `preparation` and `nutritionalInfo` are merged key by key with the French values.
+ */
+export type ProductTranslation = Partial<
+  Pick<
+    Product,
+    | 'name'
+    | 'subtitle'
+    | 'tagline'
+    | 'specialMention'
+    | 'qualityClaims'
+    | 'description'
+    | 'detailedDescription'
+    | 'benefits'
+    | 'conservation'
+    | 'usage'
+    | 'packaging'
+    | 'origin'
+    | 'certification'
+  >
+> & {
+  preparation?: Partial<Preparation>;
+  nutritionalInfo?: Pick<Nutrition, 'minerals' | 'vitamins'>;
+};
 
 export interface BlogPost extends SEOFields {
   _id?: string;
@@ -119,6 +148,8 @@ export interface SalesPoint {
   type: SalesPointType;
   phone?: string;
   hours?: string;
+  /** English overrides (PB `en` JSON). Empty fields fall back to French. */
+  en?: Partial<Pick<SalesPoint, 'situation' | 'hours'>>;
 }
 
 export const SALES_POINT_TYPES: Array<{ value: SalesPointType; label: string }> = [
@@ -159,6 +190,8 @@ export interface Category {
   /** Raw PocketBase filename for the `image` file field. */
   imageFilename?: string;
   published?: boolean;
+  /** English overrides (PB `en` JSON). Empty fields fall back to French. */
+  en?: Partial<Pick<Category, 'name' | 'description'>>;
 }
 
 /** Fallback used when the PocketBase `categories` collection isn't provisioned yet. */
@@ -193,6 +226,8 @@ export interface Training {
   image?: string;
   /** Raw PocketBase filename for the `image` file field. */
   imageFilename?: string;
+  /** English overrides (PB `en` JSON). Empty fields fall back to French. */
+  en?: Partial<Pick<Training, 'title' | 'description'>>;
 }
 
 export const TRAINING_CATEGORIES: Array<{ value: TrainingCategory; label: string }> = [

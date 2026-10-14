@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import nodemailer from 'nodemailer';
 import { env } from '$env/dynamic/private';
+import { DEFAULT_LOCALE, LOCALES, type Locale } from '$lib/i18n/routing';
 
 const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM, CONTACT_TO } = env;
 
@@ -11,6 +12,13 @@ const SUBJECT_LABELS: Record<string, string> = {
 	wholesale: 'Grossiste / Partenariat',
 	other: 'Autre'
 };
+
+const LOCALE_LABELS: Record<Locale, string> = {
+	fr: 'Français',
+	en: 'Anglais'
+};
+
+const isLocale = (value: string): value is Locale => (LOCALES as readonly string[]).includes(value);
 
 const escapeHtml = (s: string) =>
 	s
@@ -34,6 +42,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	const subject = String(body.subject ?? 'general').trim();
 	const message = String(body.message ?? '').trim();
 	const website = String(body.website ?? '').trim();
+	const rawLocale = String(body.locale ?? DEFAULT_LOCALE).trim();
+	const locale: Locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
 	if (website) {
 		return json({ ok: true });
@@ -64,12 +74,17 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const subjectLabel = SUBJECT_LABELS[subject] ?? 'Autre';
 	const mailSubject = `[Site] ${subjectLabel} — ${name}`;
+	const localeNote =
+		locale === DEFAULT_LOCALE
+			? null
+			: `${LOCALE_LABELS[locale]} (répondre en ${LOCALE_LABELS[locale].toLowerCase()})`;
 
 	const text = [
 		`Nom: ${name}`,
 		`Email: ${email}`,
 		phone ? `Téléphone: ${phone}` : null,
 		`Sujet: ${subjectLabel}`,
+		localeNote ? `Langue du visiteur: ${localeNote}` : null,
 		'',
 		message
 	]
@@ -84,6 +99,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				<tr><td style="padding: 4px 12px 4px 0;"><strong>Email</strong></td><td><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
 				${phone ? `<tr><td style="padding: 4px 12px 4px 0;"><strong>Téléphone</strong></td><td>${escapeHtml(phone)}</td></tr>` : ''}
 				<tr><td style="padding: 4px 12px 4px 0;"><strong>Sujet</strong></td><td>${escapeHtml(subjectLabel)}</td></tr>
+				${localeNote ? `<tr><td style="padding: 4px 12px 4px 0;"><strong>Langue du visiteur</strong></td><td>${escapeHtml(localeNote)}</td></tr>` : ''}
 			</table>
 			<hr style="margin: 16px 0; border: none; border-top: 1px solid #ddd;" />
 			<div style="white-space: pre-wrap;">${escapeHtml(message)}</div>

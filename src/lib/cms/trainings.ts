@@ -2,6 +2,8 @@ import type PocketBase from 'pocketbase';
 import type { RecordModel } from 'pocketbase';
 import { createPB } from '$lib/server/pocketbase';
 import type { TrainingCategory } from '$lib/admin/types';
+import type { Locale } from '$lib/i18n/routing';
+import { localizeRecord } from './translate';
 
 export interface PublicTraining {
 	id: string;
@@ -28,26 +30,29 @@ function mapRecord(pb: PocketBase, record: RecordModel): PublicTraining {
 	};
 }
 
-export async function loadTrainingsFromPB(): Promise<PublicTraining[]> {
+export async function loadTrainingsFromPB(locale: Locale = 'fr'): Promise<PublicTraining[]> {
 	try {
 		const pb = createPB();
 		const records = await pb.collection('trainings').getFullList({
 			filter: 'published = true',
 			sort: 'category,order_index'
 		});
-		return records.map((r) => mapRecord(pb, r));
+		return records.map((r) => mapRecord(pb, localizeRecord(r, 'trainings', locale)));
 	} catch {
 		return [];
 	}
 }
 
-export async function loadTrainingBySlug(slug: string): Promise<PublicTraining | null> {
+export async function loadTrainingBySlug(
+	slug: string,
+	locale: Locale = 'fr'
+): Promise<PublicTraining | null> {
 	try {
 		const pb = createPB();
 		const record = await pb.collection('trainings').getFirstListItem(
 			`slug = "${slug.replace(/"/g, '\\"')}" && published = true`
 		);
-		return mapRecord(pb, record);
+		return mapRecord(pb, localizeRecord(record, 'trainings', locale));
 	} catch {
 		return null;
 	}

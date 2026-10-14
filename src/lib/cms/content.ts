@@ -2,9 +2,12 @@ import type { Product, BlogArticle } from '$lib/stores/app';
 import { createPB } from '$lib/server/pocketbase';
 import { loadCategoriesFromPB } from '$lib/cms/categories';
 import type { RecordModel } from 'pocketbase';
+import type { Locale } from '$lib/i18n/routing';
+import { localizeRecord } from './translate';
 
-function mapProduct(record: RecordModel): Product {
+function mapProduct(source: RecordModel, locale: Locale = 'fr'): Product {
   const pb = createPB();
+  const record = localizeRecord(source, 'products', locale);
   return {
     id: record.id,
     slug: record.slug,
@@ -49,10 +52,10 @@ function mapBlogArticle(record: RecordModel): BlogArticle {
   };
 }
 
-export async function loadProducts(): Promise<Product[]> {
+export async function loadProducts(locale: Locale = 'fr'): Promise<Product[]> {
   const pb = createPB();
   const records = await pb.collection('products').getFullList({ sort: 'order,name' });
-  return records.map(mapProduct);
+  return records.map((r) => mapProduct(r, locale));
 }
 
 export async function loadBlogArticles(): Promise<BlogArticle[]> {
@@ -84,33 +87,39 @@ export async function loadSettings(settingName: string): Promise<Record<string, 
   }
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | undefined> {
+export async function getProductBySlug(
+  slug: string,
+  locale: Locale = 'fr'
+): Promise<Product | undefined> {
   try {
     const pb = createPB();
     const record = await pb.collection('products').getFirstListItem(`slug = "${slug}"`);
-    return mapProduct(record);
+    return mapProduct(record, locale);
   } catch {
     return undefined;
   }
 }
 
-export async function getFeaturedProducts(): Promise<Product[]> {
+export async function getFeaturedProducts(locale: Locale = 'fr'): Promise<Product[]> {
   const pb = createPB();
   const records = await pb.collection('products').getFullList({
     filter: 'featured = true',
     sort: 'order,name'
   });
-  return records.map(mapProduct);
+  return records.map((r) => mapProduct(r, locale));
 }
 
-export async function getProductsByCategory(category: string): Promise<Product[]> {
+export async function getProductsByCategory(
+  category: string,
+  locale: Locale = 'fr'
+): Promise<Product[]> {
   const pb = createPB();
   const filter = category === 'all' ? '' : `category = "${category}"`;
   const records = await pb.collection('products').getFullList({
     filter,
     sort: 'order,name'
   });
-  return records.map(mapProduct);
+  return records.map((r) => mapProduct(r, locale));
 }
 
 export async function getRecentArticles(limit: number = 3): Promise<BlogArticle[]> {
@@ -132,20 +141,27 @@ export async function getArticleById(id: string): Promise<BlogArticle | undefine
   }
 }
 
-export async function searchProducts(query: string): Promise<Product[]> {
+export async function searchProducts(query: string, locale: Locale = 'fr'): Promise<Product[]> {
   const pb = createPB();
   const records = await pb.collection('products').getFullList({
     filter: `name ~ "${query}" || description ~ "${query}"`,
     sort: 'order,name'
   });
-  return records.map(mapProduct);
+  return records.map((r) => mapProduct(r, locale));
 }
 
-export async function getCategories() {
-  const [products, categories] = await Promise.all([loadProducts(), loadCategoriesFromPB()]);
+export async function getCategories(locale: Locale = 'fr') {
+  const [products, categories] = await Promise.all([
+    loadProducts(locale),
+    loadCategoriesFromPB(locale)
+  ]);
 
   return [
-    { id: 'all', name: 'Tous les produits', count: products.length },
+    {
+      id: 'all',
+      name: locale === 'en' ? 'All products' : 'Tous les produits',
+      count: products.length
+    },
     ...categories.map((c) => ({
       id: c.slug,
       name: c.name,

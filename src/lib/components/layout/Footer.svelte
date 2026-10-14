@@ -1,14 +1,15 @@
 <script lang="ts">
   import { Mail, Phone, MapPin, ArrowRight, MessageCircle } from 'lucide-svelte';
+  import { t, href } from '$lib/i18n';
 
   type FooterCategory = { slug: string; name: string };
-  export let categories: FooterCategory[] = [];
+  let { categories = [] }: { categories?: FooterCategory[] } = $props();
 
   const MAX_FOOTER_CATEGORIES = 5;
-  $: visibleCategories = categories.slice(0, MAX_FOOTER_CATEGORIES);
-  $: hasMoreCategories = categories.length > MAX_FOOTER_CATEGORIES;
+  const visibleCategories = $derived(categories.slice(0, MAX_FOOTER_CATEGORIES));
+  const hasMoreCategories = $derived(categories.length > MAX_FOOTER_CATEGORIES);
 
-  let whatsappNumber = '';
+  let whatsappNumber = $state('');
 
   function handleWhatsAppSubmit(event: Event) {
     event.preventDefault();
@@ -85,7 +86,7 @@
             </div>
             <div class="text-white/70 text-sm">
               <p>Natitingou, Atacora</p>
-              <p>République du Bénin</p>
+              <p>{t('République du Bénin', 'Republic of Benin')}</p>
             </div>
           </div>
           
@@ -109,12 +110,12 @@
         </div>
         
         <div class="space-y-3 pt-4">
-          <a href="/a-propos" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Notre Histoire</span>
+          <a href={href('/a-propos')} class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">{t('Notre Histoire', 'Our Story')}</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/formations" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Formations</span>
+          <a href={href('/formations')} class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">{t('Formations', 'Training')}</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
           <!-- Impact link hidden for now -->
@@ -128,13 +129,13 @@
       <!-- Produits Column -->
       <div class="space-y-4 flex flex-col items-center md:items-start">
         <h3 class="text-xl font-bold mb-6 relative">
-          Nos Gammes
+          {t('Nos Gammes', 'Our Ranges')}
           <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 w-12 h-1 bg-accent-gold rounded-full"></span>
         </h3>
         <div class="space-y-3 w-full">
           {#each visibleCategories as category (category.slug)}
             <a
-              href="/produits?category={category.slug}"
+              href={href(`/produits?category=${category.slug}`)}
               class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start"
             >
               <span class="group-hover:translate-x-1 transition-transform duration-300">{category.name}</span>
@@ -143,10 +144,10 @@
           {/each}
           {#if hasMoreCategories}
             <a
-              href="/produits"
+              href={href('/produits')}
               class="inline-flex items-center text-accent-gold hover:text-accent-gold-bright transition-colors text-sm font-medium mt-2 justify-center md:justify-start"
             >
-              Voir toutes les gammes
+              {t('Voir toutes les gammes', 'View all ranges')}
               <ArrowRight class="w-3 h-3 ml-1" />
             </a>
           {/if}
@@ -156,24 +157,24 @@
       <!-- Wholesalers Column -->
       <div class="space-y-4 flex flex-col items-center md:items-start">
         <h3 class="text-xl font-bold mb-6 relative">
-          Partenaires
+          {t('Partenaires', 'Partners')}
           <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 w-12 h-1 bg-accent-gold rounded-full"></span>
         </h3>
         <div class="space-y-3 w-full">
-          <a href="/grossistes" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Devenir Grossiste</span>
+          <a href={href('/grossistes')} class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">{t('Devenir Grossiste', 'Become a Wholesaler')}</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/grossistes#avantages" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Programme Partenaire</span>
+          <a href={href('/grossistes#avantages')} class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">{t('Programme Partenaire', 'Partner Programme')}</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/contact" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Support Commercial</span>
+          <a href={href('/contact')} class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">{t('Support Commercial', 'Sales Support')}</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
-          <a href="/grossistes#processus" class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
-            <span class="group-hover:translate-x-1 transition-transform duration-300">Comment Ça Marche</span>
+          <a href={href('/grossistes#processus')} class="group flex items-center text-white/70 hover:text-white transition-all duration-300 text-sm justify-center md:justify-start">
+            <span class="group-hover:translate-x-1 transition-transform duration-300">{t('Comment Ça Marche', 'How It Works')}</span>
             <ArrowRight class="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
         </div>
@@ -182,21 +183,21 @@
       <!-- Newsletter & Social Column -->
       <div class="space-y-4 flex flex-col items-center md:items-start">
         <h3 class="text-xl font-bold mb-6 relative">
-          Restez Connectés
+          {t('Restez Connectés', 'Stay Connected')}
           <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 w-12 h-1 bg-accent-gold rounded-full"></span>
         </h3>
         
         <!-- WhatsApp Signup -->
         <div class="space-y-4 w-full">
           <p class="text-white/80 text-sm text-center md:text-left">
-            Recevez nos actualités sur WhatsApp
+            {t('Recevez nos actualités sur WhatsApp', 'Get our news on WhatsApp')}
           </p>
-          <form on:submit={handleWhatsAppSubmit} class="space-y-2">
+          <form onsubmit={handleWhatsAppSubmit} class="space-y-2">
             <div class="relative max-w-xs mx-auto md:mx-0 w-full">
               <input
                 type="tel"
                 bind:value={whatsappNumber}
-                placeholder="Votre numéro WhatsApp"
+                placeholder={t('Votre numéro WhatsApp', 'Your WhatsApp number')}
                 required
                 pattern="[0-9+\-\s]+"
                 class="w-full px-4 py-3 text-sm bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent-gold/50 focus:border-transparent transition-all duration-300"
@@ -210,13 +211,16 @@
             </div>
           </form>
           <p class="text-white/60 text-xs text-center md:text-left">
-            En vous inscrivant, vous acceptez de recevoir nos messages promotionnels
+            {t(
+              'En vous inscrivant, vous acceptez de recevoir nos messages promotionnels',
+              'By signing up, you agree to receive our promotional messages'
+            )}
           </p>
         </div>
         
         <!-- Social Links -->
         <div class="space-y-4 pt-4">
-          <p class="text-white/80 text-sm text-center md:text-left">Suivez-nous</p>
+          <p class="text-white/80 text-sm text-center md:text-left">{t('Suivez-nous', 'Follow us')}</p>
           <div class="flex space-x-3 justify-center md:justify-start">
             <a
               href="https://facebook.com/angelsfloor"
@@ -249,15 +253,15 @@
     <div class="mt-16 pt-8 border-t border-white/10">
       <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <div class="text-white/60 text-sm text-center md:text-left">
-          <p>&copy; {currentYear} Angel's Floor. Tous droits réservés.</p>
+          <p>&copy; {currentYear} Angel's Floor. {t('Tous droits réservés.', 'All rights reserved.')}</p>
         </div>
         
         <div class="flex flex-wrap justify-center md:justify-end gap-6 text-sm">
-          <a href="/mentions-legales" class="text-white/60 hover:text-white transition-colors">
-            Mentions légales
+          <a href={href('/mentions-legales')} class="text-white/60 hover:text-white transition-colors">
+            {t('Mentions légales', 'Legal notice')}
           </a>
-          <a href="/cgv" class="text-white/60 hover:text-white transition-colors">
-            CGV
+          <a href={href('/cgv')} class="text-white/60 hover:text-white transition-colors">
+            {t('CGV', 'Terms of Sale')}
           </a>
         </div>
       </div>

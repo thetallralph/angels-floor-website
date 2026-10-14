@@ -1,5 +1,7 @@
 import type { RecordModel } from 'pocketbase';
 import { createPB } from '$lib/server/pocketbase';
+import type { Locale } from '$lib/i18n/routing';
+import { localizeRecord } from './translate';
 import {
   SALES_POINT_TYPES,
   type SalesPoint as AdminSalesPoint,
@@ -47,13 +49,13 @@ function mapRecord(record: RecordModel): PublicSalesPoint {
  * hard-coded demo points here made the public site advertise addresses that the
  * admin panel didn't list (and that don't exist).
  */
-export async function loadSalesPointsFromPB(): Promise<PublicSalesPoint[]> {
+export async function loadSalesPointsFromPB(locale: Locale = 'fr'): Promise<PublicSalesPoint[]> {
   try {
     const pb = createPB();
     const records = await pb
       .collection('sales_points')
       .getFullList({ sort: 'department,city,name' });
-    return records.map(mapRecord);
+    return records.map((r) => mapRecord(localizeRecord(r, 'sales_points', locale)));
   } catch {
     return [];
   }
