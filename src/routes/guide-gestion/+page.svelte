@@ -2,6 +2,9 @@
 	// Guide d'utilisation de l'admin destiné aux gestionnaires du site.
 	// Page interne, en français uniquement, hors des groupes (public) et (admin) :
 	// pas d'en-tête ni de pied de page du site, non référencée (noindex, absente des menus).
+	// Accès protégé par un mot de passe simple (GUIDE_PASSWORD), voir +page.server.ts.
+	let { data, form } = $props();
+
 	let activeSection = $state('demarrer');
 	let showBackToTop = $state(false);
 
@@ -36,6 +39,8 @@
 	];
 
 	$effect(() => {
+		if (!data.hasAccess) return;
+
 		const observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
@@ -97,6 +102,54 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
+{#if !data.hasAccess}
+	<!-- Écran de connexion -->
+	<main class="bg-neutral-sand min-h-screen font-sans flex items-center justify-center p-4">
+		<div class="w-full max-w-md">
+			<div class="text-center mb-8">
+				<a href="/" class="inline-block mb-6">
+					<img src="/angelsfloor-logo.svg" alt="Angel's Floor" class="h-14 w-auto mx-auto" />
+				</a>
+				<h1 class="text-3xl font-bold text-neutral-obsidian leading-tight">Guide de gestion du site</h1>
+				<p class="text-neutral-charcoal mt-2">Accès réservé : saisissez le mot de passe</p>
+			</div>
+
+			<div class="bg-white rounded-2xl shadow-lg p-8">
+				{#if !data.configured || form?.error}
+					<div role="alert" class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+						{data.configured ? form?.error : 'Guide désactivé : mot de passe non configuré.'}
+					</div>
+				{/if}
+
+				{#if data.configured}
+					<form method="POST" action="?/login" class="space-y-4">
+						<div>
+							<label for="password" class="block text-sm font-semibold text-neutral-obsidian mb-2">Mot de passe</label>
+							<!-- svelte-ignore a11y_autofocus -->
+							<input
+								id="password"
+								name="password"
+								type="password"
+								required
+								autofocus
+								autocapitalize="none"
+								autocomplete="current-password"
+								aria-invalid={form?.error ? 'true' : undefined}
+								class="w-full rounded-xl border border-neutral-slate-light/40 bg-white px-4 py-3 text-neutral-obsidian focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 focus:outline-none transition-all duration-300"
+							/>
+						</div>
+						<button
+							type="submit"
+							class="w-full bg-primary-green text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+						>
+							Accéder au guide
+						</button>
+					</form>
+				{/if}
+			</div>
+		</div>
+	</main>
+{:else}
 <div class="bg-neutral-sand min-h-screen font-sans">
 	<!-- En-tête -->
 	<header class="relative overflow-hidden bg-primary-green text-white">
@@ -365,3 +418,4 @@
 		</button>
 	{/if}
 </div>
+{/if}
