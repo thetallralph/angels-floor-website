@@ -39,7 +39,8 @@
     errorKind = '';
 
     try {
-      const res = await fetch('/api/contact', {
+      // Pas sous /api : en production, nginx envoie tout /api/* à PocketBase.
+      const res = await fetch('/contact/envoyer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, locale: getLocale() })
