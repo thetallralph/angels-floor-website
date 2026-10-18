@@ -108,16 +108,10 @@
 		}
 	}
 
-	function statusBadge(status: string): { label: string; class: string } {
-		switch (status) {
-			case 'published':
-				return { label: 'En ligne', class: 'bg-green-100 text-green-800' };
-			case 'modified':
-				return { label: 'Modifié', class: 'bg-yellow-100 text-yellow-800' };
-			case 'draft':
-			default:
-				return { label: 'Brouillon', class: 'bg-gray-100 text-gray-600' };
-		}
+	function statusBadge(published: boolean): { label: string; class: string } {
+		return published
+			? { label: 'En ligne', class: 'bg-green-100 text-green-800' }
+			: { label: 'Brouillon', class: 'bg-gray-100 text-gray-600' };
 	}
 </script>
 
@@ -191,7 +185,7 @@
 					<tbody>
 						{#each filteredProducts as product}
 							{@const id = String(product._id || product.slug || '')}
-							{@const status = statusBadge(String(product._status || 'draft'))}
+							{@const status = statusBadge(product.published === true)}
 							<tr class="border-b border-neutral-sand last:border-0 hover:bg-neutral-pearl transition-colors">
 								<td class="px-5 py-4">
 									<div class="flex items-center gap-3">
@@ -243,7 +237,7 @@
 											>
 												<Pencil class="w-4 h-4" />
 											</a>
-											{#if product._status === 'draft' || product._status === 'modified'}
+											{#if product.published !== true}
 												<button
 													onclick={() => handlePublish(id)}
 													class="p-2 rounded-lg text-neutral-slate hover:bg-green-50 hover:text-green-600 transition-all"

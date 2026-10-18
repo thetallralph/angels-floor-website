@@ -95,6 +95,15 @@
 		return product.slug || id;
 	}
 
+	async function slugTaken(slug: string, ownRecordId: string): Promise<boolean> {
+		try {
+			const existing = await getContent('products', slug);
+			return existing.id !== ownRecordId;
+		} catch {
+			return false;
+		}
+	}
+
 	onMount(async () => {
 		loadCategoryList();
 		if (id !== 'nouveau') {
@@ -170,26 +179,39 @@
 
 		try {
 			const saveId = getSlug();
+			// Existing products are updated by record id so that editing the slug
+			// renames the product instead of creating a copy under the new slug.
+			const recordId = isNew ? '' : String(product.id || '');
+			if (saveId !== id && (await slugTaken(saveId, recordId))) {
+				message = { type: 'error', text: `Le slug « ${saveId} » est déjà utilisé par un autre produit` };
+				return;
+			}
 			const { _id, _hasDraft, _isPublished, _status, ...data } = product as Record<string, unknown>;
 			data.en = buildEnPayload();
-			const { id: savedId } = await saveContent('products', saveId, data);
+			const { id: savedId } = await saveContent('products', recordId || saveId, data);
 
 			const newFiles = pendingFiles.map((p) => p.file);
 			if (newFiles.length > 0 || removedFilenames.length > 0) {
 				await saveProductImages(savedId, newFiles, removedFilenames);
 			}
 
-			message = { type: 'success', text: 'Brouillon sauvegardé' };
+			message = {
+				type: 'success',
+				text: product.published ? 'Modifications enregistrées et en ligne' : 'Brouillon sauvegardé'
+			};
 
-			if (id === 'nouveau') {
-				goto(`/admin/produits/${saveId}`, { replaceState: true });
-			} else if (newFiles.length > 0 || removedFilenames.length > 0) {
-				// Re-fetch to pick up the new server-side filenames/URLs.
-				const refreshed = await getContent('products', saveId, 'draft');
+			const filesChanged = newFiles.length > 0 || removedFilenames.length > 0;
+			if (filesChanged || saveId !== id) {
+				// Re-fetch to pick up the record id and the new server-side filenames/URLs
+				// (the page component is reused when the URL switches to the new slug).
+				const refreshed = await getContent('products', savedId, 'draft');
 				product = refreshed as unknown as Product;
 				pendingFiles.forEach((p) => URL.revokeObjectURL(p.previewUrl));
 				pendingFiles = [];
 				syncExistingImagesFromProduct();
+			}
+			if (saveId !== id) {
+				goto(`/admin/produits/${saveId}`, { replaceState: true });
 			}
 			product.en = data.en as ProductTranslation;
 		} catch (err) {

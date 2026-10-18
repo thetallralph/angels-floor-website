@@ -54,7 +54,10 @@ function mapBlogArticle(record: RecordModel): BlogArticle {
 
 export async function loadProducts(locale: Locale = 'fr'): Promise<Product[]> {
   const pb = createPB();
-  const records = await pb.collection('products').getFullList({ sort: 'order,name' });
+  const records = await pb.collection('products').getFullList({
+    filter: 'published = true',
+    sort: 'order,name'
+  });
   return records.map((r) => mapProduct(r, locale));
 }
 
@@ -93,7 +96,9 @@ export async function getProductBySlug(
 ): Promise<Product | undefined> {
   try {
     const pb = createPB();
-    const record = await pb.collection('products').getFirstListItem(`slug = "${slug}"`);
+    const record = await pb
+      .collection('products')
+      .getFirstListItem(`slug = "${slug}" && published = true`);
     return mapProduct(record, locale);
   } catch {
     return undefined;
@@ -103,7 +108,7 @@ export async function getProductBySlug(
 export async function getFeaturedProducts(locale: Locale = 'fr'): Promise<Product[]> {
   const pb = createPB();
   const records = await pb.collection('products').getFullList({
-    filter: 'featured = true',
+    filter: 'featured = true && published = true',
     sort: 'order,name'
   });
   return records.map((r) => mapProduct(r, locale));
@@ -114,7 +119,8 @@ export async function getProductsByCategory(
   locale: Locale = 'fr'
 ): Promise<Product[]> {
   const pb = createPB();
-  const filter = category === 'all' ? '' : `category = "${category}"`;
+  const filter =
+    category === 'all' ? 'published = true' : `category = "${category}" && published = true`;
   const records = await pb.collection('products').getFullList({
     filter,
     sort: 'order,name'
@@ -144,7 +150,7 @@ export async function getArticleById(id: string): Promise<BlogArticle | undefine
 export async function searchProducts(query: string, locale: Locale = 'fr'): Promise<Product[]> {
   const pb = createPB();
   const records = await pb.collection('products').getFullList({
-    filter: `name ~ "${query}" || description ~ "${query}"`,
+    filter: `(name ~ "${query}" || description ~ "${query}") && published = true`,
     sort: 'order,name'
   });
   return records.map((r) => mapProduct(r, locale));
