@@ -113,7 +113,7 @@
       <!-- Hero Image -->
       <div class="relative h-[400px] lg:h-[600px] {heroVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} transition-all duration-700 delay-300">
         <CmsImage
-          key="home.wholesale.image"
+          key="wholesale.hero.image"
           src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800&h=600&fit=crop"
           alt={t("Supermarché Mont Sinaï – partenaire Angel's Floor", "Mont Sinaï supermarket – Angel's Floor partner")}
           class="w-full h-full object-cover rounded-3xl shadow-2xl"
