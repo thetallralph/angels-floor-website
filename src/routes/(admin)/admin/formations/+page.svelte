@@ -341,7 +341,7 @@
 										Retirer l'image
 									</button>
 								{/if}
-								<p class="text-xs text-neutral-slate">JPG, PNG ou WebP. Format carré recommandé.</p>
+								<p class="text-xs text-neutral-slate">JPG, PNG ou WebP. Format paysage (4:3) recommandé.</p>
 							</div>
 						</div>
 					</div>

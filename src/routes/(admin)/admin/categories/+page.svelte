@@ -21,6 +21,7 @@
 	let saving = $state(false);
 	let deletingId = $state('');
 	let editing = $state<DraftCategory | null>(null);
+	let slugEdited = $state(false);
 	let pendingImage = $state<File | null>(null);
 	let pendingImagePreview = $state<string>('');
 	let clearImage = $state(false);
@@ -73,6 +74,7 @@
 			published: true
 		};
 		enDraft = { name: '', description: '' };
+		slugEdited = false;
 		resetImageState();
 	}
 
@@ -104,7 +106,7 @@
 	}
 
 	function handleNameChange() {
-		if (editing && !editing.id && !editing.slug) {
+		if (editing && !editing.id && !slugEdited) {
 			editing.slug = generateSlug(editing.name);
 		}
 	}
@@ -273,6 +275,7 @@
 									id="cat-slug"
 									type="text"
 									bind:value={editing.slug}
+									oninput={() => (slugEdited = true)}
 									class="w-full px-4 py-2.5 rounded-xl border border-neutral-light focus:border-primary-green focus:ring-2 focus:ring-primary-green/20 outline-none text-sm"
 									placeholder="fonio"
 								/>
